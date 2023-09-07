@@ -1,0 +1,51 @@
+{
+    "bsonType": "object",
+    "required": ["_id", "website", "date","num_vul","vulnerability","severity"],
+    "properties":{
+        "_id":{
+            "bsonType":"objectId",
+            "description":"must be a ObjectId and is required"
+        },
+        "website":{
+            "bsonType":"string",
+            "description":"must be a string and is required"
+        },
+        "date":{
+            "bsonType":"string",
+            "format":"date-time",
+            "default":"datetime.now(tz=timezone.utc)",
+            "description":"must be a string and is required"
+        },
+        "num_vul":{
+            "bsonType":"int",
+            "description":"must be an integer and is required"
+        },
+        "vulnerability":{
+            "bsonType":["array"],
+            "items":{
+                "bsonType":"object",
+                "required":["name","vul_descript","solution"],
+                "properties":{
+                    "name":{
+                        "bsonType":"string",
+                        "description":"must be a string"
+                    },
+                    "vul_descript":{
+                        "bsonType":"string",
+                        "description":"must be a string"
+                    },
+                    "solution":{
+                        "bsonType":"string",
+                        "description":"must be a string"
+                    }
+                }
+            },
+            "description":"must be a array of objects and is required"
+        },
+        "severity":{
+            "bsonType":"string",
+            "enum":["Low","Medium","High","Critical"],
+            "description":"can only be one of the enum values and is required"
+        }
+    }
+}
