@@ -1,0 +1,81 @@
+{
+  "url_scanned": "https://stackoverflow.com/questions",
+  "vulnerabilities": [
+    {
+      "url": "https://stackoverflow.com/questions",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/questions",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/tags",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/users",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/collectives",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/collectives",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/users/signup?ssrc=product_home",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/questions",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/questions",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/users/signup?ssrc=product_home",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/questions",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/teams/integrations/slack",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/teams/integrations/microsoft-teams",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/teams/integrations/github",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/teams/integrations/jira",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/teams/integrations/okta",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/questions",
+      "vuln_type": "SQL Injection"
+    },
+    {
+      "url": "https://stackoverflow.com/help",
+      "vuln_type": "SQL Injection"
+    }
+  ]
+}
