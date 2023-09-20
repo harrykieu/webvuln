@@ -5,13 +5,15 @@ from collections import OrderedDict
 import sys
 import json
 
-client = MongoClient("mongodb://localhost:27017/webvuln")
+
+client = MongoClient("mongodb://localhost:27017")
+
 
 db = client.webvuln
 db.web_collection.drop()
 db.create_collection("web_collection")
 
-
+# viet func them data xoa data sua data  tim data va connect database viet 1 file util.py trong source core database
 # create new documents
 web1 = {
      '_id': ObjectId(),
@@ -37,7 +39,7 @@ webs = []
 webs.append(web1)
 webs.append(web2)
 
-with open('schema\\web_vuln.json','r') as j:
+with open('webvuln\\source\\core\\database\\web_vuln.json','r') as j:
     vexpr = json.load(j)
 
 # assign the schema validation expression to the cmd variable
