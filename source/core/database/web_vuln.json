@@ -1,0 +1,53 @@
+{ 
+    "$jsonSchema":
+    {
+        "bsonType": "object",
+        "required": ["_id", "website","num_vul","vulnerability","severity"],
+        "properties":{
+            "_id":{
+                "bsonType":"objectId",
+                "description":"'_id' must be a ObjectId and is required"
+            },
+            "website":{
+                "bsonType":"string",
+                "description":"'website' must be a string and is required"
+            },
+            "date": {
+                "bsonType":"date",
+                "description":"'date' must be a date-time and is required"
+            },
+            "num_vul":{
+                "bsonType":"int",
+                "description":"'num_vul' must be an integer and is required"
+            },
+            "vulnerability":{
+                "bsonType":["array"],
+                "items":{
+                    "bsonType":"object",
+                    "required":["name","vul_descript","solution"],
+                    "properties":{
+                        "name":{
+                            "bsonType":"string",
+                            "description":"'name' must be a string"
+                        },
+                        "vul_descript":{
+                            "bsonType":"string",
+                            "description":"'vul_descript' must be a string"
+                        },
+                        "solution":{
+                            "bsonType":"string",
+                            "description":"'solution' must be a string"
+                        }
+                    }
+                },
+                "description":"'vulnerability' must be a array of objects and is required"
+            },
+            "severity":{
+                "bsonType":"string",
+                "enum":["Low","Medium","High","Critical"],
+                "description":"'severity' can only be one of the enum values and is required"
+            }
+        }
+    }
+}
+

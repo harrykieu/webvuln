@@ -1,0 +1,22 @@
+version: "3.2"
+
+services:
+  # Define a service for the MongoDB database
+  mongo:
+    # Use the official MongoDB image
+    image: mongo
+    # Expose port 27017 to access the database
+    ports:
+      - "27017:27017"
+    # Set environment variables for the database name and password
+    environment:
+      - MONGO_INITDB_DATABASE=webvuln
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    # Mount a volume to persist the data
+    volumes:
+      - mongo-data:/data/db
+
+# Define a volume for the MongoDB data
+volumes:
+  mongo-data:
