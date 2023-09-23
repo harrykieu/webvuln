@@ -11,12 +11,9 @@ class WebVuln:
         except Exception as e:
             return e
     
-    def recvFlask(self,route):
-        try:
-            r = requests.get(route)
-            return r
-        except Exception as e:
-            return e
-    
+    def handleData(self, data):
+        print(data)
+
+#test
 inst = WebVuln()
-inst.sendFlask(data={'url':'http://sus.com'}, route='http://localhost:5000/recv')
+inst.sendFlask(data={'url':'http://sus.com', 'ComeFrom':'WebVuln'}, route='http://localhost:5000/recv')
