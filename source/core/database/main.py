@@ -1,6 +1,5 @@
 from pymongo import MongoClient 
 from bson.objectid import ObjectId
-from datetime import datetime, timezone
 from collections import OrderedDict
 import sys
 import json
@@ -16,7 +15,7 @@ database_utils = utils.DatabaseUtils()
 web_collection = db["web_collection"]
 
 
-with open('webvuln\\source\\core\\database\\web_vuln.json','r') as j:
+with open(f'{__file__}\\..\\web_vuln.json','r') as j:
     vexpr = {"$jsonSchema":json.load(j)}
 
 # assign the schema validation expression to the cmd variable
@@ -34,30 +33,23 @@ except Exception as e:
     print("exc",e)
 
 
-try:
-    database_utils.add_document("web_collection")
-except:
-    print("exc",sys.exc_info())
+with open(f'{__file__}\\..\\data.json') as file:
+        file_data = json.load(file)
+database_utils.add_document("web_collection",file_data)
+
     
     
 # find documents
-# try:
-#     document = database_utils.find_document("web_collection", {})
-#     print(list(document))
-# except:
-#     print("exc",sys.exc_info())
+# document = database_utils.find_document("web_collection", {})
+# print(list(document))
 
-# try:
-#     database_utils.delete_document("web_collection", {"website":"example.com"})
-#     print("delete document successfully !")
-# except:
-#     print("exc",sys.exc_info())
 
-# try:
-#     database_utils.edit_document("web_collection", {"website":"example2.com"},{"$set":{"website":"example4.com"}})
-#     print("edit document successfully !")
-# except:
-#     print("exc",sys.exc_info())
+# database_utils.delete_document("web_collection", {"website":"example.com"})
+# print("delete document successfully !")
+
+
+# database_utils.edit_document("web_collection", {"website":"example2.com"},{"$set":{"website":"example4.com"}})
+# print("edit document successfully !")
 
 
 # Disconnect from the database
