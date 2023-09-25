@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from collections import OrderedDict
 import sys
 import json
-
+import  utils 
 
 client = MongoClient("mongodb://localhost:27017")
 
@@ -12,35 +12,12 @@ client = MongoClient("mongodb://localhost:27017")
 db = client.webvuln
 db.web_collection.drop()
 db.create_collection("web_collection")
+database_utils = utils.DatabaseUtils()
+web_collection = db["web_collection"]
 
-# viet func them data xoa data sua data  tim data va connect database viet 1 file util.py trong source core database
-# create new documents
-web1 = {
-     '_id': ObjectId(),
-    'website': "example.com",
-    'date' : datetime.now(tz=timezone.utc),
-    'num_vul': 0,
-    'vulnerability': [
-    ],
-    'severity': 'Low'
-}
-web2 = {
-    '_id': ObjectId(),
-    'website': "example2.com",
-    'date' : datetime.now(tz=timezone.utc),
-    'num_vul': 0,
-    'vulnerability': [
-    ],
-    'severity': "Low"
-}
-
-
-webs = []
-webs.append(web1)
-webs.append(web2)
 
 with open('webvuln\\source\\core\\database\\web_vuln.json','r') as j:
-    vexpr = json.load(j)
+    vexpr = {"$jsonSchema":json.load(j)}
 
 # assign the schema validation expression to the cmd variable
 cmd = OrderedDict([
@@ -56,11 +33,32 @@ try:
 except Exception as e:
     print("exc",e)
 
-web_collection = db["web_collection"]
 
 try:
-    for i in range(len(webs)):
-        web_collection.insert_one(webs[i])
-        print(f"Insert document {i+1} successfully !")
+    database_utils.add_document("web_collection")
 except:
     print("exc",sys.exc_info())
+    
+    
+# find documents
+# try:
+#     document = database_utils.find_document("web_collection", {})
+#     print(list(document))
+# except:
+#     print("exc",sys.exc_info())
+
+# try:
+#     database_utils.delete_document("web_collection", {"website":"example.com"})
+#     print("delete document successfully !")
+# except:
+#     print("exc",sys.exc_info())
+
+# try:
+#     database_utils.edit_document("web_collection", {"website":"example2.com"},{"$set":{"website":"example4.com"}})
+#     print("edit document successfully !")
+# except:
+#     print("exc",sys.exc_info())
+
+
+# Disconnect from the database
+database_utils.disconnect()

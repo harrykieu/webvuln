@@ -1,0 +1,24 @@
+[{
+  "website": "example.com",
+  "date": {
+    "$date": "2023-09-23T09:31:41.274Z"
+  },
+  "num_vul": 0,
+  "vulnerability": [],
+  "severity": "Low"
+},
+{
+  "website": "example2.com",
+  "date": {
+    "$date": "2023-09-23T09:31:41.274Z"
+  },
+  "num_vul": 1,
+  "vulnerability": [
+    {
+      "name": "Broken Authentication",
+      "vul_descript": "Broken authentication occurs when an application fails to properly verify the identity and privileges of its users.",
+      "solution": "Use strong encryption and hashing algorithms to store passwords and tokens, and implement multi-factor authentication and session management."
+    }
+  ],
+  "severity": "Medium"
+}]

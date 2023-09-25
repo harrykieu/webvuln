@@ -1,13 +1,7 @@
-{ 
-    "$jsonSchema":
     {
         "bsonType": "object",
-        "required": ["_id", "website","num_vul","vulnerability","severity"],
+        "required": [ "website","date","num_vul","vulnerability","severity"],
         "properties":{
-            "_id":{
-                "bsonType":"objectId",
-                "description":"'_id' must be a ObjectId and is required"
-            },
             "website":{
                 "bsonType":"string",
                 "description":"'website' must be a string and is required"
@@ -49,5 +43,5 @@
             }
         }
     }
-}
+
 
