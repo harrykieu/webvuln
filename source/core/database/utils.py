@@ -18,11 +18,13 @@ class DatabaseUtils:
         try:
             collection = self.db.get_collection(collection_name)
             for document in file_data:
-                document["date"] = datetime.now()
+                document["scanDate"] = datetime.now()
             if isinstance(file_data,list):
                 collection.insert_many(file_data)
+                print("Insert documents successfully!")
             else:
                 collection.insert_one(file_data)
+                print("Insert document successfully!")
         except:
             print("exc",sys.exc_info())   
             
@@ -46,4 +48,4 @@ class DatabaseUtils:
             return collection.find(query)
         except:
             print("exc",sys.exc_info()) 
-#  uri hay cac value khac ko dc de trong utils , truyen file data tu main.py
+

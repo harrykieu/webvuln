@@ -1,0 +1,48 @@
+    {
+        "bsonType": "object",
+        "required": [ "domain","scanDate","numVuln","vulnerabilities","resultSeverity"],
+        "properties":{
+            "domain":{
+                "bsonType":"string",
+                "description":"'domain' must be a string and is required"
+            },
+            "scanDate": {
+                "bsonType":"date",
+                "description":"'scanDate' must be a date-time and is required"
+            },
+            "num_vul":{
+                "bsonType":"int",
+                "description":"'num_vul' must be an integer and is required"
+            },
+            "vulnerabilities":{
+                "bsonType":["array"],
+                "items":{
+                    "bsonType":"object",
+                    "required":["type","description","severity"],
+                    "properties":{
+                        "type":{
+                            "bsonType":"string",
+                            "description":"'type' must be a string"
+                        },
+                        "description":{
+                            "bsonType":"string",
+                            "description":"'description' must be a string"
+                        },
+                        "severity":{
+                            "bsonType":"string",
+                            "enum":["Low","Medium","High","Critical"],
+                            "description":"'severity' can only be one of the enum values and is required"
+                        }
+                    }
+                },
+                "description":"'vulnerabilities' must be a array of objects and is required"
+            },
+            "resultSeverity":{
+                "bsonType":"string",
+                "enum":["None","Low","Medium","High","Critical"],
+                "description":"'resultSeverity' can only be one of the enum values and is required"
+            }
+        }
+    }
+
+
