@@ -21,5 +21,7 @@ A website vulnerability scanner for coders without any knowledge of web security
 ![Database Schema](./assets/db.png)
 ## Data Sequence Diagram (for scanning a domain)
 ![Data Sequence Diagram](./assets/dataseqdiag.png)
+## API Endpoints
+![API Endpoints](./assets/api.png)
 ## Report:
 [Here](https://docs.google.com/document/d/1q2712vtjwxAC53eEqRq5TR32uh3Rn8zE73PcZUIBzOs/edit?usp=sharing)
