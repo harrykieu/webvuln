@@ -1,14 +1,13 @@
-import pymongo
+from pymongo import MongoClient 
 from pymongo import MongoClient
 from datetime import datetime
-import json 
 import sys
 from dotenv import load_dotenv
 import os
 
 class DatabaseUtils:
-    def __init__(self, database_uri=os.getenv("DATABASE_URI")):
-        self.client = MongoClient(database_uri)
+    def __init__(self):
+        self.client = MongoClient(os.getenv("DATABASE_URI"))
         self.db = self.client.get_database("webvuln")
 
     def disconnect(self):

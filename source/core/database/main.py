@@ -4,8 +4,9 @@ from collections import OrderedDict
 import sys
 import json
 import  utils 
+import os
 
-client = MongoClient("mongodb://localhost:27017")
+client = MongoClient(os.getenv("DATABASE_URI"))
 
 
 db = client.webvuln
@@ -33,13 +34,11 @@ except Exception as e:
     print("exc",e)
 
 
-with open(f'{__file__}\\..\\data.json') as file:
+with open(f'{__file__}\\..\\data_scanResult.json') as file:
         file_data = json.load(file)
 database_utils.add_document("scanResult",file_data)
 
     
-    
-# find documents
 # document = database_utils.find_document("scanResult", {})
 # print(list(document))
 
