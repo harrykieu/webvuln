@@ -1,0 +1,28 @@
+{
+    "bsonType": "object",
+    "required": [ "vulnType","type","value","createdDate","editedDate"],
+    "properties":{
+        "vulnType":{
+            "bsonType":"string",
+            "description":"'vulnType' must be a string and is required"
+        },
+        "type": {
+            "bsonType":"string",
+            "description":"'type' must be a string and is required"
+        },
+        "value":{
+            "bsonType":"string",
+            "description":"'string' must be an integer and is required"
+        },
+        "createdDate":{
+            "bsonType":"date",
+            "description":"'createdDate' must be a date-time and is required"
+        },
+        "editedDate":{
+            "bsonType":"date",
+            "description":"'editedDate' must be a date-time and is required"
+        }
+    }
+}
+
+

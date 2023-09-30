@@ -45,11 +45,9 @@ database_utils.add_document("scanResult",file_data)
 
 
 # database_utils.delete_document("scanResult", {"website":"example.com"})
-# print("delete document successfully !")
 
 
 # database_utils.edit_document("scanResult", {"website":"example2.com"},{"$set":{"website":"example4.com"}})
-# print("edit document successfully !")
 
 
 # Disconnect from the database

@@ -32,6 +32,7 @@ class DatabaseUtils:
         try:
             collection = self.db.get_collection(collection_name)
             collection.delete_one(query)
+            print("delete document successfully !")
         except:
             print("exc",sys.exc_info()) 
             
@@ -39,6 +40,7 @@ class DatabaseUtils:
         try:
             collection = self.db.get_collection(collection_name)
             collection.update_one(query, update)
+            print("edit document successfully !")
         except:
             print("exc",sys.exc_info()) 
             
