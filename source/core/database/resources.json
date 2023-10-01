@@ -2,25 +2,23 @@
     "bsonType": "object",
     "required": [ "vulnType","type","value","createdDate","editedDate"],
     "properties":{
+        "_id":{
+            "bsonType":"objectId"
+        },
         "vulnType":{
-            "bsonType":"string",
-            "description":"'vulnType' must be a string and is required"
+            "bsonType":"string"
         },
         "type": {
-            "bsonType":"string",
-            "description":"'type' must be a string and is required"
+            "bsonType":"string"
         },
         "value":{
-            "bsonType":"string",
-            "description":"'string' must be an integer and is required"
+            "bsonType":"string"
         },
         "createdDate":{
-            "bsonType":"date",
-            "description":"'createdDate' must be a date-time and is required"
+            "bsonType":"date"
         },
         "editedDate":{
-            "bsonType":"date",
-            "description":"'editedDate' must be a date-time and is required"
+            "bsonType":"date"
         }
     }
 }

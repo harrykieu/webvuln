@@ -2,17 +2,17 @@
         "bsonType": "object",
         "required": [ "domain","scanDate","numVuln","vulnerabilities","resultSeverity"],
         "properties":{
+            "_id":{
+                "bsonType":"objectId"
+            },
             "domain":{
-                "bsonType":"string",
-                "description":"'domain' must be a string and is required"
+                "bsonType":"string"
             },
             "scanDate": {
-                "bsonType":"date",
-                "description":"'scanDate' must be a date-time and is required"
+                "bsonType":"date"
             },
-            "num_vul":{
-                "bsonType":"int",
-                "description":"'num_vul' must be an integer and is required"
+            "numVuln":{
+                "bsonType":"int"
             },
             "vulnerabilities":{
                 "bsonType":["array"],
@@ -21,26 +21,21 @@
                     "required":["type","description","severity"],
                     "properties":{
                         "type":{
-                            "bsonType":"string",
-                            "description":"'type' must be a string"
+                            "bsonType":"string"
                         },
                         "description":{
-                            "bsonType":"string",
-                            "description":"'description' must be a string"
+                            "bsonType":"string"
                         },
                         "severity":{
                             "bsonType":"string",
-                            "enum":["Low","Medium","High","Critical"],
-                            "description":"'severity' can only be one of the enum values and is required"
+                            "enum":["Low","Medium","High","Critical"]
                         }
                     }
-                },
-                "description":"'vulnerabilities' must be a array of objects and is required"
+                }
             },
             "resultSeverity":{
                 "bsonType":"string",
-                "enum":["None","Low","Medium","High","Critical"],
-                "description":"'resultSeverity' can only be one of the enum values and is required"
+                "enum":["None","Low","Medium","High","Critical"]
             }
         }
     }
