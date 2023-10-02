@@ -10,4 +10,4 @@ COPY main.py ./
 
 RUN pip install pymongo
 
-CMD ["python", "main.py"]
+CMD ["python", "database.py"]
