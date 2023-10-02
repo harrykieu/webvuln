@@ -1,6 +1,6 @@
 {
     "bsonType": "object",
-    "required": [ "vulnType","type","value","createdDate","editedDate"],
+    "required": [ "_id","vulnType","type","value","createdDate","editedDate"],
     "properties":{
         "_id":{
             "bsonType":"objectId"

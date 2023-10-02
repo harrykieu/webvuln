@@ -1,6 +1,6 @@
     {
         "bsonType": "object",
-        "required": [ "domain","scanDate","numVuln","vulnerabilities","resultSeverity"],
+        "required": ["_id","domain","scanDate","numVuln","vulnerabilities","resultSeverity"],
         "properties":{
             "_id":{
                 "bsonType":"objectId"
