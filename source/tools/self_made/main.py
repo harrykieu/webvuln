@@ -12,13 +12,14 @@ if __name__ == "__main__":
   print(f"Starting scan on {url}")
   
   sqli_result = scanner.check_sqli(url)  
-  # xss_result = scanner.check_xss(url)
+  xss_result = scanner.check_xss(url)
 
 
   # Lưu kết quả vào file report.json
   report = {
       "target": url,
-      "vulnerabilities": sqli_result
+      "SQLi vulnerabilities": sqli_result,
+      "XSS vulnerabilities": xss_result
   }
   
   with open("report.json", "w") as f:
