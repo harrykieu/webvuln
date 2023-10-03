@@ -51,7 +51,7 @@ database_utils.add_document("scanResult",scanResult_data)
 
 # database_utils.edit_document("scanResult", {"domain":"example2.com"},{"$set":{"domain":"example4.com"}})
 
-############################################################################################################
+################################################################
 
 db.resources.drop()
 db.create_collection("resources")
