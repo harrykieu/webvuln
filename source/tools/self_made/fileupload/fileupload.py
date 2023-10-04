@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 class FileUpload:
     def __init__(self, url):
         self.url = url
-        self.session = None
+        self.session = requests.Session()
         self.cookies = None
         self.csrfExist = False
 
@@ -53,12 +53,7 @@ class FileUpload:
         self.session = c
 
     def dvwaChangeSecurity(self, level):
-        r = self.session.get(self.url)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        usrtkSoup = soup.find_all('input',attrs={'name':'user_token'})
-        if usrtkSoup:
-            userToken = usrtkSoup[0]['value']
-        print(userToken)
+        userToken = self.getCSRFToken()
         data = {
             'security': level,
             'seclev_submit': 'Submit',
@@ -81,10 +76,13 @@ class FileUpload:
         # Finding the file upload form and extracting the necessary fields
         dictInput = {}
         inputs = forms[0].find_all('input')
+        print(inputs)
         if inputs:
             for i in inputs:
                 if i["type"] == "file":
                     dictInput[i["name"]] = ""
+                elif i["type"] == "submit":
+                    pass
                 else:
                     dictInput[i["name"]] = i["value"]
         # Crafting the payload
@@ -101,18 +99,21 @@ class FileUpload:
             print("File upload failed")
             return    
         soup = BeautifulSoup(p.text, 'html.parser')
-        signature = soup.find_all(string=re.compile("uploaded", re.IGNORECASE))
-        if signature:
-            for s in signature:
-                print(s)
-            print("File uploaded successfully")
+        # The signature of a successful file upload
+        signatureList = ["uploaded", "successfully", "uploaded successfully"]
+        for s in signatureList:
+            signature = soup.find_all(string=re.compile(s, re.IGNORECASE))
+            if signature:
+                for htmlSig in signature:
+                    print(htmlSig)
+                print("File uploaded successfully")
+                return
             
-        
-    
     def main(self):
-        self.dvwaLogin()
-        self.dvwaChangeSecurity("low")
+        """ self.dvwaLogin()
+        self.dvwaChangeSecurity("low") """
         self.uploadfile()
 
-a = FileUpload("http://localhost/dvwa/vulnerabilities/upload/")
+#a = FileUpload("http://localhost/dvwa/vulnerabilities/upload/")
+a = FileUpload("http://localhost:12001")
 a.main()
