@@ -18,8 +18,8 @@ scanResult = db["scanResult"]
 
 with open(f'{__file__}\\..\\scanResult.json','r') as j:
     vexpr = {"$jsonSchema":json.load(j)}
+    
 
-# assign the schema validation expression to the cmd variable
 cmd = OrderedDict([
     ("collMod","scanResult"),
     ("validator", vexpr),
@@ -50,8 +50,7 @@ database_utils.add_document("scanResult",scanResult_data)
 
 
 # database_utils.edit_document("scanResult", {"domain":"example2.com"},{"$set":{"domain":"example4.com"}})
-
-################################################################
+   
 
 db.resources.drop()
 db.create_collection("resources")
@@ -60,7 +59,7 @@ resources = db["resources"]
 with open(f'{__file__}\\..\\resources.json','r') as j:
     vexpr = {"$jsonSchema":json.load(j)}
 
-# assign the schema validation expression to the cmd variable
+
 cmd = OrderedDict([
     ("collMod", "resources"),
     ("validator", vexpr),
@@ -82,6 +81,6 @@ for document in resources_data:
     document["createdDate"] = parse_datetime(document["createdDate"])
     document["editedDate"] = parse_datetime(document["editedDate"])
 database_utils.add_document("resources",resources_data)    
-    
-# Disconnect from the database    
+
+ 
 database_utils.disconnect()
