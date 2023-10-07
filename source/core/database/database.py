@@ -14,10 +14,13 @@ database_utils = utils.Database_utils()
 db.scanResult.drop()
 db.create_collection("scanResult")
 scanResult = db["scanResult"]
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
 
-with open(f'{__file__}\\..\\scanResult.json','r') as j:
-    vexpr = {"$jsonSchema":json.load(j)}
+
+json_path_1 = os.path.join(current_dir, '..','schema', 'scanResult.json')
+with open(json_path_1, 'r') as j:
+    vexpr = {"$jsonSchema": json.load(j)}
     
 
 cmd = OrderedDict([
@@ -56,7 +59,8 @@ db.resources.drop()
 db.create_collection("resources")
 resources = db["resources"]
 
-with open(f'{__file__}\\..\\resources.json','r') as j:
+json_path_2 = os.path.join(current_dir, '..','schema', 'resources.json')
+with open(json_path_2,'r') as j:
     vexpr = {"$jsonSchema":json.load(j)}
 
 
