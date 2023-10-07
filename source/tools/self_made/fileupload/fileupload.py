@@ -20,18 +20,16 @@ class FileUpload:
             r = c.get('http://localhost/dvwa/login.php')
             token = re.search("user_token'\s*value='(.*?)'", r.text).group(1)
             payload['user_token'] = token
-            print(token)
-            p = c.post('http://localhost/dvwa/login.php', data=payload)
+            c.post('http://localhost/dvwa/login.php', data=payload)
             self.cookies = c.cookies
         self.session = c
     
     def validURL(self):
         r = self.session.get(self.url)
         soup = BeautifulSoup(r.text, 'html.parser')
-        input = soup.find_all('input',attrs={'name':'user_token'})
-        if input:
+        form = soup.find_all("input", attrs={"type": "file"})
+        if form:
             print("URL is valid for file upload")
-            print(input)
             return True
         else:
             print("URL is not valid for file upload")
@@ -40,17 +38,38 @@ class FileUpload:
     def uploadfile(self):
         r = self.session.get(self.url)
         soup = BeautifulSoup(r.text, 'html.parser')
-        input = soup.find_all('input',attrs={'name':'user_token'})
-        files = {
-            "MAX_FILE_SIZE": (None, "100000"), # The maximum file size allowed by the server
-            'uploaded': ('structure.png',open('source/tools/self_made/fileupload/structure.png', 'rb'), "image/png"),
-            "Upload": (None, "Upload"), # Key for the file upload field,
-            "user_token": (None, input[0]['value'])
-        }
+        # Finding user token to bypass CSRF
+        usrtkSoup = soup.find_all('input',attrs={'name':'user_token'})
+        if usrtkSoup:
+            userToken = usrtkSoup[0]['value']
+        print(userToken)
+        # Finding the file upload form and extracting the necessary fields
+        forms = soup.find_all('form', attrs={'enctype':'multipart/form-data'})
+        dictInput = {}
+        if forms:
+            inputs = forms[0].find_all('input')
+            if inputs:
+                for i in inputs:
+                    if i["type"] == "file":
+                        dictInput[i["name"]] = ""
+                    else:
+                        dictInput[i["name"]] = i["value"]
+        # Crafting the payload
+        payload = {}
+        for key in dictInput:
+            if dictInput[key] != "":
+                payload.update({key: (None, dictInput[key])})
+            else:
+                # Case of file:
+                payload.update({key: ('structure.png',open('source/tools/self_made/fileupload/structure.png', 'rb'), "image/png")})
+        print(payload)
         session = requests.Session()
-        p = session.post(self.url, files=files, cookies=self.cookies)
+        p = session.post(self.url, files=payload, cookies=self.cookies)
         soup = BeautifulSoup(p.text, 'html.parser')
+        print(soup)
         print(soup.find_all('pre'))
+
+        
     
     def main(self):
         self.dvwa_login()
