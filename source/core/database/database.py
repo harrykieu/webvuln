@@ -43,18 +43,8 @@ with open(f'{__file__}\\..\\data_scanResult.json') as file:
 for document in scanResult_data:
     document["scanDate"] = parse_datetime(document["scanDate"])
 database_utils.addDocument("scanResult",scanResult_data)
-
-
-# document = database_utils.findDocument("scanResult", {})
-# print(list(document))
-
-
-# database_utils.deleteDocument("scanResult", {"domain":"example.com"})
-
-
-# database_utils.editDocument("scanResult", {"domain":"example2.com"},{"$set":{"domain":"example4.com"}})
    
-
+   
 db.resources.drop()
 db.create_collection("resources")
 resources = db["resources"]
