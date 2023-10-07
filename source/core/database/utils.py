@@ -2,6 +2,10 @@ from pymongo import MongoClient
 import os
 
 class DatabaseUtils:
+    """
+    This class stores the functions to add , delete, find and edit the documents in the collection 
+    so that file database.py can call functions in this module
+    """
     def __init__(self):
         """constructor to open and connect to connect database webvuln in mongodb
         so that we can call the database in all other function in the same class with self.db...
@@ -47,7 +51,7 @@ class DatabaseUtils:
         """
         function to edit the document 
         collection and query like the function above 
-        - update: input the the new value for the fielde. The format will be {"$set":{"field_name":"field_value"} 
+        - update: input the the new value for the fielde. The format will be {"$set":{"field_name":"field_value"}} 
         """
         try:
             collection = self.db.get_collection(collection_name)

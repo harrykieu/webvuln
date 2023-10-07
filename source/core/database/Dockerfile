@@ -6,7 +6,7 @@ RUN apt install python3 -y
 
 WORKDIR /usr/app/src
 
-COPY main.py ./
+COPY database.py ./
 
 RUN pip install pymongo
 
