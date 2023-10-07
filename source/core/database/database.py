@@ -8,7 +8,7 @@ from isodate import parse_datetime
 
 client = MongoClient(os.getenv("DATABASE_URI"))
 db = client.webvuln
-database_utils = utils.Database_utils()
+database_utils = utils.DatabaseUtils()
 
 
 db.scanResult.drop()
@@ -42,17 +42,17 @@ with open(f'{__file__}\\..\\data_scanResult.json') as file:
         
 for document in scanResult_data:
     document["scanDate"] = parse_datetime(document["scanDate"])
-database_utils.add_document("scanResult",scanResult_data)
+database_utils.addDocument("scanResult",scanResult_data)
 
 
-# document = database_utils.find_document("scanResult", {})
+# document = database_utils.findDocument("scanResult", {})
 # print(list(document))
 
 
-# database_utils.delete_document("scanResult", {"domain":"example.com"})
+# database_utils.deleteDocument("scanResult", {"domain":"example.com"})
 
 
-# database_utils.edit_document("scanResult", {"domain":"example2.com"},{"$set":{"domain":"example4.com"}})
+# database_utils.editDocument("scanResult", {"domain":"example2.com"},{"$set":{"domain":"example4.com"}})
    
 
 db.resources.drop()
@@ -84,7 +84,7 @@ with open(f'{__file__}\\..\\data_resources.json') as file:
 for document in resources_data:
     document["createdDate"] = parse_datetime(document["createdDate"])
     document["editedDate"] = parse_datetime(document["editedDate"])
-database_utils.add_document("resources",resources_data)    
+database_utils.addDocument("resources",resources_data)    
 
  
 database_utils.disconnect()
