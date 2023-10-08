@@ -1,6 +1,9 @@
 import requests
 import json
-from . import utils
+import utils
+from pathlib import Path
+
+ROOTPATH = Path(__file__).parent.parent.parent
 
 class WebVuln:
     def __init__(self) -> None:
@@ -29,3 +32,10 @@ class WebVuln:
         if self.__debug:
             print(f'{method} {route}: {jsonData.keys()}')
         pass
+
+    def scanURL(self, urls):
+        for url in urls:
+            utils.multiprocess("result.txt",f'{ROOTPATH}/source/tools/public/ffuf/ffuf.exe -u {url}/FUZZ -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -o scanresult.txt -p 0.2 -mc 200')
+    
+a = WebVuln()
+a.scanURL(['http://localhost:12001'])

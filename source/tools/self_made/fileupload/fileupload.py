@@ -23,7 +23,7 @@ class FileUpload:
             return "CSRF is not enabled on the website"
 
     def getCSRFToken(self) -> str:
-        """Get CSRF token from the login page of the website.
+        """Get CSRF token for the login page of the website.
         """
         r = self.session.get(self.url)
         soup = BeautifulSoup(r.text, 'html.parser')
@@ -71,8 +71,6 @@ class FileUpload:
             print("URL is not valid for file upload")
             return
         print("URL is valid for file upload")
-        if self.csrfExist:
-            token = self.getCSRFToken()
         # Finding the file upload form and extracting the necessary fields
         dictInput = {}
         inputs = forms[0].find_all('input')

@@ -24,11 +24,21 @@ def multiprocess(result, *processes):
     subprocessList = []
     for p in processes:
         try:
+            p_args = p.split(' ')
+            print(p_args)
             tempf = tempfile.TemporaryFile()
-            sp = subprocess.Popen(p, stdout=tempf, stderr=tempf)
+            try:
+                sp = subprocess.Popen(p_args, stdout=tempf, stderr=tempf)
+            except:
+                print("Error in running process: " + p)
+                tempf.close()
+                return False
             subprocessList.append((sp, tempf))
         except:
-            raise RuntimeError("Failed to run subprocess")
+            print("Error in running process: " + p)
+            sp.close()
+            tempf.close()
+            return False
     res = open(result, "wb")
     for sp, tempf in subprocessList:
         sp.wait()
