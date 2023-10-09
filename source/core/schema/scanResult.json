@@ -1,0 +1,43 @@
+    {
+        "bsonType": "object",
+        "required": ["_id","domain","scanDate","numVuln","vulnerabilities","resultSeverity"],
+        "properties":{
+            "_id":{
+                "bsonType":"objectId"
+            },
+            "domain":{
+                "bsonType":"string"
+            },
+            "scanDate": {
+                "bsonType":"date"
+            },
+            "numVuln":{
+                "bsonType":"int"
+            },
+            "vulnerabilities":{
+                "bsonType":["array"],
+                "items":{
+                    "bsonType":"object",
+                    "required":["type","description","severity"],
+                    "properties":{
+                        "type":{
+                            "bsonType":"string"
+                        },
+                        "description":{
+                            "bsonType":"string"
+                        },
+                        "severity":{
+                            "bsonType":"string",
+                            "enum":["Low","Medium","High","Critical"]
+                        }
+                    }
+                }
+            },
+            "resultSeverity":{
+                "bsonType":"string",
+                "enum":["None","Low","Medium","High","Critical"]
+            }
+        }
+    }
+
+

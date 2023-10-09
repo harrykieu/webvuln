@@ -2,7 +2,7 @@
 A website vulnerability scanner for coders without any knowledge of web security.
 ## Technology Stack
 - Python 
-- Flask (for API)
+- Flask (for API - run on localhost)
 - MongoDB
 - Flutter (for GUI)
 - Enumeration tools (dirsearch, ffuf, etc.)
@@ -19,9 +19,16 @@ A website vulnerability scanner for coders without any knowledge of web security
 ![Architecture](./assets/architecture.png)
 ## Database Schema
 ![Database Schema](./assets/db.png)
-## Data Sequence Diagram (for scanning a domain)
-![Data Sequence Diagram](./assets/dataseqdiag.png)
-## API Endpoints
-![API Endpoints](./assets/api.png)
+## Data Sequence Diagram
+### Scan a domain and get results
+![Scan](./assets/scan_dsd.png)
+### Get scan history
+![Get Scan History](./assets/getHistory_dsd.png)
+### Get resouces from database
+![Get Resources](./assets/getResources_dsd.png)
+### Add/remove/update resources to database
+![Add/Remove/Update Resources](./assets/postResources_dsd.png)
+## Flask Webserver (API for GUI - run on localhost)
+![Flask](./assets/api.png)
 ## Report:
 [Here](https://docs.google.com/document/d/1q2712vtjwxAC53eEqRq5TR32uh3Rn8zE73PcZUIBzOs/edit?usp=sharing)
