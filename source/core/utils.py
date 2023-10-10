@@ -4,6 +4,7 @@ import tempfile
 import os 
 from pathlib import Path
 import datetime
+from time import sleep
 import pytz
 
 # The root path of the project
@@ -25,11 +26,13 @@ def multiprocess(result, *processes):
     for p in processes:
         try:
             p_args = p.split(' ')
-            print(p_args)
             tempf = tempfile.TemporaryFile()
             try:
-                sp = subprocess.Popen(p_args, stdout=tempf, stderr=tempf)
-            except:
+                sp = subprocess.Popen(p_args, stdout=tempf, stderr=tempf, shell=True)
+                pollRes = sp.poll()
+                while pollRes == None:
+                    pollRes = sp.poll()
+            except sp.stderr:
                 print("Error in running process: " + p)
                 tempf.close()
                 return False
@@ -64,7 +67,6 @@ def log(data, type):
         logLocation = f'\\{logFolder}\\{logFile}'
     else:
         logLocation = f'/{logFolder}/{logFile}'
-    print(os.path.exists(f'{ROOTPATH}{logFolder}'))
     if not os.path.exists(f'{ROOTPATH}{logFolder}'):
         os.mkdir(f'{ROOTPATH}\\{logFolder}')
     if not os.path.exists(f'{ROOTPATH}{logLocation}'):

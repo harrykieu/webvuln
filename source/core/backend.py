@@ -1,7 +1,9 @@
+import os
 import requests
 import json
 import utils
 from pathlib import Path
+import tempfile
 
 ROOTPATH = Path(__file__).parent.parent.parent
 
@@ -34,8 +36,25 @@ class WebVuln:
         pass
 
     def scanURL(self, urls):
+        commands = []
+        jsonFiles = []
+        dirURL = {}
         for url in urls:
-            utils.multiprocess("result.txt",f'{ROOTPATH}/source/tools/public/ffuf/ffuf.exe -u {url}/FUZZ -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -o scanresult.txt -p 0.2 -mc 200')
-    
+            filename = f'scanresult_url{urls.index(url)}.json'
+            jsonFiles.append(filename)
+            #commands.append(f'{ROOTPATH}/source/tools/public/ffuf/ffuf.exe -u {url}/FUZZ -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -of json -o {filename} -p 0.2 -mc 200')
+            commands.append(f'python {ROOTPATH}/source/tools/public/dirsearch/dirsearch.py -u {url} -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -t 50 --format=json -x 404 -o {filename}')
+            utils.multiprocess('result.txt', *commands)
+            for jsonFile in jsonFiles:
+                with open(jsonFile, 'r') as f:
+                    data = json.load(f)
+                    for res in data["results"]:
+                        if not f'{url}' in dirURL.keys():
+                            dirURL[f'{url}'] = []
+                        dirURL[f'{url}'].append(res['url'])
+                f.close()
+                os.remove(jsonFile)
+        print(dirURL)
+        
 a = WebVuln()
-a.scanURL(['http://localhost:12001'])
+a.scanURL(['http://localhost/dvwa'])
