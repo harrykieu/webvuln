@@ -15,8 +15,8 @@ def multiprocess(result, *processes):
 
     For each process, the output and error are written to a temporary file. Those files are then read and written to a single file specified by the `result` parameter. The result is a boolean value indicating whether all processes are run successfully. If any process fails, the function will return False and the `result` file will not be created.
 
-    @param result: The file to write the result to.
-    @param processes: A list of processes to run. Each process is a string.
+    @param `result`: The file to write the result to.
+    @param `processes`: A list of processes to run. Each process is a string.
     """
     for p in processes:
         if type(p) != str:
@@ -54,19 +54,21 @@ def multiprocess(result, *processes):
 def log(data, type):
     """Log data to a file.
 
-    @param data: The data to be logged.
-    @param type: The type of the data: `ERROR`, `INFO`, `WARNING`, or `DEBUG`.
+    @param `data`: The data to be logged.
+    @param `type`: The type of the data: `ERROR`, `INFO`, `WARNING`, or `DEBUG`.
     """
     if type not in ["ERROR", "INFO", "WARNING", "DEBUG"]:
         raise ValueError("Invalid log type")
     if not data:
         raise ValueError("Empty data")
-    logFolder = "logs"
-    logFile = "log.txt"
     if platform.system() == "Windows":
-        logLocation = f'\\{logFolder}\\{logFile}'
+        logFolder = "\\logs"
+        logFile = "\\log.txt"
+        logLocation = f'{logFolder}{logFile}'
     else:
-        logLocation = f'/{logFolder}/{logFile}'
+        logFolder = "/logs"
+        logFile = "/log.txt"
+        logLocation = f'{logFolder}{logFile}'
     if not os.path.exists(f'{ROOTPATH}{logFolder}'):
         os.mkdir(f'{ROOTPATH}\\{logFolder}')
     if not os.path.exists(f'{ROOTPATH}{logLocation}'):
