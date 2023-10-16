@@ -1,14 +1,16 @@
 from pymongo import MongoClient 
 from collections import OrderedDict
 import json
-import  utils 
+import dbutils 
 import os
 from isodate import parse_datetime 
+from dotenv import load_dotenv
 
+load_dotenv()
 
 client = MongoClient(os.getenv("DATABASE_URI"))
 db = client.webvuln
-database_utils = utils.DatabaseUtils()
+database_utils = dbutils.DatabaseUtils()
 
 
 db.scanResult.drop()
@@ -78,3 +80,8 @@ database_utils.addDocument("resources",resources_data)
 
  
 database_utils.disconnect()
+
+
+a = WebVuln()
+a.resourceHandler('POST', '{"vulnType": "SQL Injection", "resType": "URL", "value": "http://localhost/dvwa", "action": "add"}')
+#a.scanURL(['http://localhost/dvwa'])

@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 import os
-import utils
-
+import source.core.utils as utils
+from dotenv import load_dotenv
 
 class DatabaseUtils:
     """This class contains the functions to add, delete, find and edit the documents in the collection.
@@ -12,10 +12,10 @@ class DatabaseUtils:
         - `username`: username of the database.
         - `password`: password of the database.
         """
-        # FIX THIS!
-        print(os.getenv("DATABASE_URI")) # WRONG!!!
+        load_dotenv()
         self.__client = MongoClient(os.getenv("DATABASE_URI"))
         self.__db = self.__client.get_database("webvuln")
+        # Add feature to create database if not exists
 
     def addDocument(self, collectionName, data) -> bool:
         """Add a document to the collection in the database.
@@ -49,7 +49,7 @@ class DatabaseUtils:
             utils.log(f'Error: {e}', "ERROR")
             return "Failed"
 
-    def editDocument(self, collectionName, query, update):
+    def updateDocument(self, collectionName, query, update):
         """Edit one document from the collection.
         - `collectionName`: name of the collection.
         - `query`: a dictionary that specifies the criteria for finding the document to be edited. 
