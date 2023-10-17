@@ -1,3 +1,4 @@
+import json
 from pymongo import MongoClient
 import os
 import source.core.utils as utils
@@ -15,7 +16,10 @@ class DatabaseUtils:
         load_dotenv()
         self.__client = MongoClient(os.getenv("DATABASE_URI"))
         self.__db = self.__client.get_database("webvuln")
-        # Add feature to create database if not exists
+        if not "resources" in self.__db.list_collection_names():
+            self.__db.create_collection("resources",validator={'$jsonSchema': json.load(open("./source/core/schema/resources.json"))})
+        if not "scanResult" in self.__db.list_collection_names():
+            self.__db.create_collection("scanResult",validator={'$jsonSchema': json.load(open("./source/core/schema/scanResult.json"))})
 
     def addDocument(self, collectionName, data) -> bool:
         """Add a document to the collection in the database.

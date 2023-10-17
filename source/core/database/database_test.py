@@ -82,6 +82,6 @@ database_utils.addDocument("resources",resources_data)
 database_utils.disconnect()
 
 
-a = WebVuln()
+""" a = WebVuln()
 a.resourceHandler('POST', '{"vulnType": "SQL Injection", "resType": "URL", "value": "http://localhost/dvwa", "action": "add"}')
-#a.scanURL(['http://localhost/dvwa'])
+#a.scanURL(['http://localhost/dvwa']) """
