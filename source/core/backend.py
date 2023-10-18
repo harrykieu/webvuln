@@ -1,3 +1,4 @@
+import base64
 from datetime import *
 import os
 import requests
@@ -6,6 +7,8 @@ import source.core.utils as utils
 from pathlib import Path
 from database.dbutils import DatabaseUtils
 from bson.binary import Binary
+from bson.json_util import dumps, loads
+import pymongo
 
 ROOTPATH = Path(__file__).parent.parent.parent
 
@@ -88,6 +91,7 @@ class WebVuln:
             if 'vulnType' in jsonData.keys() and 'resType' in jsonData.keys() and 'value' in jsonData.keys() and 'action' in jsonData.keys() and len(jsonData.keys()) == 4: #refactor later
                 action = jsonData['action']
                 if action == 'add':
+                    # Note: if the value is a file, it must be encoded in base64 string before sending to the server (client side)
                     newDocument = {
                         "vulnType": jsonData['vulnType'],
                         "type": jsonData['resType'],
@@ -95,7 +99,6 @@ class WebVuln:
                         "createdDate": datetime.now(),
                         "editedDate": datetime.now()
                     }
-                    # Need to parse
                     state = self.__database.addDocument('resources', newDocument)
                     if state == 'Failed':
                         utils.log(f'Error: Cannot add the document', "ERROR")
@@ -117,26 +120,33 @@ class WebVuln:
                 utils.log(f'Error: Invalid JSON object', "ERROR")
                 return 'Failed'
 
+    def scanResultHandler(self, method, data):
+        #FIX
+        if method not in ['GET','POST']:
+            utils.log(f'Error: {method} is not a valid method', "ERROR")
+            return 'Failed'
+        # Parse JSON object
+        jsonData = json.loads(data)
+        if method == 'GET':
+            # if 'vulnType' in jsonData.keys() and 'resType' in jsonData.keys() and len(jsonData.keys()) == 2:
+            pass
 a = WebVuln()
-""" with open(f'{ROOTPATH}/source/core/database/data_resources.json', 'r') as f:
-    listdata = json.load(f)
-    print(listdata)
-    for data in listdata:
-        data['action'] = 'add'
-        jsonData = json.dumps(data)
-        print(jsonData)
-        print(a.resourceHandler('POST', jsonData)) """
-
-""" data = {'vulnType': 'SQL Injection', 'resType': 'UserAgent'}
-jsonData = json.dumps(data)
-print(a.resourceHandler('GET', jsonData)) """
-
-obj = {}
+""" obj = {}
 obj['vulnType'] = 'File Upload'
 obj['resType'] = 'File'
-with open(f'{ROOTPATH}/source/tools/self_made/fileupload/test.jpg', 'rb') as f:
-    obj['value'] = Binary(f.read())
+with open(f'{ROOTPATH}/source/tools/self_made/fileupload/fileupload.png', 'rb') as f:
+    obj['value'] = base64.b64encode(f.read()).decode()
 f.close()
 obj['action'] = 'add'
-jsonData = json.dumps(obj)
-print(a.resourceHandler('POST', jsonData))
+print(obj)
+jsonData = dumps(obj)
+print(jsonData)
+print(a.resourceHandler('POST', jsonData)) """
+data = {'vulnType': 'File Upload', 'resType': 'File'}
+jsonData = dumps(data)
+resbig = a.resourceHandler('GET', jsonData)
+for res in resbig:
+    filecontentb64 = res['value']
+# save file
+with open(f'{ROOTPATH}/source/tools/self_made/fileupload/test2.jpg', 'wb') as f:
+    f.write(base64.b64decode(filecontentb64))
