@@ -4,6 +4,7 @@ import os
 import source.core.utils as utils
 from dotenv import load_dotenv
 
+
 class DatabaseUtils:
     """This class contains the functions to add, delete, find and edit the documents in the collection.
     """
@@ -17,9 +18,11 @@ class DatabaseUtils:
         self.__client = MongoClient(os.getenv("DATABASE_URI"))
         self.__db = self.__client.get_database("webvuln")
         if not "resources" in self.__db.list_collection_names():
-            self.__db.create_collection("resources",validator={'$jsonSchema': json.load(open("./source/core/schema/resources.json"))})
+            self.__db.create_collection("resources", validator={
+                                        '$jsonSchema': json.load(open("./source/core/schema/resources.json"))})
         if not "scanResult" in self.__db.list_collection_names():
-            self.__db.create_collection("scanResult",validator={'$jsonSchema': json.load(open("./source/core/schema/scanResult.json"))})
+            self.__db.create_collection("scanResult", validator={
+                                        '$jsonSchema': json.load(open("./source/core/schema/scanResult.json"))})
 
     def addDocument(self, collectionName, data) -> bool:
         """Add a document to the collection in the database.
