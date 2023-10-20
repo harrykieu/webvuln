@@ -1,14 +1,12 @@
-import base64
-from datetime import *
-import os
-import requests
 import json
-import source.core.utils as utils
+import os
+from datetime import datetime
 from pathlib import Path
-from database.dbutils import DatabaseUtils
-from bson.binary import Binary
+import requests
 from bson.json_util import dumps, loads
-import pymongo
+from database.dbutils import DatabaseUtils
+
+import source.core.utils as utils
 
 ROOTPATH = Path(__file__).parent.parent.parent
 
@@ -126,8 +124,12 @@ class WebVuln:
                 utils.log(f'Error: Invalid JSON object', "ERROR")
                 return 'Failed'
 
-    def scanResultHandler(self, method, data):
-        # FIX
+    def getScanResult(self, method, data):
+        """Get all the scan results from the database.
+
+        :param method: GET
+        :param data: JSON object
+        """
         if method != 'GET':
             utils.log(f'Error: {method} is not a valid method', "ERROR")
             return 'Failed'
@@ -135,8 +137,11 @@ class WebVuln:
         jsonData = json.loads(data)
         if method == 'GET':
             if 'domain' in jsonData.keys() and 'scanDate' in jsonData.keys() and len(jsonData.keys()) == 2:
+                # To avoid error in datetime (will consider changing datetime to string)
+                dateParsed = datetime.strptime(
+                    jsonData['scanDate']["$date"], "%Y-%m-%dT%H:%M:%S.%fZ")
                 query = self.__database.findDocument(
-                    'scanresults', {'domain': jsonData['domain'], 'scanDate': jsonData['scanDate']})
+                    'scanResult', {'domain': jsonData['domain'], 'scanDate': dateParsed})
                 listResult = []
                 for item in query:
                     listResult.append(item)
@@ -145,15 +150,21 @@ class WebVuln:
                     return 'Failed'
                 return listResult
             else:
-                utils.log(f'Error: Invalid JSON object', "ERROR")
+                utils.log('Error: Invalid JSON object', "ERROR")
                 return 'Failed'
 
     def saveScanResult(self, data):
+        """Save scan result to the database.
+
+        :param data: JSON object
+        """
         state = self.__database.addDocument('scanResult', data)
         if state == 'Failed':
             utils.log(f'Error: Cannot add the document', "ERROR")
             return 'Failed'
         return 'Success'
+
+    # TODO: ADD THE FUNCTIONS TO GET ALL THE HISTORIES AND RESOURCES
 
 
 a = WebVuln()
@@ -182,12 +193,11 @@ with open(f'{ROOTPATH}/source/tools/self_made/fileupload/test2.jpg', 'wb') as f:
 for item in data:
     item['scanDate'] = datetime.strptime(
         item['scanDate'], "%Y-%m-%dT%H:%M:%S.%fZ")
-    a.saveScanResult(item)
- """
+    print(item)
+    # a.saveScanResult(item) """
+""" # Example: {'domain': 'example.com', 'scanDate': datetime.datetime(2023, 9, 23, 9, 31, 41, 274000), 'numVuln': 0, 'vulnerabilities': [], 'resultSeverity': 'None'}
 dateFind = datetime.strptime(
     '2023-09-23T09:31:41.274Z', "%Y-%m-%dT%H:%M:%S.%fZ")
 data = {'domain': 'example.com', 'scanDate': dateFind}
-jsonData = dumps(data)
-print(jsonData)
-print(a.scanResultHandler('GET', jsonData))
-# Error in datetime
+jsondata = dumps(data)
+print(a.scanResultHandler('GET', data=jsondata)) """
