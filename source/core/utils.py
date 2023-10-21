@@ -1,14 +1,14 @@
 import platform
 import subprocess
 import tempfile
-import os 
+import os
 from pathlib import Path
 import datetime
-from time import sleep
 import pytz
 
 # The root path of the project
 ROOTPATH = Path(__file__).parent.parent.parent
+
 
 def multiprocess(result, *processes):
     """Run multiple processes and write the result to a file.
@@ -19,7 +19,7 @@ def multiprocess(result, *processes):
     @param `processes`: A list of processes to run. Each process is a string.
     """
     for p in processes:
-        if type(p) != str:
+        if isinstance(p, str) is False:
             raise TypeError("Process must be a string")
     # To maintain the order of the subprocesses
     subprocessList = []
@@ -28,20 +28,20 @@ def multiprocess(result, *processes):
             p_args = p.split(' ')
             tempf = tempfile.TemporaryFile()
             try:
-                sp = subprocess.Popen(p_args, stdout=tempf, stderr=tempf, shell=True)
+                sp = subprocess.Popen(
+                    p_args, stdout=tempf, stderr=tempf, shell=True)
                 pollRes = sp.poll()
-                while pollRes == None:
+                while pollRes is None:
                     pollRes = sp.poll()
             except sp.stderr:
                 print("Error in running process: " + p)
                 tempf.close()
                 return False
             subprocessList.append((sp, tempf))
-        except:
-            print("Error in running process: " + p)
+        except Exception as e:
             sp.close()
             tempf.close()
-            return False
+            raise ("Error in running process: " + p) from e
     res = open(result, "wb")
     for sp, tempf in subprocessList:
         sp.wait()
@@ -50,6 +50,7 @@ def multiprocess(result, *processes):
         tempf.close()
     res.close()
     return True
+
 
 def log(data, type):
     """Log data to a file.
@@ -84,5 +85,5 @@ def log(data, type):
         with open(f'{ROOTPATH}{logLocation}', "a") as f:
             f.write(f'{now} [{type}] {data}\n')
         f.close()
-    except:
-        raise RuntimeError("Failed to write to log file")
+    except Exception as e:
+        raise RuntimeError("Failed to write to log file") from e

@@ -3,6 +3,7 @@ import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
 
+
 class FileUpload:
     def __init__(self, url):
         self.url = url
@@ -15,7 +16,7 @@ class FileUpload:
         """
         r = self.session.get(self.url)
         soup = BeautifulSoup(r.text, 'html.parser')
-        usrtkSoup = soup.find_all('input',attrs={'name':'user_token'})
+        usrtkSoup = soup.find_all('input', attrs={'name': 'user_token'})
         if usrtkSoup:
             self.csrfExist = True
             return "CSRF is enabled on the website"
@@ -28,14 +29,14 @@ class FileUpload:
         """
         r = self.session.get(self.url)
         soup = BeautifulSoup(r.text, 'html.parser')
-        usrtkSoup = soup.find_all('input',attrs={'name':'user_token'})
+        usrtkSoup = soup.find_all('input', attrs={'name': 'user_token'})
         if usrtkSoup:
             userToken = usrtkSoup[0]['value']
             return userToken
         else:
             print("No CSRF token found!")
             return None
-    
+
     def dvwaLogin(self) -> str:
         """For DVWA only. Login to DVWA and return a session object.
         """
@@ -61,11 +62,11 @@ class FileUpload:
         r = self.session.post('http://localhost/dvwa/security.php', data=data)
         print("Security level changed to " + level)
         return r
-    
+
     def uploadfile(self):
         r = self.session.get(self.url)
         soup = BeautifulSoup(r.text, 'html.parser')
-        forms = soup.find_all('form', attrs={'enctype':'multipart/form-data'})
+        forms = soup.find_all('form', attrs={'enctype': 'multipart/form-data'})
         if not forms:
             print("URL is not valid for file upload")
             return
@@ -101,7 +102,7 @@ class FileUpload:
                     print(htmlSig)
                 print("File uploaded successfully")
                 return """
-    
+
     def craftPayload(self, formFields, filename):
         filePath = Path(filename).absolute()
         print(filePath)
@@ -112,12 +113,13 @@ class FileUpload:
             else:
                 # Case of file:
                 payload.update({key: (f'{filename}',open('source/tools/self_made/fileupload/test.php', 'rb'), "image/jpeg")}) """
-        
+
     def main(self):
         self.dvwaLogin()
         self.dvwaChangeSecurity("low")
         self.uploadfile()
 
+
 a = FileUpload("http://localhost/dvwa/vulnerabilities/upload/")
-#a = FileUpload("http://localhost:12001")
+# a = FileUpload("http://localhost:12001")
 a.main()

@@ -17,10 +17,10 @@ class DatabaseUtils:
         load_dotenv()
         self.__client = MongoClient(os.getenv("DATABASE_URI"))
         self.__db = self.__client.get_database("webvuln")
-        if not "resources" in self.__db.list_collection_names():
+        if "resources" not in self.__db.list_collection_names():
             self.__db.create_collection("resources", validator={
                                         '$jsonSchema': json.load(open("./source/core/schema/resources.json"))})
-        if not "scanResult" in self.__db.list_collection_names():
+        if "scanResult" not in self.__db.list_collection_names():
             self.__db.create_collection("scanResult", validator={
                                         '$jsonSchema': json.load(open("./source/core/schema/scanResult.json"))})
 

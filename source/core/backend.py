@@ -2,9 +2,9 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
+
 import requests
-from bson.json_util import dumps, loads
-from database.dbutils import DatabaseUtils
+from source.core.database.dbutils import DatabaseUtils
 
 import source.core.utils as utils
 
@@ -40,7 +40,10 @@ class WebVuln:
     def recvFlask(self, route, method, jsonData) -> None:
         if self.__debug:
             print(f'{method} {route}: {jsonData.keys()}')
-        pass
+        if route == '/api/history':
+            return self.getScanResult(method, jsonData)
+        elif route == '/api/resources':
+            return self.resourceHandler(method, jsonData)
 
     def scanURL(self, urls):
         commands = []
@@ -58,7 +61,7 @@ class WebVuln:
                 with open(jsonFile, 'r') as f:
                     data = json.load(f)
                     for res in data["results"]:
-                        if not f'{url}' in dirURL.keys():
+                        if f'{url}' not in dirURL.keys():
                             dirURL[f'{url}'] = []
                         dirURL[f'{url}'].append(res['url'])
                 f.close()
@@ -71,57 +74,60 @@ class WebVuln:
             utils.log(f'Error: {method} is not a valid method', "ERROR")
             return 'Failed'
         # Parse JSON object
-        jsonData = json.loads(data)
         if method == 'GET':
-            if 'vulnType' in jsonData.keys() and 'resType' in jsonData.keys() and len(jsonData.keys()) == 2:  # refactor later
-                query = self.__database.findDocument(
-                    'resources', {'vulnType': jsonData['vulnType'], 'type': jsonData['resType']})
+            if 'vulnType' in data.keys() and 'resType' in data.keys() and len(data.keys()) == 2:
+                query = {}
+                if data['vulnType'] != "":
+                    query['vulnType'] = data['vulnType']
+                if data['resType'] != "":
+                    query['type'] = data['resType']
+                cursor = self.__database.findDocument('resources', query)
                 listResult = []
-                for item in query:
+                for item in cursor:
                     listResult.append(item)
-                if query.retrieved == 0:
-                    utils.log(f'Error: No data found', "ERROR")
+                if cursor.retrieved == 0:
+                    utils.log('Error: No data found', "ERROR")
                     return 'Failed'
-                return listResult
+                return str(listResult)
             else:
-                utils.log(f'Error: Invalid JSON object', "ERROR")
+                utils.log('Error: Invalid JSON object', "ERROR")
                 return 'Failed'
         elif method == 'POST':
-            if 'vulnType' in jsonData.keys() and 'resType' in jsonData.keys() and 'value' in jsonData.keys() and 'action' in jsonData.keys() and len(jsonData.keys()) == 4:  # refactor later
-                action = jsonData['action']
+            if 'vulnType' in data.keys() and 'resType' in data.keys() and 'value' in data.keys() and 'action' in data.keys() and len(data.keys()) == 4:  # refactor later
+                action = data['action']
                 if action == 'add':
                     # Note: if the value is a file, it must be encoded in base64 string before sending to the server (client side)
                     newDocument = {
-                        "vulnType": jsonData['vulnType'],
-                        "type": jsonData['resType'],
-                        "value": jsonData['value'],
+                        "vulnType": data['vulnType'],
+                        "type": data['resType'],
+                        "value": data['value'],
                         "createdDate": datetime.now(),
                         "editedDate": datetime.now()
                     }
                     state = self.__database.addDocument(
                         'resources', newDocument)
                     if state == 'Failed':
-                        utils.log(f'Error: Cannot add the document', "ERROR")
+                        utils.log('Error: Cannot add the document', "ERROR")
                         return 'Failed'
                     return 'Success'
                 elif action == 'remove':
                     state = self.__database.deleteDocument('resources', {
-                                                           'vulnType': jsonData['vulnType'], 'type': jsonData['resType'], 'value': jsonData['value']})
+                                                           'vulnType': data['vulnType'], 'type': data['resType'], 'value': data['value']})
                     if state == 'Failed':
                         utils.log(
-                            f'Error: Cannot delete the document', "ERROR")
+                            'Error: Cannot delete the document', "ERROR")
                         return 'Failed'
                     return 'Success'
                 elif action == 'update':
                     state = self.__database.updateDocument('resources', {
-                                                           'vulnType': jsonData['vulnType'], 'type': jsonData['resType']}, {'$set': {'value': jsonData['value']}})
+                                                           'vulnType': data['vulnType'], 'type': data['resType']}, {'$set': {'value': data['value']}})
                     if state == 'Failed':
                         utils.log(
-                            f'Error: Cannot update the document', "ERROR")
+                            'Error: Cannot update the document', "ERROR")
                         return 'Failed'
                     return 'Success'
             else:
-                utils.log(f'Error: Invalid JSON object', "ERROR")
+                utils.log('Error: Invalid JSON object', "ERROR")
                 return 'Failed'
 
     def getScanResult(self, method, data):
@@ -134,21 +140,23 @@ class WebVuln:
             utils.log(f'Error: {method} is not a valid method', "ERROR")
             return 'Failed'
         # Parse JSON object
-        jsonData = json.loads(data)
         if method == 'GET':
-            if 'domain' in jsonData.keys() and 'scanDate' in jsonData.keys() and len(jsonData.keys()) == 2:
-                # To avoid error in datetime (will consider changing datetime to string)
-                dateParsed = datetime.strptime(
-                    jsonData['scanDate']["$date"], "%Y-%m-%dT%H:%M:%S.%fZ")
-                query = self.__database.findDocument(
-                    'scanResult', {'domain': jsonData['domain'], 'scanDate': dateParsed})
+            if 'domain' in data.keys() and 'scanDate' in data.keys() and len(data.keys()) == 2:
+                query = {}
+                if data['domain'] != "":
+                    query['domain'] = data['domain']
+                if data['scanDate'] != "":
+                    dateParsed = datetime.strptime(
+                        data['scanDate'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    query['scanDate'] = dateParsed
+                cursor = self.__database.findDocument('scanResult', query)
                 listResult = []
-                for item in query:
+                for item in cursor:
                     listResult.append(item)
-                if query.retrieved == 0:
-                    utils.log(f'Error: No data found', "ERROR")
+                if cursor.retrieved == 0:
+                    utils.log('Error: No data found', "ERROR")
                     return 'Failed'
-                return listResult
+                return str(listResult)
             else:
                 utils.log('Error: Invalid JSON object', "ERROR")
                 return 'Failed'
@@ -160,11 +168,11 @@ class WebVuln:
         """
         state = self.__database.addDocument('scanResult', data)
         if state == 'Failed':
-            utils.log(f'Error: Cannot add the document', "ERROR")
+            utils.log('Error: Cannot add the document', "ERROR")
             return 'Failed'
         return 'Success'
 
-    # TODO: ADD THE FUNCTIONS TO GET ALL THE HISTORIES AND RESOURCES
+    # TODO: ADD THE FUNCTIONS TO GET ALL THE RESOURCES
 
 
 a = WebVuln()
@@ -176,7 +184,7 @@ with open(f'{ROOTPATH}/source/tools/self_made/fileupload/fileupload.png', 'rb') 
 f.close()
 obj['action'] = 'add'
 print(obj)
-jsonData = dumps(obj)
+data = dumps(obj)
 print(jsonData)
 print(a.resourceHandler('POST', jsonData)) """
 """ data = {'vulnType': 'File Upload', 'resType': 'File'}
@@ -197,7 +205,8 @@ for item in data:
     # a.saveScanResult(item) """
 """ # Example: {'domain': 'example.com', 'scanDate': datetime.datetime(2023, 9, 23, 9, 31, 41, 274000), 'numVuln': 0, 'vulnerabilities': [], 'resultSeverity': 'None'}
 dateFind = datetime.strptime(
-    '2023-09-23T09:31:41.274Z', "%Y-%m-%dT%H:%M:%S.%fZ")
-data = {'domain': 'example.com', 'scanDate': dateFind}
+    '2023-09-23T09:31:41.274Z', "%Y-%m-%dT%H:%M:%S.%fZ") """
+""" data = {'domain': 'All', 'scanDate': 'All'}
 jsondata = dumps(data)
-print(a.scanResultHandler('GET', data=jsondata)) """
+print(a.getScanResult('GET', data=jsondata)) """
+# TODO: ADD PYPROJECT TOML
