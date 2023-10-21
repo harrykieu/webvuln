@@ -9,8 +9,9 @@ backend = be.WebVuln()
 # Debug
 backend.setDebug(True)
 
-# Note: the Content-Type header must be set to `application/json` for the request to be parsed correctly.
+# Note: the Content-Type header must be set to `application/json` for the request to be parsed correctly.  # noqa: E501
 # Note: the Origin header must be set to match the sender's origin ('backend' or 'frontend').
+
 
 @app.post('/api/scan')
 def scan():
@@ -25,12 +26,13 @@ def scan():
     orgHeader = request.headers.get('Origin')
     if orgHeader != 'frontend':
         if app.debug:
-            utils.log("/api/scan: Missing or invalid Origin header", "DEBUG")    
+            utils.log("/api/scan: Missing or invalid Origin header", "DEBUG")
         return "Forbidden", 403
     contHeader = request.headers.get('Content-Type')
     if contHeader != 'application/json':
         if app.debug:
-            utils.log("/api/scan: Missing or invalid Content-Type header", "DEBUG")
+            utils.log(
+                "/api/scan: Missing or invalid Content-Type header", "DEBUG")
         return "Bad request", 400
     data = request.get_json()
     if not data:
@@ -40,7 +42,8 @@ def scan():
     keys = data.keys()
     if 'url' in keys and 'modules' in keys and len(keys) == 2:
         if app.debug:
-            utils.log(f"/api/scan: Successfully received data: {data}", "DEBUG")
+            utils.log(
+                f"/api/scan: Successfully received data: {data}", "DEBUG")
         backend.recvFlask('/api/scan', 'POST', data)
         return "Success", 200
     else:
@@ -48,15 +51,16 @@ def scan():
             utils.log("/api/scan: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
 
+
 @app.get('/api/history')
 def history():
     """Get scan history.
-    
+
     This function is used for frontend to get scan history using `/api/history` endpoint with `GET`.
 
     The request body should contain a JSON object with the following properties:
-    - `url`: The URL of the website.
-    - `date`: The date of the scan.
+    - `domain`: The URL of the website.
+    - `scanDate`: The date of the scan, in format `%Y-%m-%dT%H:%M:%S.%fZ`, example: `2023-09-23T09:31:41.274Z`
     """
     orgHeader = request.headers.get('Origin')
     if orgHeader != 'frontend':
@@ -66,7 +70,8 @@ def history():
     contHeader = request.headers.get('Content-Type')
     if contHeader != 'application/json':
         if app.debug:
-            utils.log("/api/history: Missing or invalid Content-Type header", "DEBUG")
+            utils.log(
+                "/api/history: Missing or invalid Content-Type header", "DEBUG")
         return "Bad request", 400
     data = request.get_json()
     if not data:
@@ -74,15 +79,21 @@ def history():
             utils.log("/api/history: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if 'url' in keys and 'date' in keys and len(keys) == 2:
+    if 'domain' in keys and 'scanDate' in keys and len(keys) == 2:
         if app.debug:
-            utils.log(f"/api/history: Successfully received data: {data}", "DEBUG")
-        backend.recvFlask('/api/history', 'GET', data)
-        return "Success", 200
+            utils.log(
+                f"/api/history: Successfully received data: {data}", "DEBUG")
+        result = backend.recvFlask('/api/history', 'GET', data)
+        if result == 'Failed':
+            utils.log('/api/history: Failed to get scan history', "ERROR")
+            return "Failed", 404
+        else:
+            return result, 200
     else:
         if app.debug:
             utils.log("/api/history: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
+
 
 @app.post('/api/resources')
 def postResources():
@@ -104,7 +115,8 @@ def postResources():
     contHeader = request.headers.get('Content-Type')
     if contHeader != 'application/json':
         if app.debug:
-            utils.log("/api/resources: Missing or invalid Content-Type header", "DEBUG")
+            utils.log(
+                "/api/resources: Missing or invalid Content-Type header", "DEBUG")
         return "Bad request", 400
     data = request.get_json()
     if not data:
@@ -114,7 +126,8 @@ def postResources():
     keys = data.keys()
     if 'vulnType' in keys and 'type' in keys and 'value' in keys and 'action' in keys and len(keys) == 4:
         if app.debug:
-            utils.log(f"/api/resources: Successfully received data: {data}", "DEBUG")
+            utils.log(
+                f"/api/resources: Successfully received data: {data}", "DEBUG")
         backend.recvFlask('/api/resources', 'POST', data)
         return "Success", 200
     else:
@@ -122,15 +135,16 @@ def postResources():
             utils.log("/api/resources: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
 
+
 @app.get('/api/resources')
 def getResources():
     """Get resources.
-    
+
     This function is used for frontend to get resource using `/api/resources` endpoint with `GET`.
 
     The request body should contain a JSON object with the following properties:
     - `vulnType`: Type of vulnerability (e.g. XSS, SQLi, etc.)
-    - `type`: Type of resource (e.g. payload, exploit, etc.) - has `All` type
+    - `resType`: Type of resource (e.g. payload, exploit, etc.) - has `All` type
     """
     orgHeader = request.headers.get('Origin')
     if orgHeader != 'frontend':
@@ -140,7 +154,8 @@ def getResources():
     contHeader = request.headers.get('Content-Type')
     if contHeader != 'application/json':
         if app.debug:
-            utils.log("/api/resources: Missing or invalid Content-Type header", "DEBUG")
+            utils.log(
+                "/api/resources: Missing or invalid Content-Type header", "DEBUG")
         return "Bad request", 400
     data = request.get_json()
     if not data:
@@ -148,16 +163,22 @@ def getResources():
             utils.log("/api/resources: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if 'vulnType' in keys and 'type' in keys and len(keys) == 2:
+    if 'vulnType' in keys and 'resType' in keys and len(keys) == 2:
         if app.debug:
-            utils.log(f"/api/resources: Successfully received data: {data}", "DEBUG")
-        backend.recvFlask('/api/resources', 'GET', data)
-        return "Success", 200
+            utils.log(
+                f"/api/resources: Successfully received data: {data}", "DEBUG")
+        result = backend.recvFlask('/api/resources', 'GET', data)
+        if result == 'Failed':
+            utils.log('/api/resources: Failed to get resources', "ERROR")
+            return "Failed", 404
+        else:
+            return result, 200
     else:
         if app.debug:
             utils.log("/api/resources: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
-    
+
+
 @app.post('/api/result')
 def postResult():
     """Create/Update/Remove a result.
@@ -175,7 +196,8 @@ def postResult():
     contHeader = request.headers.get('Content-Type')
     if contHeader != 'application/json':
         if app.debug:
-            utils.log("/api/result: Missing or invalid Content-Type header", "DEBUG")
+            utils.log(
+                "/api/result: Missing or invalid Content-Type header", "DEBUG")
         return "Bad request", 400
     data = request.get_json()
     if not data:
@@ -185,13 +207,15 @@ def postResult():
     keys = data.keys()
     if 'result' in keys and len(keys) == 1:
         if app.debug:
-            utils.log(f"/api/result: Successfully received data: {data}", "DEBUG")
+            utils.log(
+                f"/api/result: Successfully received data: {data}", "DEBUG")
         backend.recvFlask('/api/result', 'POST', data)
         return "Success", 200
     else:
         if app.debug:
             utils.log("/api/result: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
+
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)

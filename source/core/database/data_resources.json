@@ -1,9 +1,7 @@
 [ 
  {
     "vulnType": "SQL Injection",
-    "type": "UserAgent",
-    "value": "Mozilla/5.0 ;--",
-    "createdDate":"2023-09-23T09:31:41.274Z",
-    "editedDate": "2023-09-23T09:31:41.274Z"
+    "resType": "UserAgent",
+    "value": "Mozilla/5.0 ;--"
   }
 ]
