@@ -1,7 +1,7 @@
 import platform
 import subprocess
 import tempfile
-import os 
+import os
 from pathlib import Path
 import datetime
 import pytz
@@ -9,26 +9,39 @@ import pytz
 # The root path of the project
 ROOTPATH = Path(__file__).parent.parent.parent
 
+
 def multiprocess(result, *processes):
     """Run multiple processes and write the result to a file.
 
     For each process, the output and error are written to a temporary file. Those files are then read and written to a single file specified by the `result` parameter. The result is a boolean value indicating whether all processes are run successfully. If any process fails, the function will return False and the `result` file will not be created.
 
-    @param result: The file to write the result to.
-    @param processes: A list of processes to run. Each process is a string.
+    @param `result`: The file to write the result to.
+    @param `processes`: A list of processes to run. Each process is a string.
     """
     for p in processes:
-        if type(p) != str:
+        if isinstance(p, str) is False:
             raise TypeError("Process must be a string")
     # To maintain the order of the subprocesses
     subprocessList = []
     for p in processes:
         try:
+            p_args = p.split(' ')
             tempf = tempfile.TemporaryFile()
-            sp = subprocess.Popen(p, stdout=tempf, stderr=tempf)
+            try:
+                sp = subprocess.Popen(
+                    p_args, stdout=tempf, stderr=tempf, shell=True)
+                pollRes = sp.poll()
+                while pollRes is None:
+                    pollRes = sp.poll()
+            except sp.stderr:
+                print("Error in running process: " + p)
+                tempf.close()
+                return False
             subprocessList.append((sp, tempf))
-        except:
-            raise RuntimeError("Failed to run subprocess")
+        except Exception as e:
+            sp.close()
+            tempf.close()
+            raise ("Error in running process: " + p) from e
     res = open(result, "wb")
     for sp, tempf in subprocessList:
         sp.wait()
@@ -38,23 +51,25 @@ def multiprocess(result, *processes):
     res.close()
     return True
 
+
 def log(data, type):
     """Log data to a file.
 
-    @param data: The data to be logged.
-    @param type: The type of the data: `ERROR`, `INFO`, `WARNING`, or `DEBUG`.
+    @param `data`: The data to be logged.
+    @param `type`: The type of the data: `ERROR`, `INFO`, `WARNING`, or `DEBUG`.
     """
     if type not in ["ERROR", "INFO", "WARNING", "DEBUG"]:
         raise ValueError("Invalid log type")
     if not data:
         raise ValueError("Empty data")
-    logFolder = "logs"
-    logFile = "log.txt"
     if platform.system() == "Windows":
-        logLocation = f'\\{logFolder}\\{logFile}'
+        logFolder = "\\logs"
+        logFile = "\\log.txt"
+        logLocation = f'{logFolder}{logFile}'
     else:
-        logLocation = f'/{logFolder}/{logFile}'
-    print(os.path.exists(f'{ROOTPATH}{logFolder}'))
+        logFolder = "/logs"
+        logFile = "/log.txt"
+        logLocation = f'{logFolder}{logFile}'
     if not os.path.exists(f'{ROOTPATH}{logFolder}'):
         os.mkdir(f'{ROOTPATH}\\{logFolder}')
     if not os.path.exists(f'{ROOTPATH}{logLocation}'):
@@ -70,5 +85,5 @@ def log(data, type):
         with open(f'{ROOTPATH}{logLocation}', "a") as f:
             f.write(f'{now} [{type}] {data}\n')
         f.close()
-    except:
-        raise RuntimeError("Failed to write to log file")
+    except Exception as e:
+        raise RuntimeError("Failed to write to log file") from e
