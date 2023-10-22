@@ -7,12 +7,12 @@ A website vulnerability scanner for coders without any knowledge of web security
 - Flutter (for GUI)
 - Enumeration tools (dirsearch, ffuf, etc.)
 ## Use Cases
-- Scan a domain/list of domains from input/CSV/JSON file(s)
-- See and modify the scan history
+- Scan a domain or list of domains from input/CSV/JSON file(s)
+- Choose modules to scan
+- See the scan history
 - Add/remove payloads and other resources to the database using CSV/JSON file(s)
 - Send a notification when the scan is complete
 - Analyze using bar/pie charts, click on the chart to show more details
-- Choose modules to scan
 - Add self-written modules
 - Export a report in PDF format
 ## System Architecture
