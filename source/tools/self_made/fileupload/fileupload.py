@@ -5,11 +5,12 @@ from bs4 import BeautifulSoup
 
 
 class FileUpload:
-    def __init__(self, url):
+    def __init__(self, url, isDVWA=False):
         self.url = url
         self.session = requests.Session()
         self.cookies = None
         self.csrfExist = False
+        self.isDVWA = isDVWA
 
     def checkCSRF(self) -> str:
         """Check if CSRF is enabled on the website.
@@ -38,8 +39,10 @@ class FileUpload:
             return None
 
     def dvwaLogin(self) -> str:
-        """For DVWA only. Login to DVWA and return a session object.
+        """(For DVWA only) Login to DVWA and return a session object.
         """
+        if not self.isDVWA:
+            return
         payload = {
             'username': 'admin',
             'password': 'password',
@@ -53,6 +56,10 @@ class FileUpload:
             self.cookies = c.cookies
 
     def dvwaChangeSecurity(self, level):
+        """(For DVWA only) Change DVWA security level.
+        """
+        if not self.isDVWA:
+            return
         userToken = self.getCSRFToken()
         data = {
             'security': level,
@@ -63,7 +70,9 @@ class FileUpload:
         print("Security level changed to " + level)
         return r
 
-    def uploadfile(self):
+    def uploadFile(self):
+        """Upload file to the website.
+        """
         r = self.session.get(self.url)
         soup = BeautifulSoup(r.text, 'html.parser')
         forms = soup.find_all('form', attrs={'enctype': 'multipart/form-data'})
@@ -84,7 +93,7 @@ class FileUpload:
                 else:
                     formFields[i["name"]] = i["value"]
         # Uploading valid file first for testing
-        self.craftPayload(formFields, "structure.png")
+        self.craftPayload(formFields, "test.jpg")
         """  # Crafting the payload
         
         session = requests.Session()
@@ -117,9 +126,4 @@ class FileUpload:
     def main(self):
         self.dvwaLogin()
         self.dvwaChangeSecurity("low")
-        self.uploadfile()
-
-
-a = FileUpload("http://localhost/dvwa/vulnerabilities/upload/")
-# a = FileUpload("http://localhost:12001")
-a.main()
+        self.uploadFile()

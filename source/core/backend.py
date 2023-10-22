@@ -5,10 +5,12 @@ from pathlib import Path
 
 import requests
 from source.core.database.dbutils import DatabaseUtils
-
 import source.core.utils as utils
+from source.tools.self_made.fileupload.fileupload import FileUpload
 
 ROOTPATH = Path(__file__).parent.parent.parent
+MODULES = ['ffuf', 'dirsearch', 'lfi', 'sqli',
+           'xss', 'fileupload', 'idor', 'pathtraversal']
 
 
 class WebVuln:
@@ -57,36 +59,72 @@ class WebVuln:
             utils.log(f'Error: Invalid route {route}', "ERROR")
             return 'Failed'
 
-    def scanURL(self, urls):
+    def scanURL(self, urls, modules):
         """Scan the URLs.
 
         :param urls: List of URLs
+        :param modules: List of modules
         """
+
         commands = []
         jsonFiles = []
         dirURL = {}
         if isinstance(urls, list) is False:
             raise TypeError("URLs must be a list")
+        elif isinstance(modules, list) is False:
+            raise TypeError("Modules must be a list")
+        if urls == [] or modules == []:
+            raise ValueError("URLs and/or modules must not be empty")
         for url in urls:
             filename = f'scanresult_url{urls.index(url)}.json'
             jsonFiles.append(filename)
-            # FFUF or Dirsearch?
-            commands.append(
-                f'{ROOTPATH}/source/tools/public/ffuf/ffuf.exe -u {url}/FUZZ -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -of json -o {filename} -p 0.2 -mc 200')
-            # commands.append(
-            #    f'python {ROOTPATH}/source/tools/public/dirsearch/dirsearch.py -u {url} -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -t 50 --format=json -x 404 -o {filename}')
+            if 'ffuf' in modules:
+                commands.append(
+                    f'{ROOTPATH}/source/tools/public/ffuf/ffuf.exe -u {url}/FUZZ -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -of json -o {filename} -p 0.2 -mc 200')
+            elif 'dirsearch' in modules:
+                commands.append(
+                    f'python {ROOTPATH}/source/tools/public/dirsearch/dirsearch.py -u {url} -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -t 50 --format=json -x 404 -o {filename}')
+            if commands != []:
+                utils.multiprocess('result.txt', *commands)
+                for jsonFile in jsonFiles:
+                    with open(jsonFile, 'r') as f:
+                        data = json.load(f)
+                        for res in data["results"]:
+                            if f'{url}' not in dirURL.keys():
+                                dirURL[f'{url}'] = []
+                            dirURL[f'{url}'].append(res['url'])
+                    f.close()
+                    os.remove(jsonFile)
+            else:
+                dirURL[f'{url}'] = [f'{url}']
+        commands = []  # Reinitalize the commands
+        for module in modules:
+            if module == 'ffuf':
+                pass
+            elif module == 'dirsearch':
+                pass
+            elif module == 'lfi':
+                pass
+            elif module == 'sqli':
+                pass
+            elif module == 'xss':
+                pass
+            elif module == 'fileupload':
+                for key in dirURL:
+                    for url in dirURL[key]:
+                        a = FileUpload(url)
+                        a.main()
+            elif module == 'idor':
+                pass
+            elif module == 'pathtraversal':
+                pass
+            else:
+                raise ValueError(f'Invalid module {module}')
+        if commands != []:
             utils.multiprocess('result.txt', *commands)
-            for jsonFile in jsonFiles:
-                with open(jsonFile, 'r') as f:
-                    data = json.load(f)
-                    for res in data["results"]:
-                        if f'{url}' not in dirURL.keys():
-                            dirURL[f'{url}'] = []
-                        dirURL[f'{url}'].append(res['url'])
-                f.close()
-                os.remove(jsonFile)
-        # Missing choosing scan modules???
-        print(dirURL)
+        else:
+            utils.log('Error: No module is selected', "ERROR")
+            return 'Failed'
 
     def resourceHandler(self, method, data):
         """Handle the resources.
@@ -200,7 +238,7 @@ class WebVuln:
 
 
 a = WebVuln()
-a.scanURL(['http://localhost:12001'])
+a.scanURL(['http://localhost:12001'], ['fileupload'])
 """ obj = {}
 obj['vulnType'] = 'File Upload'
 obj['resType'] = 'File'
