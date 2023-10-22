@@ -32,3 +32,7 @@ A website vulnerability scanner for coders without any knowledge of web security
 ![Flask](./assets/api.png)
 ## Report:
 [Here](https://docs.google.com/document/d/1q2712vtjwxAC53eEqRq5TR32uh3Rn8zE73PcZUIBzOs/edit?usp=sharing)
+## How to run
+- Install Docker
+- Run `docker-compose up` at the `source\\core\\database` directory
+- Add mongoURI to the `.env_example` file at the root directory and rename it to `.env`
