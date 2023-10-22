@@ -23,39 +23,58 @@ class WebVuln:
         return self.__debug
 
     def sendFlask(self, data):
-        route = '/api/result'
-        # Checking the keys required for the request
+        """Send data to Flask.
+
+        :param data: JSON object"""
         keys = json.loads(data).keys()
         if 'result' in keys and len(keys) == 1:
             try:
                 if self.__debug:
                     utils.log(
                         f'/api/result: Sending data to Flask: {data}', "DEBUG")
-                requests.post(url=f'http://localhost:5000/{route}', data=data, headers={
+                requests.post(url='http://localhost:5000//api/result', data=data, headers={
                               'Content-Type': 'application/json', 'Origin': 'backend'})
             except Exception as e:
                 utils.log(f'Error: {e}', "ERROR")
                 return e
 
     def recvFlask(self, route, method, jsonData) -> None:
+        """Receive data from Flask based on the route.
+
+        :param route: The route of the request
+        :param method: `GET` or `POST`
+        :param jsonData: JSON object
+        """
         if self.__debug:
             print(f'{method} {route}: {jsonData.keys()}')
         if route == '/api/history':
             return self.getScanResult(method, jsonData)
         elif route == '/api/resources':
             return self.resourceHandler(method, jsonData)
+        elif route == '/api/scan':
+            return self.scanURL(jsonData['urls'])
+        else:
+            utils.log(f'Error: Invalid route {route}', "ERROR")
+            return 'Failed'
 
     def scanURL(self, urls):
+        """Scan the URLs.
+
+        :param urls: List of URLs
+        """
         commands = []
         jsonFiles = []
         dirURL = {}
+        if isinstance(urls, list) is False:
+            raise TypeError("URLs must be a list")
         for url in urls:
             filename = f'scanresult_url{urls.index(url)}.json'
             jsonFiles.append(filename)
             # FFUF or Dirsearch?
-            # commands.append(f'{ROOTPATH}/source/tools/public/ffuf/ffuf.exe -u {url}/FUZZ -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -of json -o {filename} -p 0.2 -mc 200')
             commands.append(
-                f'python {ROOTPATH}/source/tools/public/dirsearch/dirsearch.py -u {url} -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -t 50 --format=json -x 404 -o {filename}')
+                f'{ROOTPATH}/source/tools/public/ffuf/ffuf.exe -u {url}/FUZZ -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -of json -o {filename} -p 0.2 -mc 200')
+            # commands.append(
+            #    f'python {ROOTPATH}/source/tools/public/dirsearch/dirsearch.py -u {url} -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -t 50 --format=json -x 404 -o {filename}')
             utils.multiprocess('result.txt', *commands)
             for jsonFile in jsonFiles:
                 with open(jsonFile, 'r') as f:
@@ -70,6 +89,11 @@ class WebVuln:
         print(dirURL)
 
     def resourceHandler(self, method, data):
+        """Handle the resources.
+
+        :param method: `GET` or `POST`
+        :param data: JSON object
+        """
         if method not in ['GET', 'POST']:
             utils.log(f'Error: {method} is not a valid method', "ERROR")
             return 'Failed'
@@ -176,6 +200,7 @@ class WebVuln:
 
 
 a = WebVuln()
+a.scanURL(['http://localhost:12001'])
 """ obj = {}
 obj['vulnType'] = 'File Upload'
 obj['resType'] = 'File'
@@ -209,4 +234,3 @@ dateFind = datetime.strptime(
 """ data = {'domain': 'All', 'scanDate': 'All'}
 jsondata = dumps(data)
 print(a.getScanResult('GET', data=jsondata)) """
-# TODO: ADD PYPROJECT TOML

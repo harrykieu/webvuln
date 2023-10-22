@@ -55,8 +55,8 @@ def multiprocess(result, *processes):
 def log(data, type):
     """Log data to a file.
 
-    @param `data`: The data to be logged.
-    @param `type`: The type of the data: `ERROR`, `INFO`, `WARNING`, or `DEBUG`.
+    :param `data`: The data to be logged.
+    :param `type`: The type of the data: `ERROR`, `INFO`, `WARNING`, or `DEBUG`.
     """
     if type not in ["ERROR", "INFO", "WARNING", "DEBUG"]:
         raise ValueError("Invalid log type")
