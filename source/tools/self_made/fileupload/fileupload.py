@@ -1,16 +1,16 @@
 import re
 import requests
-from pathlib import Path
 from bs4 import BeautifulSoup
 
 
 class FileUpload:
-    def __init__(self, url, isDVWA=False):
+    def __init__(self, url, resources, isDVWA=False):
         self.url = url
         self.session = requests.Session()
         self.cookies = None
         self.csrfExist = False
         self.isDVWA = isDVWA
+        self.resources = resources
 
     def checkCSRF(self) -> str:
         """Check if CSRF is enabled on the website.
@@ -70,30 +70,37 @@ class FileUpload:
         print("Security level changed to " + level)
         return r
 
-    def uploadFile(self):
-        """Upload file to the website.
-        """
-        r = self.session.get(self.url)
+    def get_all_forms(self, url):
+        r = self.session.get(url)
         soup = BeautifulSoup(r.text, 'html.parser')
         forms = soup.find_all('form', attrs={'enctype': 'multipart/form-data'})
         if not forms:
             print("URL is not valid for file upload")
-            return
+            return None
         print("URL is valid for file upload")
-        # Finding the file upload form and extracting the necessary fields
-        formFields = {}
-        inputs = forms[0].find_all('input')
-        print(inputs)
+        return forms
+
+    def get_form_details(self, form) -> dict:
+        inputs = form.find_all('input')
+        formDetails = {}
         if inputs:
             for i in inputs:
                 if i["type"] == "file":
-                    formFields[i["name"]] = ""
+                    formDetails[i["name"]] = ""
                 elif i["type"] == "submit":
                     pass
                 else:
-                    formFields[i["name"]] = i["value"]
-        # Uploading valid file first for testing
-        self.craftPayload(formFields, "test.jpg")
+                    formDetails[i["name"]] = i["value"]
+        return formDetails
+
+    def uploadFile(self):
+        """Upload file to the website.
+        """
+        forms = self.get_all_forms(self.url)
+        for form in forms:
+            self.craftPayload(self.get_form_details(form))
+
+        # Uploading valid file first for testing """
         """  # Crafting the payload
         
         session = requests.Session()
@@ -112,16 +119,31 @@ class FileUpload:
                 print("File uploaded successfully")
                 return """
 
-    def craftPayload(self, formFields, filename):
-        filePath = Path(filename).absolute()
-        print(filePath)
-        """ payload = {}
-        for key in formFields:
-            if formFields[key] != "":
-                payload.update({key: (None, formFields[key])})
-            else:
-                # Case of file:
-                payload.update({key: (f'{filename}',open('source/tools/self_made/fileupload/test.php', 'rb'), "image/jpeg")}) """
+    def craftPayload(self, formField):
+        payload = {}
+        # Add file
+        for res in self.resources:
+            for key in formField:
+                if formField[key] != "":
+                    payload.update({key: (None, formField[key])})
+                else:
+                    payload.update(
+                        {key: ('abc.jpg', res['value'], "image/jpeg")})
+            p = self.session.post(self.url, files=payload)
+            if p.status_code != 200:
+                print("File upload failed")
+                return
+            soup = BeautifulSoup(p.text, 'html.parser')
+            # The signature of a successful file upload
+            signatureList = ["uploaded",
+                             "successfully", "uploaded successfully"]
+            for s in signatureList:
+                signature = soup.find_all(string=re.compile(s, re.IGNORECASE))
+                if signature:
+                    for htmlSig in signature:
+                        print(htmlSig)
+                    print("File uploaded successfully")
+                    break
 
     def main(self):
         self.dvwaLogin()

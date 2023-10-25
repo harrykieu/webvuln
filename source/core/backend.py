@@ -110,9 +110,12 @@ class WebVuln:
             elif module == 'xss':
                 pass
             elif module == 'fileupload':
+                # Get all the resources first
+                resources = self.resourceHandler(
+                    'GET', {"vulnType": "File Upload", "resType": "File"})
                 for key in dirURL:
                     for url in dirURL[key]:
-                        a = FileUpload(url)
+                        a = FileUpload(url, resources)
                         a.main()
             elif module == 'idor':
                 pass
@@ -150,7 +153,7 @@ class WebVuln:
                 if cursor.retrieved == 0:
                     utils.log('Error: No data found', "ERROR")
                     return 'Failed'
-                return str(listResult)
+                return listResult
             else:
                 utils.log('Error: Invalid JSON object', "ERROR")
                 return 'Failed'
@@ -233,42 +236,3 @@ class WebVuln:
             utils.log('Error: Cannot add the document', "ERROR")
             return 'Failed'
         return 'Success'
-
-    # TODO: ADD THE FUNCTIONS TO GET ALL THE RESOURCES
-
-
-a = WebVuln()
-a.scanURL(['http://localhost:12001'], ['fileupload'])
-""" obj = {}
-obj['vulnType'] = 'File Upload'
-obj['resType'] = 'File'
-with open(f'{ROOTPATH}/source/tools/self_made/fileupload/fileupload.png', 'rb') as f:
-    obj['value'] = base64.b64encode(f.read()).decode()
-f.close()
-obj['action'] = 'add'
-print(obj)
-data = dumps(obj)
-print(jsonData)
-print(a.resourceHandler('POST', jsonData)) """
-""" data = {'vulnType': 'File Upload', 'resType': 'File'}
-jsonData = dumps(data)
-resbig = a.resourceHandler('GET', jsonData)
-for res in resbig:
-    filecontentb64 = res['value']
-# save file
-with open(f'{ROOTPATH}/source/tools/self_made/fileupload/test2.jpg', 'wb') as f:
-    f.write(base64.b64decode(filecontentb64))
- """
-""" data = loads(
-    open(f'{ROOTPATH}/source/core/database/data_scanResult.json', 'r').read())
-for item in data:
-    item['scanDate'] = datetime.strptime(
-        item['scanDate'], "%Y-%m-%dT%H:%M:%S.%fZ")
-    print(item)
-    # a.saveScanResult(item) """
-""" # Example: {'domain': 'example.com', 'scanDate': datetime.datetime(2023, 9, 23, 9, 31, 41, 274000), 'numVuln': 0, 'vulnerabilities': [], 'resultSeverity': 'None'}
-dateFind = datetime.strptime(
-    '2023-09-23T09:31:41.274Z', "%Y-%m-%dT%H:%M:%S.%fZ") """
-""" data = {'domain': 'All', 'scanDate': 'All'}
-jsondata = dumps(data)
-print(a.getScanResult('GET', data=jsondata)) """
