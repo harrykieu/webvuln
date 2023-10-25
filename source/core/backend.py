@@ -133,7 +133,9 @@ class WebVuln:
         """Handle the resources.
 
         :param method: `GET` or `POST`
-        :param data: JSON object
+        :param data: JSON object. The format of the JSON object is as follows:
+        - GET: `{"vulnType": "", "resType": "}`
+        - POST: `{"vulnType": "", "resType": "", "value": "", "action": ""}` with `"action"` is either `"add"`, `"remove"` or `"update"`
         """
         if method not in ['GET', 'POST']:
             utils.log(f'Error: {method} is not a valid method', "ERROR")
