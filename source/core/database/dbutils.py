@@ -23,6 +23,9 @@ class DatabaseUtils:
         if "scanResult" not in self.__db.list_collection_names():
             self.__db.create_collection("scanResult", validator={
                                         '$jsonSchema': json.load(open("./source/core/schema/scanResult.json"))})
+        if "fileResources" not in self.__db.list_collection_names():
+            self.__db.create_collection("fileResources", validator={
+                                        '$jsonSchema': json.load(open("./source/core/schema/fileResources.json"))})
 
     def addDocument(self, collectionName, data) -> bool:
         """Add a document to the collection in the database.

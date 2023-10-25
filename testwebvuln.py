@@ -7,10 +7,10 @@ print(lista[0])
 for a in lista:
     print(lista.index(a)) """
 
-a.scanURL(['http://localhost:12001'], ['fileupload'])
+# a.scanURL(['http://localhost:12001'], ['fileupload'])
 # a.scanURL(['http://localhost/formtest.html'], ['fileupload'])
 
-
+# Upload file
 """ obj = {}
 obj['vulnType'] = 'File Upload'
 obj['resType'] = 'File'
