@@ -239,7 +239,7 @@ class WebVuln:
                         "editedDate": datetime.now()
                     }
                     state = self.__database.addDocument(
-                        'resources', newDocument)
+                        'fileResources', newDocument)
                     if state == 'Failed':
                         utils.log('Error: Cannot add the document', "ERROR")
                         return 'Failed'
@@ -253,7 +253,7 @@ class WebVuln:
                         return 'Failed'
                     return 'Success'
                 elif action == 'update':
-                    state = self.__database.updateDocument('resources', {
+                    state = self.__database.updateDocument('fileResources', {
                                                            "fileName": data['fileName'], "description": data['description'], "base64value": data['base64value']})
                     if state == 'Failed':
                         utils.log(

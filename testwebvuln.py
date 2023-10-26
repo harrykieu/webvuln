@@ -1,4 +1,10 @@
 from source.core.backend import WebVuln
+from pathlib import Path
+from json import dumps, loads
+import base64
+ROOTPATH = Path(__file__).parent
+
+
 a = WebVuln()
 """ lista = a.resourceHandler(
     'GET', data={'vulnType': 'File Upload', 'resType': 'File'})
@@ -11,17 +17,18 @@ for a in lista:
 # a.scanURL(['http://localhost/formtest.html'], ['fileupload'])
 
 # Upload file
-""" obj = {}
-obj['vulnType'] = 'File Upload'
-obj['resType'] = 'File'
+obj = {}
+obj['fileName'] = 'abc.png'
+obj['description'] = 'valid'
 with open(f'{ROOTPATH}/source/tools/self_made/fileupload/fileupload.png', 'rb') as f:
-    obj['value'] = base64.b64encode(f.read()).decode()
+    obj['base64value'] = base64.b64encode(f.read()).decode()
 f.close()
 obj['action'] = 'add'
-print(obj)
-data = dumps(obj)
-print(jsonData)
-print(a.resourceHandler('POST', jsonData)) """
+print(a.fileHandler('POST', obj))
+# Retrieve file
+data = {'fileName': 'abc.png'}
+jsondata = dumps(data)
+
 """ data = {'vulnType': 'File Upload', 'resType': 'File'}
 jsonData = dumps(data)
 resbig = a.resourceHandler('GET', jsonData)

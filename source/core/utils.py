@@ -71,7 +71,7 @@ def log(data, type):
         logFile = "/log.txt"
         logLocation = f'{logFolder}{logFile}'
     if not os.path.exists(f'{ROOTPATH}{logFolder}'):
-        os.mkdir(f'{ROOTPATH}\\{logFolder}')
+        os.mkdir(f'{ROOTPATH}{logFolder}')
     if not os.path.exists(f'{ROOTPATH}{logLocation}'):
         # Create the log file
         open(f'{ROOTPATH}{logLocation}', "x")

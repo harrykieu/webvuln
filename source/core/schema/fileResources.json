@@ -1,6 +1,6 @@
 {
     "bsonType": "object",
-    "required": [ "_id","fileName","phase","base64value","createdDate","editedDate"],
+    "required": [ "_id","fileName","description","base64value","createdDate","editedDate"],
     "properties":{
         "_id":{
             "bsonType":"objectId"
