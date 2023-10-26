@@ -95,174 +95,184 @@ def history():
         return "Bad request", 400
 
 
-@app.post('/api/resources')
+@app.post('/api/resourcesnormal')
 def postResources():
-    """Create/Update/Remove a resource.
+    """Create/Update/Remove a normal (string) resource.
 
-    This function is used for frontend to create, update, or remove a resource using `/api/resources` endpoint with `POST`.
+    This function is used for frontend to create, update, or remove a resource using `/api/resourcesnormal` endpoint with `POST`.
 
     The request body should contain a JSON object with the following properties:
     - `vulnType`: Type of vulnerability (e.g. XSS, SQLi, etc.)
-    - `type`: Type of resource (e.g. payload, exploit, etc.)
+    - `resType`: Type of resource (e.g. payload, exploit, etc.)
     - `value`: Value of the resource (e.g. payload, exploit, etc.)
     - `action`: Action to perform (e.g. create, update, remove)
     """
     orgHeader = request.headers.get('Origin')
     if orgHeader != 'frontend':
         if app.debug:
-            utils.log("/api/resources: Missing or invalid Origin header", "DEBUG")
+            utils.log(
+                "/api/resourcesnormal: Missing or invalid Origin header", "DEBUG")
         return "Forbidden", 403
     contHeader = request.headers.get('Content-Type')
     if contHeader != 'application/json':
         if app.debug:
             utils.log(
-                "/api/resources: Missing or invalid Content-Type header", "DEBUG")
+                "/api/resourcesnormal: Missing or invalid Content-Type header", "DEBUG")
         return "Bad request", 400
     data = request.get_json()
     if not data:
         if app.debug:
-            utils.log("/api/resources: Missing or invalid JSON data", "DEBUG")
+            utils.log(
+                "/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if 'vulnType' in keys and 'type' in keys and 'value' in keys and 'action' in keys and len(keys) == 4:
+    if 'vulnType' in keys and 'resType' in keys and 'value' in keys and 'action' in keys and len(keys) == 4:
         if app.debug:
             utils.log(
-                f"/api/resources: Successfully received data: {data}", "DEBUG")
-        backend.recvFlask('/api/resources', 'POST', data)
+                f"/api/resourcesnormal: Successfully received data: {data}", "DEBUG")
+        backend.recvFlask('/api/resourcesnormal', 'POST', data)
         return "Success", 200
     else:
         if app.debug:
-            utils.log("/api/resources: Missing or invalid JSON data", "DEBUG")
+            utils.log(
+                "/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
 
 
-@app.get('/api/resources')
+@app.get('/api/resourcesnormal')
 def getResources():
     """Get resources.
 
-    This function is used for frontend to get resource using `/api/resources` endpoint with `GET`.
+    This function is used for frontend to get resource using `/api/resourcesnormal` endpoint with `GET`.
 
     The request body should contain a JSON object with the following properties:
-    - `vulnType`: Type of vulnerability (e.g. XSS, SQLi, etc.)
-    - `resType`: Type of resource (e.g. payload, exploit, etc.) - has `All` type
+    - `vulnType`: Type of vulnerability (e.g. XSS, SQLi, etc.) - `All` value to find all resources
+    - `resType`: Type of resource (e.g. payload, exploit, etc.) - `All` value to find all resources
     """
     orgHeader = request.headers.get('Origin')
     if orgHeader != 'frontend':
         if app.debug:
-            utils.log("/api/resources: Missing or invalid Origin header", "DEBUG")
+            utils.log(
+                "/api/resourcesnormal: Missing or invalid Origin header", "DEBUG")
         return "Forbidden", 403
     contHeader = request.headers.get('Content-Type')
     if contHeader != 'application/json':
         if app.debug:
             utils.log(
-                "/api/resources: Missing or invalid Content-Type header", "DEBUG")
+                "/api/resourcesnormal: Missing or invalid Content-Type header", "DEBUG")
         return "Bad request", 400
     data = request.get_json()
     if not data:
         if app.debug:
-            utils.log("/api/resources: Missing or invalid JSON data", "DEBUG")
+            utils.log(
+                "/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
     if 'vulnType' in keys and 'resType' in keys and len(keys) == 2:
         if app.debug:
             utils.log(
-                f"/api/resources: Successfully received data: {data}", "DEBUG")
-        result = backend.recvFlask('/api/resources', 'GET', data)
+                f"/api/resourcesnormal: Successfully received data: {data}", "DEBUG")
+        result = backend.recvFlask('/api/resourcesnormal', 'GET', data)
         if result == 'Failed':
-            utils.log('/api/resources: Failed to get resources', "ERROR")
+            utils.log('/api/resourcesnormal: Failed to get resources', "ERROR")
             return "Failed", 404
         else:
             return result, 200
     else:
         if app.debug:
-            utils.log("/api/resources: Missing or invalid JSON data", "DEBUG")
+            utils.log(
+                "/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
 
 # FIX
 
 
-@app.get('/api/resourcesfu')
-def getResourcesFU():
+@app.get('/api/resourcesfile')
+def getResourcesFile():
     """Get files for file upload module.
 
-    This function is used for frontend to get file resource using `/api/resourcesfu` endpoint with `GET` (especially for file upload module).
+    This function is used for frontend to get file resource using `/api/resourcesfile` endpoint with `GET` (especially for file upload module).
 
     The request body should contain a JSON object with the following properties:
-    - `step`: Step of the file upload module (e.g. valid, invalidbutvalidExtension, invalidbutvalidMG)
+    - `description`: Step of the file upload module (e.g. valid, invalidbutvalidExtension, invalidbutvalidMG)
     """
     orgHeader = request.headers.get('Origin')
     if orgHeader != 'frontend':
         if app.debug:
-            utils.log("/api/resources: Missing or invalid Origin header", "DEBUG")
+            utils.log(
+                "/api/resourcesfile: Missing or invalid Origin header", "DEBUG")
         return "Forbidden", 403
     contHeader = request.headers.get('Content-Type')
     if contHeader != 'application/json':
         if app.debug:
             utils.log(
-                "/api/resources: Missing or invalid Content-Type header", "DEBUG")
+                "/api/resourcesfile: Missing or invalid Content-Type header", "DEBUG")
         return "Bad request", 400
     data = request.get_json()
     if not data:
         if app.debug:
-            utils.log("/api/resources: Missing or invalid JSON data", "DEBUG")
+            utils.log("/api/resourcesfile: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if 'vulnType' in keys and 'resType' in keys and len(keys) == 2:
+    if 'description' in keys and len(keys) == 1:
         if app.debug:
             utils.log(
-                f"/api/resources: Successfully received data: {data}", "DEBUG")
-        result = backend.recvFlask('/api/resources', 'GET', data)
+                f"/api/resourcesfile: Successfully received data: {data}", "DEBUG")
+        result = backend.recvFlask('/api/resourcesfile', 'GET', data)
         if result == 'Failed':
-            utils.log('/api/resources: Failed to get resources', "ERROR")
+            utils.log('/api/resourcesfile: Failed to get resources', "ERROR")
             return "Failed", 404
         else:
             return result, 200
     else:
         if app.debug:
-            utils.log("/api/resources: Missing or invalid JSON data", "DEBUG")
+            utils.log("/api/resourcesfile: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
 
 # Fix
 
 
-@app.post('/api/fileResources')
-def postResourcesFU():
+@app.post('/api/resourcesfile')
+def postResourcesFile():
     """Create/Update/Remove a file resource.
 
-    This function is used for frontend to create, update, or remove a file resource using `/api/fileResources` endpoint with `POST` (especially for file upload module).
+    This function is used for frontend to create, update, or remove a file resource using `/api/resourcesfile` endpoint with `POST` (especially for file upload module).
 
     The request body should contain a JSON object with the following properties:
-    - `vulnType`: Type of vulnerability (e.g. XSS, SQLi, etc.)
-    - `type`: Type of resource (e.g. payload, exploit, etc.)
-    - `value`: Value of the resource (e.g. payload, exploit, etc.)
+    - `fileName`: Name of the file.
+    - `description`: Description of the file.
+    - `base64value`: The base64 value of the file.
     - `action`: Action to perform (e.g. create, update, remove)
     """
     orgHeader = request.headers.get('Origin')
     if orgHeader != 'frontend':
         if app.debug:
-            utils.log("/api/resources: Missing or invalid Origin header", "DEBUG")
+            utils.log(
+                "/api/resourcesnormal: Missing or invalid Origin header", "DEBUG")
         return "Forbidden", 403
     contHeader = request.headers.get('Content-Type')
     if contHeader != 'application/json':
         if app.debug:
             utils.log(
-                "/api/resources: Missing or invalid Content-Type header", "DEBUG")
+                "/api/resourcesnormal: Missing or invalid Content-Type header", "DEBUG")
         return "Bad request", 400
     data = request.get_json()
     if not data:
         if app.debug:
-            utils.log("/api/resources: Missing or invalid JSON data", "DEBUG")
+            utils.log(
+                "/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if 'vulnType' in keys and 'type' in keys and 'value' in keys and 'action' in keys and len(keys) == 4:
+    if 'fileName' in keys and 'description' in keys and 'base64value' in keys and 'action' in keys and len(keys) == 4:
         if app.debug:
             utils.log(
-                f"/api/resources: Successfully received data: {data}", "DEBUG")
-        backend.recvFlask('/api/resources', 'POST', data)
+                f"/api/resourcesnormal: Successfully received data: {data}", "DEBUG")
+        backend.recvFlask('/api/resourcesnormal', 'POST', data)
         return "Success", 200
     else:
         if app.debug:
-            utils.log("/api/resources: Missing or invalid JSON data", "DEBUG")
+            utils.log(
+                "/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
 
 

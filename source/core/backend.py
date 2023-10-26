@@ -51,8 +51,10 @@ class WebVuln:
             print(f'{method} {route}: {jsonData.keys()}')
         if route == '/api/history':
             return self.getScanResult(method, jsonData)
-        elif route == '/api/resources':
+        elif route == '/api/resourcesnormal':
             return self.resourceHandler(method, jsonData)
+        elif route == '/api/resourcesfile':
+            return self.fileHandler(method, jsonData)
         elif route == '/api/scan':
             return self.scanURL(jsonData['urls'])
         else:
@@ -188,6 +190,71 @@ class WebVuln:
                 elif action == 'update':
                     state = self.__database.updateDocument('resources', {
                                                            'vulnType': data['vulnType'], 'type': data['resType']}, {'$set': {'value': data['value']}})
+                    if state == 'Failed':
+                        utils.log(
+                            'Error: Cannot update the document', "ERROR")
+                        return 'Failed'
+                    return 'Success'
+            else:
+                utils.log('Error: Invalid JSON object', "ERROR")
+                return 'Failed'
+
+    def fileHandler(self, method, data):
+        """Handle the file resources.
+
+        :param method: `GET` or `POST`
+        :param data: JSON object. The format of the JSON object is as follows:
+        - GET: `{"description": ""}`
+        - POST: `{"fileName": "", "description": "", "base64value": "", "action": ""}` with `"action"` is either `"add"`, `"remove"` or `"update"`"""
+        if method not in ['GET', 'POST']:
+            utils.log(f'Error: {method} is not a valid method', "ERROR")
+            return 'Failed'
+        # Parse JSON object
+        if method == 'GET':
+            if 'description' in data.keys() and len(data.keys()) == 1:
+                query = {}
+                if data['description'] != "":
+                    query['description'] = data['description']
+                cursor = self.__database.findDocument('fileResources', query)
+                listResult = []
+                for item in cursor:
+                    listResult.append(item)
+                if cursor.retrieved == 0:
+                    utils.log('Error: No data found', "ERROR")
+                    return 'Failed'
+                return listResult
+            else:
+                utils.log('Error: Invalid JSON object', "ERROR")
+                return 'Failed'
+        elif method == 'POST':
+            if 'fileName' in data.keys() and 'description' in data.keys() and 'base64value' in data.keys() and 'action' in data.keys() and len(data.keys()) == 4:
+                action = data['action']
+                if action == 'add':
+                    # Note: if the value is a file, it must be encoded in base64 string before sending to the server (client side)
+                    newDocument = {
+                        "fileName": data['fileName'],
+                        "description": data['description'],
+                        "base64value": data['base64value'],
+                        "createdDate": datetime.now(),
+                        "editedDate": datetime.now()
+                    }
+                    state = self.__database.addDocument(
+                        'resources', newDocument)
+                    if state == 'Failed':
+                        utils.log('Error: Cannot add the document', "ERROR")
+                        return 'Failed'
+                    return 'Success'
+                elif action == 'remove':
+                    state = self.__database.deleteDocument('fileResources', {
+                                                           "fileName": data['fileName'], "description": data['description'], "base64value": data['base64value']})
+                    if state == 'Failed':
+                        utils.log(
+                            'Error: Cannot delete the document', "ERROR")
+                        return 'Failed'
+                    return 'Success'
+                elif action == 'update':
+                    state = self.__database.updateDocument('resources', {
+                                                           "fileName": data['fileName'], "description": data['description'], "base64value": data['base64value']})
                     if state == 'Failed':
                         utils.log(
                             'Error: Cannot update the document', "ERROR")

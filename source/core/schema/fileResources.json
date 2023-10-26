@@ -8,7 +8,7 @@
         "fileName":{
             "bsonType":"string"
         },
-        "phase": {
+        "description": {
             "bsonType":"string"
         },
         "base64value":{
