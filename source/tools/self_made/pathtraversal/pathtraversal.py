@@ -12,12 +12,12 @@ class PathTraversal:
     def __init__(self, url):
         self.url = url
 
-    def scan_website(self):
+    def scanWebsite(self):
         results = {
             "path_traversal": []
         }
 
-        if self.check_path_traversal():
+        if self.checkPathTraversal():
             results["path_traversal"].append({
                 "url": self.url,
                 "details": "[+] path traversal detected"
@@ -30,8 +30,8 @@ class PathTraversal:
 
         return results
 
-    def check_path_traversal(self):
-        with open(f'{__file__}\\..\\path_traversal_payload.txt') as f:
+    def checkPathTraversal(self):
+        with open(f'{__file__}\\..\\pathTraversalPayload.txt') as f:
             path_traversal_payloads = f.read().splitlines()
 
         print("\n[+] Checking path traversal")
@@ -52,5 +52,3 @@ class PathTraversal:
         return False
 
 
-path_traversal = PathTraversal("http://localhost:8091/loadImage.php")
-path_traversal.scan_website()
