@@ -1,6 +1,6 @@
 from source.core.backend import WebVuln
 from pathlib import Path
-from json import dumps, loads
+from json import dumps
 import base64
 ROOTPATH = Path(__file__).parent
 
@@ -13,11 +13,11 @@ print(lista[0])
 for a in lista:
     print(lista.index(a)) """
 
-# a.scanURL(['http://localhost:12001'], ['fileupload'])
+a.scanURL(['http://localhost:12001'], ['fileupload'])
 # a.scanURL(['http://localhost/formtest.html'], ['fileupload'])
 
 # Upload file
-obj = {}
+""" obj = {}
 obj['fileName'] = 'abc.png'
 obj['description'] = 'valid'
 with open(f'{ROOTPATH}/source/tools/self_made/fileupload/fileupload.png', 'rb') as f:
@@ -27,7 +27,7 @@ obj['action'] = 'add'
 print(a.fileHandler('POST', obj))
 # Retrieve file
 data = {'fileName': 'abc.png'}
-jsondata = dumps(data)
+jsondata = dumps(data) """
 
 """ data = {'vulnType': 'File Upload', 'resType': 'File'}
 jsonData = dumps(data)

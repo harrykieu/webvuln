@@ -100,25 +100,6 @@ class FileUpload:
         for form in forms:
             self.craftPayload(self.get_form_details(form))
 
-        # Uploading valid file first for testing """
-        """  # Crafting the payload
-        
-        session = requests.Session()
-        p = session.post(self.url, files=payload, cookies=self.cookies)
-        if p.status_code != 200:
-            print("File upload failed")
-            return    
-        soup = BeautifulSoup(p.text, 'html.parser')
-        # The signature of a successful file upload
-        signatureList = ["uploaded", "successfully", "uploaded successfully"]
-        for s in signatureList:
-            signature = soup.find_all(string=re.compile(s, re.IGNORECASE))
-            if signature:
-                for htmlSig in signature:
-                    print(htmlSig)
-                print("File uploaded successfully")
-                return """
-
     def craftPayload(self, formField):
         payload = {}
         # Add file
@@ -129,6 +110,8 @@ class FileUpload:
                 else:
                     payload.update(
                         {key: ('abc.jpg', res['value'], "image/jpeg")})
+            print(payload)
+            return
             p = self.session.post(self.url, files=payload)
             if p.status_code != 200:
                 print("File upload failed")

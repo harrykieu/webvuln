@@ -113,8 +113,8 @@ class WebVuln:
                 pass
             elif module == 'fileupload':
                 # Get all the resources first
-                resources = self.resourceHandler(
-                    'GET', {"vulnType": "File Upload", "resType": "File"})
+                resources = self.fileHandler(
+                    'GET', {})
                 for key in dirURL:
                     for url in dirURL[key]:
                         a = FileUpload(url, resources)
