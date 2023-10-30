@@ -25,7 +25,7 @@ class WebVuln:
     def getDebug(self) -> bool:
         return self.__debug
 
-    def sendFlask(self, data):
+    def sendResultFlask(self, data) -> str:
         """Send data to Flask.
 
         :param data: JSON object"""
@@ -35,13 +35,17 @@ class WebVuln:
                 if self.__debug:
                     utils.log(
                         f'/api/result: Sending data to Flask: {data}', "DEBUG")
-                requests.post(url='http://localhost:5000//api/result', data=data, headers={
+                requests.post(url='http://localhost:5000/api/result', data=data, headers={
                               'Content-Type': 'application/json', 'Origin': 'backend'})
             except Exception as e:
-                utils.log(f'Error: {e}', "ERROR")
-                return e
+                if self.__debug:
+                    print(f'[backend.py-sendResultFlask] Error: {e}')
+                utils.log(
+                    f'[backend.py-sendResultFlask] Error: {e}', "ERROR")
+                return 'Failed'
+            return 'Success'
 
-    def recvFlask(self, route, method, jsonData) -> None:
+    def recvFlask(self, route, method, jsonData) -> None | str:
         """Receive data from Flask based on the route.
 
         :param route: The route of the request
@@ -73,11 +77,26 @@ class WebVuln:
         jsonFiles = []
         dirURL = {}
         if isinstance(urls, list) is False:
-            raise TypeError("URLs must be a list")
+            if self.__debug:
+                print(
+                    '[backend.py-scanURL] Error: URLs must be a list')
+            utils.log(
+                '[backend.py-scanURL] Error: URLs must be a list', "ERROR")
+            return 'Failed'
         elif isinstance(modules, list) is False:
-            raise TypeError("Modules must be a list")
+            if self.__debug:
+                print(
+                    '[backend.py-scanURL] Error: Modules must be a list')
+            utils.log(
+                '[backend.py-scanURL] Error: Modules must be a list', "ERROR")
+            return 'Failed'
         if urls == [] or modules == []:
-            raise ValueError("URLs and/or modules must not be empty")
+            if self.__debug:
+                print(
+                    '[backend.py-scanURL] Error: URLs and modules must not be empty')
+            utils.log(
+                '[backend.py-scanURL] Error: URLs and modules must not be empty', "ERROR")
+            return 'Failed'
         for url in urls:
             filename = f'scanresult_url{urls.index(url)}.json'
             jsonFiles.append(filename)
@@ -100,7 +119,6 @@ class WebVuln:
                     os.remove(jsonFile)
             else:
                 dirURL[f'{url}'] = [f'{url}']
-        commands = []  # Reinitalize the commands
         for module in modules:
             if module == 'ffuf':
                 pass
@@ -116,6 +134,13 @@ class WebVuln:
                 # Get all the resources first
                 resources = self.fileHandler(
                     'GET', {})
+                if resources == 'Failed':
+                    utils.log(
+                        '[backend.py-scanURL] Error: Failed to get resources', "ERROR")
+                    if self.__debug:
+                        print(
+                            '[backend.py-scanURL] Error: Failed to get resources')
+                    return 'Failed'
                 for key in dirURL:
                     for url in dirURL[key]:
                         a = FileUpload(url, resources)
@@ -126,13 +151,19 @@ class WebVuln:
                 pass
             else:
                 raise ValueError(f'Invalid module {module}')
-        if commands != []:
-            utils.multiprocess('result.txt', *commands)
-        else:
-            utils.log('Error: No module is selected', "ERROR")
+        # Missing the result handler
+        exampleJSONres = {'result': 'abc'}
+        try:
+            self.sendResultFlask(json.dumps(exampleJSONres))
+        except Exception as e:
+            if self.__debug:
+                print(f'[backend.py-scanURL] Error: {e}')
+            utils.log(
+                f'[backend.py-scanURL] Error: {e}', "ERROR")
             return 'Failed'
+        return 'Success'
 
-    def resourceHandler(self, method, data):
+    def resourceHandler(self, method, data) -> str | list:
         """Handle the resources.
 
         :param method: `GET` or `POST`
@@ -142,7 +173,11 @@ class WebVuln:
         Note: when the action is `"update"`, the `"value"` field must be the list of the old value and the new value. Example: `{"vulnType": "", "resType": "", "value": ["oldValue", "newValue"], "action": "update"}`
         """
         if method not in ['GET', 'POST']:
-            utils.log(f'Error: {method} is not a valid method', "ERROR")
+            if self.__debug:
+                print(
+                    f'[backend.py-resourceHandler] Error: {method} is not a valid method')
+            utils.log(
+                f'[backend.py-resourceHandler] Error: {method} is not a valid method', "ERROR")
             return 'Failed'
         # Parse JSON object
         if method == 'GET':
@@ -152,13 +187,17 @@ class WebVuln:
                     query['vulnType'] = data['vulnType']
                 if data['resType'] != "":
                     query['type'] = data['resType']
-                cursor = self.__database.findDocument('resources', query)
+                try:
+                    cursor = self.__database.findDocument('resources', query)
+                except Exception as e:
+                    utils.log(
+                        f'[backend.py-findDocument-GET] Error: {e}', "ERROR")
+                    if self.__debug:
+                        print(f'[backend.py-findDocument-GET] Error: {e}')
+                    return 'Failed'
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
-                if cursor.retrieved == 0:
-                    utils.log('Error: No data found', "ERROR")
-                    return 'Failed'
                 return listResult
             else:
                 utils.log('Error: Invalid JSON object', "ERROR")
@@ -175,24 +214,39 @@ class WebVuln:
                         "createdDate": datetime.now(),
                         "editedDate": datetime.now()
                     }
-                    state = self.__database.addDocument(
-                        'resources', newDocument)
-                    if state == 'Failed':
-                        utils.log('Error: Cannot add the document', "ERROR")
-                        return 'Failed'
-                    return 'Success'
-                elif action == 'remove':
-                    state = self.__database.deleteDocument('resources', {
-                                                           'vulnType': data['vulnType'], 'type': data['resType'], 'value': data['value']})
-                    if state == 'Failed':
+                    try:
+                        self.__database.addDocument('resources', newDocument)
+                        return 'Success'
+                    except Exception as e:
+                        if self.__debug:
+                            if isinstance(e, pymongo.errors.DuplicateKeyError):
+                                print(
+                                    '[backend.py-resourceHandler-addDocument] Error: Duplicate key')
+                            else:
+                                print(
+                                    f'[backend.py-resourceHandler-addDocument] Error: {e}')
                         utils.log(
-                            'Error: Cannot delete the document', "ERROR")
+                            f'[backend.py-resourceHandler-addDocument] Error: {e}', "ERROR")
                         return 'Failed'
-                    return 'Success'
+                elif action == 'remove':
+                    try:
+                        self.__database.deleteDocument('resources', {
+                                                       'vulnType': data['vulnType'], 'type': data['resType'], 'value': data['value']})
+                        return 'Success'
+                    except Exception as e:
+                        if self.__debug:
+                            print(
+                                f'[backend.py-resourceHandler-deleteDocument] Error: {e}')
+                        utils.log(
+                            f'[backend.py-resourceHandler-deleteDocument] Error: {e}', "ERROR")
+                        return 'Failed'
                 elif action == 'update':
                     if len(data['value']) != 2:
                         utils.log(
-                            '[backend.py-updateDocument] Error: Invalid JSON object', "ERROR")
+                            '[backend.py-resourceHandler-updateDocument] Error: Invalid JSON object', "ERROR")
+                        if self.__debug:
+                            print(
+                                '[backend.py-resourceHandler-updateDocument] Error: Invalid JSON object')
                         return 'Failed'
                     try:
                         self.__database.updateDocument('resources', {'vulnType': data['vulnType'], 'type': data['resType'], 'value': data['value'][0]}, {
@@ -200,16 +254,16 @@ class WebVuln:
                         return 'Success'
                     except Exception as e:
                         utils.log(
-                            f'[backend.py-updateDocument] Error: {e}', "ERROR")
+                            f'[backend.py-resourceHandler-updateDocument] Error: {e}', "ERROR")
                         if self.__debug:
                             print(
-                                f'[backend.py-deleteDocument] Error: {e}')
-                        raise e
+                                f'[backend.py-resourceHandler-updateDocument] Error: {e}')
+                        return 'Failed'
             else:
                 utils.log('Error: Invalid JSON object', "ERROR")
                 return 'Failed'
 
-    def fileHandler(self, method, data):
+    def fileHandler(self, method, data) -> str | list:
         """Handle the file resources.
 
         :param method: `GET` or `POST`
@@ -217,7 +271,11 @@ class WebVuln:
         - GET: `{"description": ""}`
         - POST: `{"fileName": "", "description": "", "base64value": "", "action": ""}` with `"action"` is either `"add"`, `"remove"` or `"update"`"""
         if method not in ['GET', 'POST']:
-            utils.log(f'Error: {method} is not a valid method', "ERROR")
+            if self.__debug:
+                print(
+                    f'[backend.py-fileHandler] Error: {method} is not a valid method')
+            utils.log(
+                f'[backend.py-fileHandler] Error: {method} is not a valid method', "ERROR")
             return 'Failed'
         # Parse JSON object
         if method == 'GET':
@@ -228,20 +286,19 @@ class WebVuln:
                 try:
                     cursor = self.__database.findDocument(
                         'fileResources', query)
-                    listResult = []
-                    for item in cursor:
-                        listResult.append(item)
-                    if cursor.retrieved == 0:
-                        utils.log(
-                            '[backend.py-findDocument] Error: No data found', "ERROR")
-                        return 'Failed'
                 except Exception as e:
                     if self.__debug:
-                        print(f'[backend.py-findDocument] Error: {e}')
+                        print(f'[backend.py-fileHandler-GET] Error: {e}')
                     return 'Failed'
+                listResult = []
+                for item in cursor:
+                    listResult.append(item)
                 return listResult
             else:
-                utils.log('[backend.py-findDocument] Error: Invalid JSON object',
+                if self.__debug:
+                    print(
+                        '[backend.py-fileHandler-GET] Error: Invalid JSON object')
+                utils.log('[backend.py-fileHandler-GET] Error: Invalid JSON object',
                           "ERROR")
                 return 'Failed'
         elif method == 'POST':
@@ -263,11 +320,11 @@ class WebVuln:
                         if isinstance(e, pymongo.errors.DuplicateKeyError):
                             if self.__debug:
                                 print(
-                                    '[backend.py-addDocument] Error: Duplicate key')
+                                    '[backend.py-fileHandler-addDocument] Error: Duplicate key')
                         else:
                             if self.__debug:
                                 print(
-                                    f'[backend.py-addDocument] Error: {e}')
+                                    f'[backend.py-fileHandler-addDocument] Error: {e}')
                         return 'Failed'
                     return 'Success'
                 elif action == 'remove':
@@ -277,7 +334,9 @@ class WebVuln:
                     except Exception as e:
                         if self.__debug:
                             print(
-                                f'[backend.py-deleteDocument] Error: {e}')
+                                f'[backend.py-fileHandler-deleteDocument] Error: {e}')
+                        utils.log(
+                            f'[backend.py-fileHandler-deleteDocument] Error: {e}', "ERROR")
                         return 'Failed'
                     return 'Success'
                 elif action == 'update':
@@ -287,21 +346,31 @@ class WebVuln:
                     except Exception as e:
                         if self.__debug:
                             print(
-                                f'[backend.py-updateDocument] Error: {e}')
+                                f'[backend.py-fileHandler-updateDocument] Error: {e}')
+                        utils.log(
+                            f'[backend.py-fileHandler-updateDocument] Error: {e}', "ERROR")
                         return 'Failed'
                     return 'Success'
             else:
-                utils.log('Error: Invalid JSON object', "ERROR")
+                if self.__debug:
+                    print(
+                        '[backend.py-fileHandler-POST] Error: Invalid JSON object')
+                utils.log(
+                    '[backend.py-fileHandler-POST] Error: Invalid JSON object', "ERROR")
                 return 'Failed'
 
-    def getScanResult(self, method, data):
+    def getScanResult(self, method, data) -> str | list:
         """Get all the scan results from the database.
 
         :param method: GET
         :param data: JSON object
         """
         if method != 'GET':
-            utils.log(f'Error: {method} is not a valid method', "ERROR")
+            if self.__debug:
+                print(
+                    f'[backend.py-getScanResult] Error: {method} is not a valid method')
+            utils.log(
+                f'[backend.py-getScanResult] Error: {method} is not a valid method', "ERROR")
             return 'Failed'
         # Parse JSON object
         if method == 'GET':
@@ -313,25 +382,35 @@ class WebVuln:
                     dateParsed = datetime.strptime(
                         data['scanDate'], "%Y-%m-%dT%H:%M:%S.%fZ")
                     query['scanDate'] = dateParsed
-                cursor = self.__database.findDocument('scanResult', query)
+                try:
+                    cursor = self.__database.findDocument('scanResult', query)
+                except Exception as e:
+                    if self.__debug:
+                        print(f'[backend.py-getScanResult] Error: {e}')
+                    utils.log(
+                        f'[backend.py-getScanResult] Error: {e}', "ERROR")
+                    return 'Failed'
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
-                if cursor.retrieved == 0:
-                    utils.log('Error: No data found', "ERROR")
-                    return 'Failed'
                 return str(listResult)
             else:
-                utils.log('Error: Invalid JSON object', "ERROR")
+                utils.log(
+                    '[backend.py-getScanResult] Error: Invalid JSON object', "ERROR")
+                if self.__debug:
+                    print('[backend.py-getScanResult] Error: Invalid JSON object')
                 return 'Failed'
 
-    def saveScanResult(self, data):
+    def saveScanResult(self, data) -> str:
         """Save scan result to the database.
 
         :param data: JSON object
         """
-        state = self.__database.addDocument('scanResult', data)
-        if state == 'Failed':
-            utils.log('Error: Cannot add the document', "ERROR")
+        try:
+            self.__database.addDocument('scanResult', data)
+        except Exception as e:
+            if self.__debug:
+                print(f'[backend.py-saveScanResult] Error: {e}')
+            utils.log(f'[backend.py-saveScanResult] Error: {e}', "ERROR")
             return 'Failed'
         return 'Success'

@@ -1,11 +1,11 @@
 from flask import Flask
 from flask import request
-from . import backend as be
-from . import utils
+from source.core.backend import WebVuln
+import source.core.utils as utils
 
 
 app = Flask(__name__)
-backend = be.WebVuln()
+backend = WebVuln()
 # Debug
 backend.setDebug(True)
 
@@ -302,11 +302,11 @@ def postResult():
             utils.log("/api/result: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if 'result' in keys and len(keys) == 1:
+    if 'result' in keys and len(keys) == 1:  # FIX LATER
         if app.debug:
             utils.log(
                 f"/api/result: Successfully received data: {data}", "DEBUG")
-        backend.recvFlask('/api/result', 'POST', data)
+        # frontend.recvFlask('/api/result', 'POST', data)
         return "Success", 200
     else:
         if app.debug:

@@ -13,7 +13,7 @@ print(lista[0])
 for a in lista:
     print(lista.index(a)) """
 
-# a.scanURL(['http://localhost:12001'], ['fileupload'])
+print(a.scanURL(['http://localhost:12001'], ['lfi']))
 # a.scanURL(['http://localhost/formtest.html'], ['fileupload'])
 
 # Push resource to db
@@ -25,14 +25,14 @@ jsondata[0]["action"] = "add"
 print(jsondata)
 print(a.resourceHandler('POST', data=jsondata[0]))"""
 # Update resource in db
-with open(f'{ROOTPATH}/source/core/database/data_resources.json', 'r') as f:
+""" with open(f'{ROOTPATH}/source/core/database/data_resources.json', 'r') as f:
     data = f.read()
 f.close
 jsondata = loads(data)
 jsondata[0]["action"] = "update"
 jsondata[0]['value'] = ['Mozilla/6.0 ;--', 'Mozilla/6.1 ;--']
 print(jsondata)
-print(a.resourceHandler('POST', data=jsondata[0]))
+print(a.resourceHandler('POST', data=jsondata[0])) """
 # Upload file
 """ obj = {}
 obj['fileName'] = 'abc.png'
