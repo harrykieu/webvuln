@@ -1,7 +1,7 @@
+import base64
+from json import dumps, loads
 from source.core.backend import WebVuln
 from pathlib import Path
-from json import dumps
-import base64
 ROOTPATH = Path(__file__).parent
 
 
@@ -13,9 +13,26 @@ print(lista[0])
 for a in lista:
     print(lista.index(a)) """
 
-a.scanURL(['http://localhost:12001'], ['fileupload'])
+# a.scanURL(['http://localhost:12001'], ['fileupload'])
 # a.scanURL(['http://localhost/formtest.html'], ['fileupload'])
 
+# Push resource to db
+""" with open(f'{ROOTPATH}/source/core/database/data_resources.json', 'r') as f:
+    data = f.read()
+f.close()
+jsondata = loads(data)
+jsondata[0]["action"] = "add"
+print(jsondata)
+print(a.resourceHandler('POST', data=jsondata[0]))"""
+# Update resource in db
+with open(f'{ROOTPATH}/source/core/database/data_resources.json', 'r') as f:
+    data = f.read()
+f.close
+jsondata = loads(data)
+jsondata[0]["action"] = "update"
+jsondata[0]['value'] = ['Mozilla/6.0 ;--', 'Mozilla/6.1 ;--']
+print(jsondata)
+print(a.resourceHandler('POST', data=jsondata[0]))
 # Upload file
 """ obj = {}
 obj['fileName'] = 'abc.png'
@@ -24,11 +41,11 @@ with open(f'{ROOTPATH}/source/tools/self_made/fileupload/fileupload.png', 'rb') 
     obj['base64value'] = base64.b64encode(f.read()).decode()
 f.close()
 obj['action'] = 'add'
-print(a.fileHandler('POST', obj))
+print(a.fileHandler('POST', obj)) """
 # Retrieve file
-data = {'fileName': 'abc.png'}
-jsondata = dumps(data) """
-
+""" data = {'fileName': 'abc.png'}
+jsondata = dumps(data)
+print(jsondata) """
 """ data = {'vulnType': 'File Upload', 'resType': 'File'}
 jsonData = dumps(data)
 resbig = a.resourceHandler('GET', jsonData)

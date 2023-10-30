@@ -2,6 +2,7 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
+import pymongo
 
 import requests
 from source.core.database.dbutils import DatabaseUtils
@@ -138,6 +139,7 @@ class WebVuln:
         :param data: JSON object. The format of the JSON object is as follows:
         - GET: `{"vulnType": "", "resType": "}`
         - POST: `{"vulnType": "", "resType": "", "value": "", "action": ""}` with `"action"` is either `"add"`, `"remove"` or `"update"`
+        Note: when the action is `"update"`, the `"value"` field must be the list of the old value and the new value. Example: `{"vulnType": "", "resType": "", "value": ["oldValue", "newValue"], "action": "update"}`
         """
         if method not in ['GET', 'POST']:
             utils.log(f'Error: {method} is not a valid method', "ERROR")
@@ -188,13 +190,21 @@ class WebVuln:
                         return 'Failed'
                     return 'Success'
                 elif action == 'update':
-                    state = self.__database.updateDocument('resources', {
-                                                           'vulnType': data['vulnType'], 'type': data['resType']}, {'$set': {'value': data['value']}})
-                    if state == 'Failed':
+                    if len(data['value']) != 2:
                         utils.log(
-                            'Error: Cannot update the document', "ERROR")
+                            '[backend.py-updateDocument] Error: Invalid JSON object', "ERROR")
                         return 'Failed'
-                    return 'Success'
+                    try:
+                        self.__database.updateDocument('resources', {'vulnType': data['vulnType'], 'type': data['resType'], 'value': data['value'][0]}, {
+                                                       '$set': {'value': data['value'][1]}})
+                        return 'Success'
+                    except Exception as e:
+                        utils.log(
+                            f'[backend.py-updateDocument] Error: {e}', "ERROR")
+                        if self.__debug:
+                            print(
+                                f'[backend.py-deleteDocument] Error: {e}')
+                        raise e
             else:
                 utils.log('Error: Invalid JSON object', "ERROR")
                 return 'Failed'
@@ -215,16 +225,24 @@ class WebVuln:
                 query = {}
                 if data['description'] != "":
                     query['description'] = data['description']
-                cursor = self.__database.findDocument('fileResources', query)
-                listResult = []
-                for item in cursor:
-                    listResult.append(item)
-                if cursor.retrieved == 0:
-                    utils.log('Error: No data found', "ERROR")
+                try:
+                    cursor = self.__database.findDocument(
+                        'fileResources', query)
+                    listResult = []
+                    for item in cursor:
+                        listResult.append(item)
+                    if cursor.retrieved == 0:
+                        utils.log(
+                            '[backend.py-findDocument] Error: No data found', "ERROR")
+                        return 'Failed'
+                except Exception as e:
+                    if self.__debug:
+                        print(f'[backend.py-findDocument] Error: {e}')
                     return 'Failed'
                 return listResult
             else:
-                utils.log('Error: Invalid JSON object', "ERROR")
+                utils.log('[backend.py-findDocument] Error: Invalid JSON object',
+                          "ERROR")
                 return 'Failed'
         elif method == 'POST':
             if 'fileName' in data.keys() and 'description' in data.keys() and 'base64value' in data.keys() and 'action' in data.keys() and len(data.keys()) == 4:
@@ -238,26 +256,38 @@ class WebVuln:
                         "createdDate": datetime.now(),
                         "editedDate": datetime.now()
                     }
-                    state = self.__database.addDocument(
-                        'fileResources', newDocument)
-                    if state == 'Failed':
-                        utils.log('Error: Cannot add the document', "ERROR")
+                    try:
+                        self.__database.addDocument(
+                            'fileResources', newDocument)
+                    except Exception as e:
+                        if isinstance(e, pymongo.errors.DuplicateKeyError):
+                            if self.__debug:
+                                print(
+                                    '[backend.py-addDocument] Error: Duplicate key')
+                        else:
+                            if self.__debug:
+                                print(
+                                    f'[backend.py-addDocument] Error: {e}')
                         return 'Failed'
                     return 'Success'
                 elif action == 'remove':
-                    state = self.__database.deleteDocument('fileResources', {
-                                                           "fileName": data['fileName'], "description": data['description'], "base64value": data['base64value']})
-                    if state == 'Failed':
-                        utils.log(
-                            'Error: Cannot delete the document', "ERROR")
+                    try:
+                        self.__database.deleteDocument('fileResources', {
+                            "fileName": data['fileName'], "description": data['description'], "base64value": data['base64value']})
+                    except Exception as e:
+                        if self.__debug:
+                            print(
+                                f'[backend.py-deleteDocument] Error: {e}')
                         return 'Failed'
                     return 'Success'
                 elif action == 'update':
-                    state = self.__database.updateDocument('fileResources', {
-                                                           "fileName": data['fileName'], "description": data['description'], "base64value": data['base64value']})
-                    if state == 'Failed':
-                        utils.log(
-                            'Error: Cannot update the document', "ERROR")
+                    try:
+                        self.__database.updateDocument('fileResources', {
+                            "fileName": data['fileName'], "description": data['description'], "base64value": data['base64value']})
+                    except Exception as e:
+                        if self.__debug:
+                            print(
+                                f'[backend.py-updateDocument] Error: {e}')
                         return 'Failed'
                     return 'Success'
             else:

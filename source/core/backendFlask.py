@@ -194,7 +194,7 @@ def getResourcesFile():
     This function is used for frontend to get file resource using `/api/resourcesfile` endpoint with `GET` (especially for file upload module).
 
     The request body should contain a JSON object with the following properties:
-    - `description`: Step of the file upload module (e.g. valid, invalidbutvalidExtension, invalidbutvalidMG)
+    - `description`: Step of the file upload module (e.g. valid, invalidbutvalidExtension, invalidbutvalidMH)
     """
     orgHeader = request.headers.get('Origin')
     if orgHeader != 'frontend':

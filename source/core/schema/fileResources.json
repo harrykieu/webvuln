@@ -9,7 +9,8 @@
             "bsonType":"string"
         },
         "description": {
-            "bsonType":"string"
+            "bsonType":"string",
+            "enum": ["valid", "invalidbutvalidExtension", "invalidbutvalidMH"]
         },
         "base64value":{
             "bsonType":"string"
