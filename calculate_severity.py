@@ -1,7 +1,9 @@
 def calculateWebsiteSafetyRate(website_vulnerabilities):
+    """Calculate the website's safety rate and severity 
+    :param website_vulnerabilities: A list of vulnerabilities defined in the list vulnerabilities.
+    :return: A tuple containing the website safety rate and its severity.
     """
-    Define the CVSS scores for each vulnerability
-    """
+    # Define the CVSS scores for each vulnerability
     vulnerabilities = {
         "sql injection": 8.6,
         "broken authentication": 9.8,
@@ -19,11 +21,9 @@ def calculateWebsiteSafetyRate(website_vulnerabilities):
                       for vuln in website_vulnerabilities)
 
     total_original_score = 100
-    website_safety_rate = (1 - total_score / total_original_score) * 100
+    website_safety_rate = (1 - (total_score / total_original_score)) * 100
 
-    """
-    Define the conversion table for severity
-    """
+    # Define the conversion table for severity
     severity_conversion = {
         (0, 39): "Critical",
         (40, 69): "High",
@@ -38,10 +38,3 @@ def calculateWebsiteSafetyRate(website_vulnerabilities):
             severity = label
 
     return website_safety_rate, severity
-
-
-website_vulnerabilities = ["sql injection", "broken authentication",
-                           "sensitive data exposure", "XML External Entity Injection", "broken access control", "Cross-Site Scripting (XSS)"]
-safety_rate, severity = calculateWebsiteSafetyRate(website_vulnerabilities)
-print(f"Website Safety Rate: {safety_rate:.1f}")
-print(f"Severity: {severity}")
