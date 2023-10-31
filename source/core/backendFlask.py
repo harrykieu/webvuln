@@ -103,7 +103,7 @@ def postResources():
 
     The request body should contain a JSON object with the following properties:
     - `vulnType`: Type of vulnerability (e.g. XSS, SQLi, etc.)
-    - `type`: Type of resource (e.g. payload, exploit, etc.)
+    - `resType`: Type of resource (e.g. payload, exploit, etc.)
     - `value`: Value of the resource (e.g. payload, exploit, etc.)
     - `action`: Action to perform (e.g. create, update, remove)
     """
@@ -124,7 +124,7 @@ def postResources():
             utils.log("/api/resources: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if 'vulnType' in keys and 'type' in keys and 'value' in keys and 'action' in keys and len(keys) == 4:
+    if 'vulnType' in keys and 'resType' in keys and 'value' in keys and 'action' in keys and len(keys) == 4:
         if app.debug:
             utils.log(
                 f"/api/resources: Successfully received data: {data}", "DEBUG")
