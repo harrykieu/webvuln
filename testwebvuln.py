@@ -13,7 +13,7 @@ print(lista[0])
 for a in lista:
     print(lista.index(a)) """
 
-print(a.scanURL(['http://localhost:12001'], ['lfi']))
+print(a.scanURL(['http://localhost:12001'], ['fileupload']))
 # a.scanURL(['http://localhost/formtest.html'], ['fileupload'])
 
 # Push resource to db
@@ -35,9 +35,9 @@ print(jsondata)
 print(a.resourceHandler('POST', data=jsondata[0])) """
 # Upload file
 """ obj = {}
-obj['fileName'] = 'abc.png'
-obj['description'] = 'valid'
-with open(f'{ROOTPATH}/source/tools/self_made/fileupload/fileupload.png', 'rb') as f:
+obj['fileName'] = 'test.jpg'
+obj['description'] = 'invalidbutvalidExtension'
+with open(f'{ROOTPATH}/source/tools/self_made/fileupload/test.jpg', 'rb') as f:
     obj['base64value'] = base64.b64encode(f.read()).decode()
 f.close()
 obj['action'] = 'add'

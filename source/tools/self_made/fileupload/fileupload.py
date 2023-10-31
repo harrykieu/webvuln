@@ -1,6 +1,8 @@
+from base64 import b64decode
 import re
 import requests
 from bs4 import BeautifulSoup
+import source.core.utils as utils
 
 
 class FileUpload:
@@ -11,6 +13,7 @@ class FileUpload:
         self.csrfExist = False
         self.isDVWA = isDVWA
         self.resources = resources
+        self.result = False
 
     def checkCSRF(self) -> str:
         """Check if CSRF is enabled on the website.
@@ -38,6 +41,7 @@ class FileUpload:
             print("No CSRF token found!")
             return None
 
+    # ================================DVWA=======================================
     def dvwaLogin(self) -> str:
         """(For DVWA only) Login to DVWA and return a session object.
         """
@@ -69,8 +73,9 @@ class FileUpload:
         r = self.session.post('http://localhost/dvwa/security.php', data=data)
         print("Security level changed to " + level)
         return r
+    # ===========================================================================
 
-    def get_all_forms(self, url):
+    def getAllForms(self, url):
         r = self.session.get(url)
         soup = BeautifulSoup(r.text, 'html.parser')
         forms = soup.find_all('form', attrs={'enctype': 'multipart/form-data'})
@@ -80,7 +85,7 @@ class FileUpload:
         print("URL is valid for file upload")
         return forms
 
-    def get_form_details(self, form) -> dict:
+    def getFormDetails(self, form) -> dict:
         inputs = form.find_all('input')
         formDetails = {}
         if inputs:
@@ -96,39 +101,96 @@ class FileUpload:
     def uploadFile(self):
         """Upload file to the website.
         """
-        forms = self.get_all_forms(self.url)
+        forms = self.getAllForms(self.url)
+        if not forms:
+            utils.log("[FileUpload] URL is not valid for file upload", "ERROR")
+            return self.result
         for form in forms:
-            self.craftPayload(self.get_form_details(form))
+            self.craftPayload(self.getFormDetails(form))
 
     def craftPayload(self, formField):
         payload = {}
         # Add file
+        validFiles = []
+        validExtension = []
+        validMH = []
         for res in self.resources:
+            if res['description'] == 'valid':
+                validFiles.append(res)
+            elif res['description'] == 'invalidbutvalidExtension':
+                validExtension.append(res)
+            elif res['description'] == 'invalidbutvalidMH':
+                validMH.append(res)
+            else:
+                pass
+        for validFile in validFiles:
             for key in formField:
                 if formField[key] != "":
                     payload.update({key: (None, formField[key])})
                 else:
                     payload.update(
-                        {key: ('abc.jpg', res['value'], "image/jpeg")})
-            print(payload)
-            return
+                        {key: (validFile['fileName'], b64decode(validFile['base64value']), "image/jpeg")})
             p = self.session.post(self.url, files=payload)
             if p.status_code != 200:
-                print("File upload failed")
-                return
-            soup = BeautifulSoup(p.text, 'html.parser')
-            # The signature of a successful file upload
-            signatureList = ["uploaded",
-                             "successfully", "uploaded successfully"]
-            for s in signatureList:
-                signature = soup.find_all(string=re.compile(s, re.IGNORECASE))
-                if signature:
-                    for htmlSig in signature:
-                        print(htmlSig)
-                    print("File uploaded successfully")
-                    break
+                print("[-] File upload failed!")
+                return self.result
+            elif self.checkSuccess(p.text) is False:
+                print("[-] File upload failed!")
+                return self.result
+            else:
+                print("[+] Valid file upload success!")
+        for validExtFile in validExtension:
+            # print(validExtFile)
+            print(b64decode(validExtFile['base64value']))
+            for key in formField:
+                if formField[key] != "":
+                    payload.update({key: (None, formField[key])})
+                else:
+                    payload.update(
+                        {key: (validExtFile['fileName'], b64decode(validExtFile['base64value']), "image/jpeg")})
+            p = self.session.post(self.url, files=payload)
+            if p.status_code != 200:
+                print("[-] File upload failed!")
+                return self.result
+            elif self.checkSuccess(p.text) is False:
+                print("[-] File upload failed!")
+                return self.result
+            else:
+                print("[+] Invalid file with valid extension upload success!")
+        for validMHFile in validMH:
+            for key in formField:
+                if formField[key] != "":
+                    payload.update({key: (None, formField[key])})
+                else:
+                    payload.update(
+                        {key: (validMHFile['fileName'], b64decode(validMHFile['base64value']), "image/jpeg")})
+            p = self.session.post(self.url, files=payload)
+            if p.status_code != 200:
+                print("[-] File upload failed!")
+                return self.result
+            elif self.checkSuccess(p.text) is False:
+                print("[-] File upload failed!")
+                return self.result
+            else:
+                print("[+] Invalid file with valid magic number upload success!")
+        self.result = True
+        return self.result
+
+    def checkSuccess(self, responseContent) -> bool:
+        signatureList = ["uploaded", "successfully", "uploaded successfully"]
+        soup = BeautifulSoup(responseContent, 'html.parser')
+        for s in signatureList:
+            signature = soup.find_all(string=re.compile(s, re.IGNORECASE))
+            if signature:
+                for htmlSig in signature:
+                    print(f'[!] Signature found: "{htmlSig}"')
+                print("[-] Uploaded successfully")
+                return True
+            else:
+                print('[!] Signature not found!')
+                return False
 
     def main(self):
         self.dvwaLogin()
         self.dvwaChangeSecurity("low")
-        self.uploadFile()
+        return self.uploadFile()
