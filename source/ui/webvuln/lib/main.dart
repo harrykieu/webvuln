@@ -7,10 +7,10 @@ import 'package:webvuln/views/resultScreen.dart';
 import 'package:webvuln/views/scanScreen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ionicons/ionicons.dart';
-import 'views/draft.dart';
+// import 'views/draft.dart';
 
 void main() {
-  runApp(history_Screen());
+  runApp(const mainScreen());
 }
 
 // Copyright 2019 The Flutter team. All rights reserved.

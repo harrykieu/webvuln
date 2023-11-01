@@ -87,6 +87,8 @@ class _scanScreenState extends State<scanScreen> {
                 hintName: 'URL',
               ),
             ),
+
+            // tu day den dong 150
             Padding(
               padding: EdgeInsetsDirectional.symmetric(
                   horizontal: 100, vertical: 10),
