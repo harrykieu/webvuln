@@ -17,8 +17,9 @@ def calculateWebsiteSafetyRate(website_vulnerabilities):
         "Insufficient Logging & Monitoring": 5.3
     }
 
-    total_score = sum(vulnerabilities[vuln]
-                      for vuln in website_vulnerabilities)
+    total_score = 0
+    for vuln in website_vulnerabilities:
+        total_score += vulnerabilities[vuln]
 
     total_original_score = 100
     website_safety_rate = (1 - (total_score / total_original_score)) * 100
