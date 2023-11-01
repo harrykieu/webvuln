@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:webvuln/service/api.dart';
 import 'scanScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'submitButton.dart';
+import 'input.dart';
 
 class resourceScreen extends StatefulWidget {
   const resourceScreen({super.key});
@@ -45,7 +47,7 @@ class _resourceScreenState extends State<resourceScreen> {
                         resType: _typeController.text,
                         value: _valueController.text);
                   },
-                  title: 'Post Resources'),
+                  childButton: Text('get data to resource'),),
           Row(
             children: [
               boxInput(controller:_vulnTypeSearchController , content: 'Enter vulnerability Type to search')

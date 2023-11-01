@@ -4,6 +4,8 @@ import 'package:webvuln/views/drawer.dart';
 import 'package:get/get.dart';
 import 'scanScreen.dart';
 import 'package:webvuln/service/api.dart';
+import 'submitButton.dart';
+import 'input.dart';
 
 class historyScreen extends StatefulWidget {
   const historyScreen({super.key});
@@ -35,7 +37,9 @@ class _historyScreenState extends State<historyScreen> {
                   datetime: _dateScanController.text,
                 );
               },
-              title: 'GET URL and Date')
+              childButton: Text(
+              'Get data history'
+              ),)
         ],
       ),
     );

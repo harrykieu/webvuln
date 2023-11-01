@@ -9,9 +9,8 @@ String baseUrl = 'http://127.0.0.1:5000';
 Options _options = Options(
     headers: {'Content-Type': 'application/json', 'Origin': 'frontend'});
 
-
 //POST api/scan
-Future<void> postURL(
+Future<String> postURL(
     {required String nameURL, required int moduleNumber}) async {
   final data = jsonEncode(URL(url: nameURL, modules: moduleNumber));
   final url = baseUrl + '/api/scan';
@@ -20,16 +19,16 @@ Future<void> postURL(
     final response = await dio.post(url, data: data, options: _options);
 
     if (response.statusCode == 200) {
-      print('Data posted successfully');
       print(data);
+      return "Data posted successfull";
     } else {
-      print('Failed to post data');
+      return "Failed post data";
     }
   } catch (e) {
-    print('Error:$e');
-    print(ContentType.json);  
+    print(ContentType.json);
     print(nameURL);
     print(data);
+    return "Error: $e";
   }
 }
 
@@ -61,8 +60,8 @@ Future<void> postResources(
     required String action,
     required String resType,
     required String value}) async {
-  final data = jsonEncode(
-      resource(vulnType: vulnType, action: action, resType: resType, value: value));
+  final data = jsonEncode(resource(
+      vulnType: vulnType, action: action, resType: resType, value: value));
   final url = baseUrl + '/api/resources';
 
   try {

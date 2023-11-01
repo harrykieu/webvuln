@@ -7,9 +7,10 @@ import 'package:webvuln/views/resultScreen.dart';
 import 'package:webvuln/views/scanScreen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ionicons/ionicons.dart';
+import 'views/draft.dart';
 
 void main() {
-  runApp(const mainScreen());
+  runApp(history_Screen());
 }
 
 // Copyright 2019 The Flutter team. All rights reserved.
@@ -46,44 +47,52 @@ class _mainScreenState extends State<mainScreen> {
               width: 150,
               height: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topRight: Radius.circular(10),bottomRight: Radius.circular(10)),
-                color: Color(0xFFDCE8F6)
-              ),
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(10),
+                      bottomRight: Radius.circular(10)),
+                  color: Color(0xFFDCE8F6)),
               child: NavigationRail(
-                backgroundColor: Color(0xFF080848),
-                indicatorShape: RoundedRectangleBorder(
+                  backgroundColor: Color(0xFF080848),
+                  indicatorShape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
-                leading: Container(
-                  width: 150,
-                  height: 150,
-                  padding: EdgeInsets.all(20),
-                  child: Image(image: AssetImage('lib/assets/logo.png')),
-                ),
-                trailing: ElevatedButton(
-                    onPressed: () {},
-                    child: Icon(Icons.settings)),
-                destinations: const [
-                  NavigationRailDestination(
-                    icon: Icon(Ionicons.scan_sharp),
-                    label: Text('scan'),
-                  ),
-                  NavigationRailDestination(
-                      icon: Icon(Ionicons.analytics), label: Text('result')),
-                  NavigationRailDestination(
-                      icon: Icon(FontAwesomeIcons.clockRotateLeft), label: Text('History')),
-                  NavigationRailDestination(
-                      icon: LineIcon.addressBook(), label: Text('Resources'))
-                ],
-                selectedIndex: _selectedIndex,
-                onDestinationSelected: (int index) {
-                  setState(() {
-                    _selectedIndex = index;
-                    numberPage = _selectedIndex;
-                    print(numberPage);
-                    print(_selectedIndex);
-                  });
-                }),
+                  leading: Container(
+                      width: 150,
+                      height: 200,
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          Image.asset('lib/assets/logo.png'),
+                          Text(
+                            'WEB VULN',
+                            style: TextStyle(color: Colors.white),
+                          )
+                        ],
+                      )),
+                  trailing: ElevatedButton(
+                      onPressed: () {}, child: Icon(Icons.settings)),
+                  destinations: const [
+                    NavigationRailDestination(
+                      icon: Icon(Ionicons.scan_sharp),
+                      label: Text('scan'),
+                    ),
+                    NavigationRailDestination(
+                        icon: Icon(Ionicons.analytics), label: Text('result')),
+                    NavigationRailDestination(
+                        icon: Icon(FontAwesomeIcons.clockRotateLeft),
+                        label: Text('History')),
+                    NavigationRailDestination(
+                        icon: LineIcon.addressBook(), label: Text('Resources'))
+                  ],
+                  selectedIndex: _selectedIndex,
+                  onDestinationSelected: (int index) {
+                    setState(() {
+                      _selectedIndex = index;
+                      numberPage = _selectedIndex;
+                      print(numberPage);
+                      print(_selectedIndex);
+                    });
+                  }),
             ),
             StreamBuilder<int>(
               stream: _selectedIndexStream,

@@ -6,6 +6,11 @@ import 'package:webvuln/views/drawer.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
 import 'package:checkbox_grouped/checkbox_grouped.dart';
 import 'package:webvuln/views/resultScreen.dart';
+import 'package:webvuln/items/progressBar.dart';
+import 'submitButton.dart';
+import 'input.dart';
+import 'package:easy_loader/easy_loader.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class scanScreen extends StatefulWidget {
   const scanScreen({super.key});
@@ -17,9 +22,7 @@ class scanScreen extends StatefulWidget {
 class _scanScreenState extends State<scanScreen> {
   @override
   void initState() {
-    setState(() {
-      
-    });
+    setState(() {});
     super.initState();
   }
 
@@ -29,8 +32,9 @@ class _scanScreenState extends State<scanScreen> {
   final _historyURLController = TextEditingController();
   final _dateScanController = TextEditingController();
   final _checkboxController = GroupController();
-  final bool isLoading = false;
-  Widget progressCircular = CircularProgressIndicator.adaptive();
+  Widget contentChild = Text('Scan');
+  String buttonContent = 'Scan';
+  bool isLoading = false;
   String notice = "";
   String contentContainer = "";
   List<String> content = [
@@ -149,70 +153,18 @@ class _scanScreenState extends State<scanScreen> {
                 postURL(
                     nameURL: urlController.text,
                     moduleNumber: int.parse(_moduleController.text));
-                Get.to(resultScreen());
+                // Get.to(resultScreen());
+                setState(() {
+                  contentChild = EasyLoading.show(status: 'Loading...') as Widget;
+                });
               },
-              title: 'Scan',
-            ),
-            Container(
-              width: 50,
-              height: 50,
-              child: progressCircular,
-            ),
-            SizedBox(
-              width: 100,
-              height: 30,
+              childButton: contentChild,
             ),
           ],
         ));
   }
 }
+// viet them ham nhan data tu backend de setState cho widget trong contentChild
 
-class submitButton extends StatelessWidget {
-  const submitButton(
-      {super.key,
-      // required TextEditingController moduleController,
-      required this.onPressed,
-      required this.title});
 
-  final String title;
-  final Function() onPressed;
 
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: onPressed,
-      child: Text(title),
-    );
-  }
-}
-
-class inputUser extends StatelessWidget {
-  const inputUser({
-    super.key,
-    required this.controller,
-    required this.hintName,
-  });
-
-  final TextEditingController controller;
-  final String hintName;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      decoration: InputDecoration(
-        fillColor: Colors.white,
-        filled: true,
-        hintText: 'URL',
-        contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.transparent, width: 1.0),
-          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-        ),
-      ),
-      controller: controller,
-    );
-  }
-}

@@ -40,6 +40,9 @@ dependencies:
   checkbox_grouped: ^2.0.0
   font_awesome_flutter: ^10.6.0
   ionicons: ^0.2.2
+  percent_indicator: ^4.2.3
+  easy_loader: ^2.0.0
+  flutter_easyloading: ^3.0.5
 
 dev_dependencies:
   flutter_test:

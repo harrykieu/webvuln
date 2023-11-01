@@ -16,12 +16,16 @@ class _resultScreenState extends State<resultScreen> {
   Widget build(BuildContext context) {
     Get.testMode = true;
     return Scaffold(
+      appBar:AppBar(
+        title: Text("Result Scan",style: GoogleFonts.poppins(),textAlign: TextAlign.center,),
+        leading: IconButton(onPressed: (){}, icon: Icon(Icons.arrow_back)),
+      ) ,
       body: Row(
         children: [
-          FloatingActionButton(onPressed: () {
-            Get.to(mainScreen());
-          }),
-          Text('result')
+          // FloatingActionButton(onPressed: () {
+            
+          // }),
+          // Text('result')
         ],
       ),
     );
