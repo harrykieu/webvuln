@@ -1,18 +1,16 @@
 import requests
 import re
 import urllib.parse
-import pymongo
-import os
 
 s = requests.Session()
 s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.5938.92"
 
 
 class PathTraversal:
-    def __init__(self, url):
+    def __init__(self, url, resources):
         self.url = url
-        self.client = pymongo.MongoClient(os.getenv("DATABASE_URI"))
-        self.db = self.client["webvuln"]
+        self.resources = resources        
+
 
     def scanWebsite(self):
         results = {
@@ -28,15 +26,12 @@ class PathTraversal:
         return results
 
     def checkPathTraversal(self):
-        # Fetch path traversal payloads from the database
-        collection = self.db["resources"]
-        path_traversal_payloads = [
-            doc["value"] for doc in collection.find({"vulnType": "PathTraversal"})]
+        
 
         print("\n[+] Checking path traversal")
 
-        for payload in path_traversal_payloads:
-            encoded_payload = urllib.parse.quote(payload)
+        for payload in self.resources:
+            encoded_payload = urllib.parse.quote(payload['value'])
             new_url = f"{self.url}?file_name={encoded_payload}"
 
             print("[!] Trying", new_url)
