@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:webvuln/service/api.dart';
 import 'scanScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'submitButton.dart';
-import 'input.dart';
+import '../items/submitButton.dart';
+import '../items/input.dart';
 
 class resourceScreen extends StatefulWidget {
   const resourceScreen({super.key});

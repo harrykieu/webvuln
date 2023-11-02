@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:webvuln/views/drawer.dart';
+import 'package:webvuln/items/drawer.dart';
 import 'package:get/get.dart';
 import 'scanScreen.dart';
 import 'package:webvuln/service/api.dart';
-import 'submitButton.dart';
-import 'input.dart';
+import '../items/submitButton.dart';
+import '../items/input.dart';
 
 class historyScreen extends StatefulWidget {
   const historyScreen({super.key});

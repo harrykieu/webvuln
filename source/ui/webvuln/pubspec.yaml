@@ -44,6 +44,7 @@ dependencies:
   easy_loader: ^2.0.0
   flutter_easyloading: ^3.0.5
   intl: ^0.18.1
+  group_button: ^5.3.3
 
 dev_dependencies:
   flutter_test:

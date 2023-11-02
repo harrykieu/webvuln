@@ -14,8 +14,9 @@ class submitButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width:100,
-      height:100,
+      height:50,
       child: FloatingActionButton(
+        backgroundColor: Color(0xFF4C4FAB),
       onPressed: onPressed,
       child: childButton,
     ),

@@ -7,6 +7,7 @@ import 'package:webvuln/views/resultScreen.dart';
 import 'package:webvuln/views/scanScreen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:webvuln/views/scanScreen1.dart';
 // import 'views/draft.dart';
 
 void main() {
@@ -27,7 +28,7 @@ class _mainScreenState extends State<mainScreen> {
   @override
   int _selectedIndex = 0;
   List _selectedItem = [
-    const scanScreen(),
+    const scanScreen1(),
     const resultScreen(),
     const historyScreen(),
     const resourceScreen()

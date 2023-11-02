@@ -9,18 +9,17 @@ import 'package:webvuln/views/resultScreen.dart';
 import 'package:webvuln/items/progressBar.dart';
 import '../items/submitButton.dart';
 import '../items/input.dart';
-import 'package:webvuln/items/categoryButton.dart';
 import 'package:easy_loader/easy_loader.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-class scanScreen extends StatefulWidget {
-  const scanScreen({super.key});
+class scanScreen1 extends StatefulWidget {
+  const scanScreen1({super.key});
 
   @override
-  State<scanScreen> createState() => _scanScreenState();
+  State<scanScreen1> createState() => _scanScreen1State();
 }
 
-class _scanScreenState extends State<scanScreen> {
+class _scanScreen1State extends State<scanScreen1> {
   @override
   void initState() {
     setState(() {});
@@ -33,7 +32,7 @@ class _scanScreenState extends State<scanScreen> {
   final _historyURLController = TextEditingController();
   final _dateScanController = TextEditingController();
   final _checkboxController = GroupController();
-  Widget contentChild = Text('Scan',style: GoogleFonts.montserrat(color: Colors.white,fontWeight: FontWeight.normal),);
+  Widget contentChild = Text('Scan');
   String buttonContent = 'Scan';
   bool isLoading = false;
   String notice = "";
@@ -92,7 +91,7 @@ class _scanScreenState extends State<scanScreen> {
             // tu day den dong 150
             Padding(
               padding: EdgeInsetsDirectional.symmetric(
-                  horizontal: 100, vertical: 10),
+                  horizontal: 80, vertical: 10),
               child: Container(
                 decoration: BoxDecoration(
                     color: Colors.white,
@@ -125,10 +124,10 @@ class _scanScreenState extends State<scanScreen> {
             ),
             Padding(
               padding: EdgeInsetsDirectional.symmetric(
-                  horizontal: 100, vertical: 10),
+                  horizontal: 80, vertical: 10),
               child: Container(
                 width: double.infinity,
-                height: 100,
+                height: 90,
                 // margin: EdgeInsetsDirectional.symmetric(horizontal: ),
                 padding: EdgeInsetsDirectional.symmetric(
                     horizontal: 10, vertical: 10),
@@ -158,9 +157,7 @@ class _scanScreenState extends State<scanScreen> {
                     moduleNumber: int.parse(_moduleController.text));
                 // Get.to(resultScreen());
                 setState(() {
-                  contentChild = CircularProgressIndicator.adaptive(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  );
+                  contentChild = EasyLoading.show(status: 'Loading...') as Widget;
                 });
               },
               childButton: contentChild,
@@ -170,6 +167,5 @@ class _scanScreenState extends State<scanScreen> {
   }
 }
 // viet them ham nhan data tu backend de setState cho widget trong contentChild
-
 
 
