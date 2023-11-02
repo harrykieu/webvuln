@@ -8,8 +8,6 @@ import requests
 from source.core.database.dbutils import DatabaseUtils
 import source.core.utils as utils
 from source.tools.self_made.fileupload.fileupload import FileUpload
-from source.tools.self_made.pathtraversal.pathtraversal import PathTraversal
-
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = ['ffuf', 'dirsearch', 'lfi', 'sqli',
@@ -78,6 +76,7 @@ class WebVuln:
         commands = []
         jsonFiles = []
         dirURL = {}
+        result = {"result": {}}
         if isinstance(urls, list) is False:
             if self.__debug:
                 print(
@@ -135,7 +134,7 @@ class WebVuln:
             elif module == 'fileupload':
                 # Get all the resources first
                 resources = self.fileHandler(
-                    'GET', {})
+                    'GET', {"description": ""})
                 if resources == 'Failed':
                     utils.log(
                         '[backend.py-scanURL] Error: Failed to get resources', "ERROR")
@@ -146,22 +145,24 @@ class WebVuln:
                 for key in dirURL:
                     for url in dirURL[key]:
                         a = FileUpload(url, resources)
-                        a.main()
+                        vuln = a.main()
+                        if vuln is True:
+                            result["result"][url] = 'File Upload'
+                            print(result)
+                            if self.__debug:
+                                print(
+                                    f'[backend.py-scanURL] {url} is vulnerable to file upload')
+                            utils.log(
+                                f'[backend.py-scanURL] {url} is vulnerable to file upload', "INFO")
             elif module == 'idor':
                 pass
             elif module == 'pathtraversal':
-                resources = self.resourceHandler(
-                    'GET', {})
-                for key in dirURL:
-                    for url in dirURL[key]:
-                        a = PathTraversal(url, resources)
-                        
+                pass
             else:
                 raise ValueError(f'Invalid module {module}')
         # Missing the result handler
-        exampleJSONres = {'result': 'abc'}
         try:
-            self.sendResultFlask(json.dumps(exampleJSONres))
+            self.sendResultFlask(json.dumps(result))
         except Exception as e:
             if self.__debug:
                 print(f'[backend.py-scanURL] Error: {e}')
@@ -276,7 +277,8 @@ class WebVuln:
         :param method: `GET` or `POST`
         :param data: JSON object. The format of the JSON object is as follows:
         - GET: `{"description": ""}`
-        - POST: `{"fileName": "", "description": "", "base64value": "", "action": ""}` with `"action"` is either `"add"`, `"remove"` or `"update"`"""
+        - POST: `{"fileName": "", "description": "", "base64value": "", "action": ""}` with `"action"` is either `"add"`, `"remove"` or `"update"`.
+        The `description` field must be `valid`, `invalidbutvalidExtension` or `invalidbutvalidMH`."""
         if method not in ['GET', 'POST']:
             if self.__debug:
                 print(

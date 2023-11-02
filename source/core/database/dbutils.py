@@ -1,6 +1,8 @@
 import json
 from pymongo import MongoClient
 import os
+
+import pymongo
 import source.core.utils as utils
 from dotenv import load_dotenv
 
@@ -20,9 +22,16 @@ class DatabaseUtils:
         if "resources" not in self.__db.list_collection_names():
             self.__db.create_collection("resources", validator={
                                         '$jsonSchema': json.load(open("./source/core/schema/resources.json"))})
+            self.__db.get_collection("resources").create_index(
+                [("value", pymongo.TEXT)], unique=True)
         if "scanResult" not in self.__db.list_collection_names():
             self.__db.create_collection("scanResult", validator={
                                         '$jsonSchema': json.load(open("./source/core/schema/scanResult.json"))})
+        if "fileResources" not in self.__db.list_collection_names():
+            self.__db.create_collection("fileResources", validator={
+                                        '$jsonSchema': json.load(open("./source/core/schema/fileResources.json"))})
+            self.__db.get_collection("fileResources").create_index(
+                [("fileName", pymongo.TEXT), ("base64value", pymongo.TEXT)], unique=True)
 
     def addDocument(self, collectionName, data) -> bool:
         """Add a document to the collection in the database.
@@ -30,6 +39,7 @@ class DatabaseUtils:
         - `data`: data of the document. 
         If there is more than one document, this function inserts the data using `insert_many()`, otherwise it uses `insert_one()`.
         """
+        # TODO: Fix insert duplicate
         try:
             collection = self.__db.get_collection(collectionName)
             if isinstance(data, list):
@@ -39,7 +49,7 @@ class DatabaseUtils:
                 collection.insert_one(data)
                 return True
         except Exception as e:
-            utils.log(f'Error: {e}', "ERROR")
+            utils.log(f'[dbutils.py-addDocument] Error: {e}', "ERROR")
             raise e
 
     def deleteDocument(self, collectionName, query):
@@ -51,10 +61,10 @@ class DatabaseUtils:
         try:
             collection = self.__db.get_collection(collectionName)
             collection.delete_one(query)
-            return "Success"
+            return True
         except Exception as e:
-            utils.log(f'Error: {e}', "ERROR")
-            return "Failed"
+            utils.log(f'[dbutils.py-deleteDocument] Error: {e}', "ERROR")
+            raise e
 
     def updateDocument(self, collectionName, query, update):
         """Edit one document from the collection.
@@ -67,9 +77,10 @@ class DatabaseUtils:
         try:
             collection = self.__db.get_collection(collectionName)
             collection.update_one(query, update)
-            print("edit document successfully !")
+            return True
         except Exception as e:
-            print("exc", e)
+            utils.log(f'[dbutils.py-updateDocument] Error: {e}', "ERROR")
+            raise e
 
     def findDocument(self, collectionName, query):
         """Find one document from the collection.
@@ -81,7 +92,8 @@ class DatabaseUtils:
             collection = self.__db.get_collection(collectionName)
             return collection.find(query)
         except Exception as e:
-            print("exc", e)
+            utils.log(f'[dbutils.py-findDocument] Error: {e}', "ERROR")
+            raise e
 
     def disconnect(self):
         """Disconnect from the database.
