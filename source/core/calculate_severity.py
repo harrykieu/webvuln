@@ -18,8 +18,10 @@ def calculateWebsiteSafetyRate(website_vulnerabilities):
     }
 
     total_score = 0
-    for vuln in website_vulnerabilities:
-        total_score += vulnerabilities[vuln]
+
+    for vuln, is_vulnerable in website_vulnerabilities.items():
+        if is_vulnerable:
+            total_score += vulnerabilities.get(vuln, 0)
 
     total_original_score = 100
     website_safety_rate = (1 - (total_score / total_original_score)) * 100
