@@ -107,6 +107,7 @@ class FileUpload:
             return self.result
         for form in forms:
             self.craftPayload(self.getFormDetails(form))
+        return self.result
 
     def craftPayload(self, formField):
         payload = {}
@@ -133,12 +134,13 @@ class FileUpload:
             p = self.session.post(self.url, files=payload)
             if p.status_code != 200:
                 print("[-] File upload failed!")
-                return self.result
+                self.result = False
             elif self.checkSuccess(p.text) is False:
                 print("[-] File upload failed!")
-                return self.result
+                self.result = False
             else:
                 print("[+] Valid file upload success!")
+                self.result = True
         for validExtFile in validExtension:
             # print(validExtFile)
             print(b64decode(validExtFile['base64value']))
@@ -151,30 +153,31 @@ class FileUpload:
             p = self.session.post(self.url, files=payload)
             if p.status_code != 200:
                 print("[-] File upload failed!")
-                return self.result
+                self.result = False
             elif self.checkSuccess(p.text) is False:
                 print("[-] File upload failed!")
-                return self.result
+                self.result = False
             else:
                 print("[+] Invalid file with valid extension upload success!")
-        for validMHFile in validMH:
-            for key in formField:
-                if formField[key] != "":
-                    payload.update({key: (None, formField[key])})
+                self.result = True
+        if self.result is False:
+            for validMHFile in validMH:
+                for key in formField:
+                    if formField[key] != "":
+                        payload.update({key: (None, formField[key])})
+                    else:
+                        payload.update(
+                            {key: (validMHFile['fileName'], b64decode(validMHFile['base64value']), "image/jpeg")})
+                p = self.session.post(self.url, files=payload)
+                if p.status_code != 200:
+                    print("[-] File upload failed!")
+                    self.result = False
+                elif self.checkSuccess(p.text) is False:
+                    print("[-] File upload failed!")
+                    self.result = False
                 else:
-                    payload.update(
-                        {key: (validMHFile['fileName'], b64decode(validMHFile['base64value']), "image/jpeg")})
-            p = self.session.post(self.url, files=payload)
-            if p.status_code != 200:
-                print("[-] File upload failed!")
-                return self.result
-            elif self.checkSuccess(p.text) is False:
-                print("[-] File upload failed!")
-                return self.result
-            else:
-                print("[+] Invalid file with valid magic number upload success!")
-        self.result = True
-        return self.result
+                    print("[+] Invalid file with valid magic number upload success!")
+                    self.result = True
 
     def checkSuccess(self, responseContent) -> bool:
         signatureList = ["uploaded", "successfully", "uploaded successfully"]
@@ -193,4 +196,5 @@ class FileUpload:
     def main(self):
         self.dvwaLogin()
         self.dvwaChangeSecurity("low")
-        return self.uploadFile()
+        self.uploadFile()
+        return self.result

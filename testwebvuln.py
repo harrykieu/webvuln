@@ -13,7 +13,7 @@ print(lista[0])
 for a in lista:
     print(lista.index(a)) """
 
-print(a.scanURL(['http://localhost:12001'], ['fileupload']))
+print(a.scanURL(['http://localhost:12001', 'http://localhost:12002'], ['fileupload']))
 # a.scanURL(['http://localhost/formtest.html'], ['fileupload'])
 
 # Push resource to db

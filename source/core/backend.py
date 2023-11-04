@@ -71,12 +71,25 @@ class WebVuln:
 
         :param urls: List of URLs
         :param modules: List of modules
+        The return json will have the following format:
+        ```
+        {
+            "result": [
+                "url1":  {
+                    "module": "vulnerable/not vulnerable"
+                },
+                "url2": {
+                    "module": "vulnerable/not vulnerable"
+                }
+            ]
+        }
+        ```
         """
 
         commands = []
         jsonFiles = []
         dirURL = {}
-        result = {"result": {}}
+        listResult = []
         if isinstance(urls, list) is False:
             if self.__debug:
                 print(
@@ -101,6 +114,7 @@ class WebVuln:
         for url in urls:
             filename = f'scanresult_url{urls.index(url)}.json'
             jsonFiles.append(filename)
+            # For using ffuf and dirsearch (if needed)
             if 'ffuf' in modules:
                 commands.append(
                     f'{ROOTPATH}/source/tools/public/ffuf/ffuf.exe -u {url}/FUZZ -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -of json -o {filename} -p 0.2 -mc 200')
@@ -132,7 +146,6 @@ class WebVuln:
             elif module == 'xss':
                 pass
             elif module == 'fileupload':
-                # Get all the resources first
                 resources = self.fileHandler(
                     'GET', {"description": ""})
                 if resources == 'Failed':
@@ -142,27 +155,59 @@ class WebVuln:
                         print(
                             '[backend.py-scanURL] Error: Failed to get resources')
                     return 'Failed'
+                #TODO: FIX THE LOGIC?
                 for key in dirURL:
+                    resultURL = {
+                        "domain": key,
+                        "scanDate": datetime.now(),
+                        "numVuln": 0,
+                        "vulnerabilities": []
+                    }
                     for url in dirURL[key]:
                         a = FileUpload(url, resources)
                         vuln = a.main()
+                        print(vuln)
                         if vuln is True:
-                            result["result"][url] = 'File Upload'
-                            print(result)
+                            resultURL["numVuln"] += 1
+                            resultURL["vulnerabilities"].append(
+                                {
+                                    "type": "File Upload",
+                                    "description": f"{url} is vulnerable to file upload",
+                                    "severity": "High",
+                                }
+                            )
                             if self.__debug:
                                 print(
                                     f'[backend.py-scanURL] {url} is vulnerable to file upload')
                             utils.log(
                                 f'[backend.py-scanURL] {url} is vulnerable to file upload', "INFO")
+                        else:
+                            if self.__debug:
+                                print(
+                                    f'[backend.py-scanURL] {url} is not vulnerable to file upload')
+                            utils.log(
+                                f'[backend.py-scanURL] {url} is not vulnerable to file upload', "INFO")
+                        listResult.append(resultURL)
+                print(listResult)
             elif module == 'idor':
                 pass
             elif module == 'pathtraversal':
                 pass
             else:
                 raise ValueError(f'Invalid module {module}')
-        # Missing the result handler
+        for res in listResult:
+            res["resultSeverity"] = "High"
+            try:
+                self.__database.addDocument('scanResult', res)
+            except Exception as e:
+                if self.__debug:
+                    print(f'[backend.py-scanURL] Error: {e}')
+                utils.log(
+                    f'[backend.py-scanURL] Error: {e}', "ERROR")
+                return 'Failed'
+        result = {"result": listResult}
         try:
-            self.sendResultFlask(json.dumps(result))
+            self.sendResultFlask(json.dumps(result, default=str))
         except Exception as e:
             if self.__debug:
                 print(f'[backend.py-scanURL] Error: {e}')
@@ -409,17 +454,3 @@ class WebVuln:
                 if self.__debug:
                     print('[backend.py-getScanResult] Error: Invalid JSON object')
                 return 'Failed'
-
-    def saveScanResult(self, data) -> str:
-        """Save scan result to the database.
-
-        :param data: JSON object
-        """
-        try:
-            self.__database.addDocument('scanResult', data)
-        except Exception as e:
-            if self.__debug:
-                print(f'[backend.py-saveScanResult] Error: {e}')
-            utils.log(f'[backend.py-saveScanResult] Error: {e}', "ERROR")
-            return 'Failed'
-        return 'Success'
