@@ -1,0 +1,7 @@
+[ 
+ {
+    "vulnType": "SQL Injection",
+    "resType": "UserAgent",
+    "value": "Mozilla/5.0 ;--"
+  }
+]

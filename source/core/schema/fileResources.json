@@ -1,0 +1,27 @@
+{
+    "bsonType": "object",
+    "required": [ "_id","fileName","description","base64value","createdDate","editedDate"],
+    "properties":{
+        "_id":{
+            "bsonType":"objectId"
+        },
+        "fileName":{
+            "bsonType":"string"
+        },
+        "description": {
+            "bsonType":"string",
+            "enum": ["valid", "invalidbutvalidExtension", "invalidbutvalidMH"]
+        },
+        "base64value":{
+            "bsonType":"string"
+        },
+        "createdDate":{
+            "bsonType":"date"
+        },
+        "editedDate":{
+            "bsonType":"date"
+        }
+    }
+}
+
+
