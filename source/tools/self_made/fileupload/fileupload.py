@@ -16,11 +16,10 @@ class FileUpload:
         self.result = False
 
     def checkCSRF(self) -> str:
-        """Check if CSRF is enabled on the website.
-        """
+        """Check if CSRF is enabled on the website."""
         r = self.session.get(self.url)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        usrtkSoup = soup.find_all('input', attrs={'name': 'user_token'})
+        soup = BeautifulSoup(r.text, "html.parser")
+        usrtkSoup = soup.find_all("input", attrs={"name": "user_token"})
         if usrtkSoup:
             self.csrfExist = True
             return "CSRF is enabled on the website"
@@ -29,13 +28,12 @@ class FileUpload:
             return "CSRF is not enabled on the website"
 
     def getCSRFToken(self) -> str:
-        """Get CSRF token for the login page of the website.
-        """
+        """Get CSRF token for the login page of the website."""
         r = self.session.get(self.url)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        usrtkSoup = soup.find_all('input', attrs={'name': 'user_token'})
+        soup = BeautifulSoup(r.text, "html.parser")
+        usrtkSoup = soup.find_all("input", attrs={"name": "user_token"})
         if usrtkSoup:
-            userToken = usrtkSoup[0]['value']
+            userToken = usrtkSoup[0]["value"]
             return userToken
         else:
             print("No CSRF token found!")
@@ -43,42 +41,33 @@ class FileUpload:
 
     # ================================DVWA=======================================
     def dvwaLogin(self) -> str:
-        """(For DVWA only) Login to DVWA and return a session object.
-        """
+        """(For DVWA only) Login to DVWA and return a session object."""
         if not self.isDVWA:
             return
-        payload = {
-            'username': 'admin',
-            'password': 'password',
-            'Login': 'Login'
-        }
+        payload = {"username": "admin", "password": "password", "Login": "Login"}
         with self.session as c:
-            r = c.get('http://localhost/dvwa/login.php')
+            r = c.get("http://localhost/dvwa/login.php")
             token = re.search("user_token'\s*value='(.*?)'", r.text).group(1)
-            payload['user_token'] = token
-            c.post('http://localhost/dvwa/login.php', data=payload)
+            payload["user_token"] = token
+            c.post("http://localhost/dvwa/login.php", data=payload)
             self.cookies = c.cookies
 
     def dvwaChangeSecurity(self, level):
-        """(For DVWA only) Change DVWA security level.
-        """
+        """(For DVWA only) Change DVWA security level."""
         if not self.isDVWA:
             return
         userToken = self.getCSRFToken()
-        data = {
-            'security': level,
-            'seclev_submit': 'Submit',
-            'user_token': userToken
-        }
-        r = self.session.post('http://localhost/dvwa/security.php', data=data)
+        data = {"security": level, "seclev_submit": "Submit", "user_token": userToken}
+        r = self.session.post("http://localhost/dvwa/security.php", data=data)
         print("Security level changed to " + level)
         return r
+
     # ===========================================================================
 
     def getAllForms(self, url):
         r = self.session.get(url)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        forms = soup.find_all('form', attrs={'enctype': 'multipart/form-data'})
+        soup = BeautifulSoup(r.text, "html.parser")
+        forms = soup.find_all("form", attrs={"enctype": "multipart/form-data"})
         if not forms:
             print("URL is not valid for file upload")
             return None
@@ -86,7 +75,7 @@ class FileUpload:
         return forms
 
     def getFormDetails(self, form) -> dict:
-        inputs = form.find_all('input')
+        inputs = form.find_all("input")
         formDetails = {}
         if inputs:
             for i in inputs:
@@ -99,8 +88,7 @@ class FileUpload:
         return formDetails
 
     def uploadFile(self):
-        """Upload file to the website.
-        """
+        """Upload file to the website."""
         forms = self.getAllForms(self.url)
         if not forms:
             utils.log("[FileUpload] URL is not valid for file upload", "ERROR")
@@ -116,11 +104,11 @@ class FileUpload:
         validExtension = []
         validMH = []
         for res in self.resources:
-            if res['description'] == 'valid':
+            if res["description"] == "valid":
                 validFiles.append(res)
-            elif res['description'] == 'invalidbutvalidExtension':
+            elif res["description"] == "invalidbutvalidExtension":
                 validExtension.append(res)
-            elif res['description'] == 'invalidbutvalidMH':
+            elif res["description"] == "invalidbutvalidMH":
                 validMH.append(res)
             else:
                 pass
@@ -130,7 +118,14 @@ class FileUpload:
                     payload.update({key: (None, formField[key])})
                 else:
                     payload.update(
-                        {key: (validFile['fileName'], b64decode(validFile['base64value']), "image/jpeg")})
+                        {
+                            key: (
+                                validFile["fileName"],
+                                b64decode(validFile["base64value"]),
+                                "image/jpeg",
+                            )
+                        }
+                    )
             p = self.session.post(self.url, files=payload)
             if p.status_code != 200:
                 print("[-] File upload failed!")
@@ -143,13 +138,20 @@ class FileUpload:
                 self.result = True
         for validExtFile in validExtension:
             # print(validExtFile)
-            print(b64decode(validExtFile['base64value']))
+            print(b64decode(validExtFile["base64value"]))
             for key in formField:
                 if formField[key] != "":
                     payload.update({key: (None, formField[key])})
                 else:
                     payload.update(
-                        {key: (validExtFile['fileName'], b64decode(validExtFile['base64value']), "image/jpeg")})
+                        {
+                            key: (
+                                validExtFile["fileName"],
+                                b64decode(validExtFile["base64value"]),
+                                "image/jpeg",
+                            )
+                        }
+                    )
             p = self.session.post(self.url, files=payload)
             if p.status_code != 200:
                 print("[-] File upload failed!")
@@ -167,7 +169,14 @@ class FileUpload:
                         payload.update({key: (None, formField[key])})
                     else:
                         payload.update(
-                            {key: (validMHFile['fileName'], b64decode(validMHFile['base64value']), "image/jpeg")})
+                            {
+                                key: (
+                                    validMHFile["fileName"],
+                                    b64decode(validMHFile["base64value"]),
+                                    "image/jpeg",
+                                )
+                            }
+                        )
                 p = self.session.post(self.url, files=payload)
                 if p.status_code != 200:
                     print("[-] File upload failed!")
@@ -181,7 +190,7 @@ class FileUpload:
 
     def checkSuccess(self, responseContent) -> bool:
         signatureList = ["uploaded", "successfully", "uploaded successfully"]
-        soup = BeautifulSoup(responseContent, 'html.parser')
+        soup = BeautifulSoup(responseContent, "html.parser")
         for s in signatureList:
             signature = soup.find_all(string=re.compile(s, re.IGNORECASE))
             if signature:
@@ -190,7 +199,7 @@ class FileUpload:
                 print("[-] Uploaded successfully")
                 return True
             else:
-                print('[!] Signature not found!')
+                print("[!] Signature not found!")
                 return False
 
     def main(self):
