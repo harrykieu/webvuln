@@ -3,6 +3,7 @@ import re
 import requests
 from bs4 import BeautifulSoup
 import source.core.utils as utils
+import os
 
 
 class FileUpload:
@@ -14,6 +15,11 @@ class FileUpload:
         self.isDVWA = isDVWA
         self.resources = resources
         self.result = False
+        os.system("color")
+        self.red = "\033[31m"  # Red color code for text output
+        self.white = "\033[0m"  # White color code for text output
+        self.green = "\033[32m"  # Green color code for text output
+        self.blue = "\033[94m"  # Light blue color code for text output
 
     def checkCSRF(self) -> str:
         """Check if CSRF is enabled on the website."""
@@ -29,14 +35,15 @@ class FileUpload:
 
     def getCSRFToken(self) -> str:
         """Get CSRF token for the login page of the website."""
-        r = self.session.get(self.url)
+        r = self.session.get(self.url, cookies=self.cookies)
         soup = BeautifulSoup(r.text, "html.parser")
         usrtkSoup = soup.find_all("input", attrs={"name": "user_token"})
         if usrtkSoup:
+            self.csrfExist = True
             userToken = usrtkSoup[0]["value"]
             return userToken
         else:
-            print("No CSRF token found!")
+            print(f"{self.red}[-] CSRF token not found!{self.white}")
             return None
 
     # ================================DVWA=======================================
@@ -65,7 +72,7 @@ class FileUpload:
     # ===========================================================================
 
     def getAllForms(self, url):
-        r = self.session.get(url)
+        r = self.session.get(url, cookies=self.cookies)
         soup = BeautifulSoup(r.text, "html.parser")
         forms = soup.find_all("form", attrs={"enctype": "multipart/form-data"})
         if not forms:
@@ -82,12 +89,14 @@ class FileUpload:
                 if i["type"] == "file":
                     formDetails[i["name"]] = ""
                 elif i["type"] == "submit":
+                    if self.isDVWA:
+                        formDetails[i["name"]] = "Upload"
                     pass
                 else:
                     formDetails[i["name"]] = i["value"]
         return formDetails
 
-    def uploadFile(self):
+    def uploadFile(self) -> bool:
         """Upload file to the website."""
         forms = self.getAllForms(self.url)
         if not forms:
@@ -97,7 +106,7 @@ class FileUpload:
             self.craftPayload(self.getFormDetails(form))
         return self.result
 
-    def craftPayload(self, formField):
+    def craftPayload(self, formField) -> None:
         payload = {}
         # Add file
         validFiles = []
@@ -112,6 +121,7 @@ class FileUpload:
                 validMH.append(res)
             else:
                 pass
+        print(f'{self.blue}[-] Uploading valid files...{self.white}')
         for validFile in validFiles:
             for key in formField:
                 if formField[key] != "":
@@ -126,19 +136,26 @@ class FileUpload:
                             )
                         }
                     )
-            p = self.session.post(self.url, files=payload)
+            if self.csrfExist and self.isDVWA:
+                payload.update({"user_token": self.getCSRFToken()})
+            p = self.session.post(self.url, files=payload, cookies=self.cookies)
+            if p.history[0].status_code == 301 or p.history[0].status_code == 302:
+                print(f'{self.red}[!] File upload failed! Check the URL!{self.white}')
+                return self.result
             if p.status_code != 200:
-                print("[-] File upload failed!")
+                print(f'{self.red}[!] File upload failed!{self.white}')
                 self.result = False
             elif self.checkSuccess(p.text) is False:
-                print("[-] File upload failed!")
+                print(f'{self.red}[!] File upload failed!{self.white}')
                 self.result = False
             else:
-                print("[+] Valid file upload success!")
+                print(f'{self.green}[!] Valid file upload success!{self.white}')
                 self.result = True
+        if self.result is False:
+            print(f'{self.red} [!] Valid file upload failed! Quitting...{self.white}')
+            return self.result
+        print(f'{self.blue}[-] Uploading invalid files with valid extension...{self.white}')
         for validExtFile in validExtension:
-            # print(validExtFile)
-            print(b64decode(validExtFile["base64value"]))
             for key in formField:
                 if formField[key] != "":
                     payload.update({key: (None, formField[key])})
@@ -152,17 +169,20 @@ class FileUpload:
                             )
                         }
                     )
-            p = self.session.post(self.url, files=payload)
+            if self.csrfExist and self.isDVWA:
+                payload.update({"user_token": self.getCSRFToken()})
+            p = self.session.post(self.url, files=payload, cookies=self.cookies)
             if p.status_code != 200:
-                print("[-] File upload failed!")
+                print(f'{self.red}[!] File upload failed!{self.white}')
                 self.result = False
             elif self.checkSuccess(p.text) is False:
-                print("[-] File upload failed!")
+                print(f'{self.red}[!] File upload failed!{self.white}')
                 self.result = False
             else:
-                print("[+] Invalid file with valid extension upload success!")
+                print(f'{self.green}[!] Invalid file with valid extension upload success!{self.white}')
                 self.result = True
         if self.result is False:
+            print(f'{self.blue}[-] Uploading invalid files with valid magic number...{self.white}')
             for validMHFile in validMH:
                 for key in formField:
                     if formField[key] != "":
@@ -177,15 +197,20 @@ class FileUpload:
                                 )
                             }
                         )
-                p = self.session.post(self.url, files=payload)
+                if self.csrfExist and self.isDVWA:
+                    payload.update({"user_token": self.getCSRFToken()})
+                p = self.session.post(
+                    self.url,
+                    files=payload,
+                )
                 if p.status_code != 200:
-                    print("[-] File upload failed!")
+                    print(f'{self.red}[!] File upload failed!{self.white}')
                     self.result = False
                 elif self.checkSuccess(p.text) is False:
-                    print("[-] File upload failed!")
+                    print(f'{self.red}[!] File upload failed!{self.white}')
                     self.result = False
                 else:
-                    print("[+] Invalid file with valid magic number upload success!")
+                    print(f'{self.green}[!] Invalid file with valid magic number upload success!{self.white}')
                     self.result = True
 
     def checkSuccess(self, responseContent) -> bool:
@@ -195,14 +220,14 @@ class FileUpload:
             signature = soup.find_all(string=re.compile(s, re.IGNORECASE))
             if signature:
                 for htmlSig in signature:
-                    print(f'[!] Signature found: "{htmlSig}"')
-                print("[-] Uploaded successfully")
+                    print(f'{self.green}[+] Signature found: {htmlSig}{self.white}')
+                print(f'{self.green}[+] File upload success!{self.white}')
                 return True
             else:
-                print("[!] Signature not found!")
+                print(f'{self.red}[+] Signature not found!{self.white}')
                 return False
 
-    def main(self):
+    def main(self) -> bool:
         self.dvwaLogin()
         self.dvwaChangeSecurity("low")
         self.uploadFile()

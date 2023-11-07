@@ -122,10 +122,14 @@ class WebVuln:
             jsonFiles.append(filename)
             # For using ffuf and dirsearch (if needed)
             if "ffuf" in modules:
+                modules.pop(modules.index("ffuf"))
+                print('[-] Running ffuf...')
                 commands.append(
-                    f"{ROOTPATH}/source/tools/public/ffuf/ffuf.exe -u {url}/FUZZ -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -of json -o {filename} -p 0.2 -mc 200"
+                    f"{ROOTPATH}/source/tools/public/ffuf/ffuf.exe -u {url}/FUZZ -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -of json -o {filename} -p 0.2 -mc 200,301"
                 )
             elif "dirsearch" in modules:
+                modules.pop(modules.index("dirsearch"))
+                print('[-] Running dirsearch...')
                 commands.append(
                     f"python {ROOTPATH}/source/tools/public/dirsearch/dirsearch.py -u {url} -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -t 50 --format=json -x 404 -o {filename}"
                 )
@@ -142,18 +146,20 @@ class WebVuln:
                     os.remove(jsonFile)
             else:
                 dirURL[f"{url}"] = [f"{url}"]
+            os.remove("result.txt")
+            print(f'[!] All URLs: {dirURL}')
         for module in modules:
-            if module == "ffuf":
-                pass
-            elif module == "dirsearch":
-                pass
-            elif module == "lfi":
+            if module == "lfi":
+                print('[+] Checking LFI vulnerability...')
                 pass
             elif module == "sqli":
+                print('[+] Checking SQLi vulnerability...')
                 pass
             elif module == "xss":
+                print('[+] Checking XSS vulnerability...')
                 pass
             elif module == "fileupload":
+                print('[+] Checking file upload vulnerability...')
                 resources = self.fileHandler("GET", {"description": ""})
                 if resources == "Failed":
                     utils.log(
@@ -171,9 +177,11 @@ class WebVuln:
                         "vulnerabilities": [],
                     }
                     for url in dirURL[key]:
-                        a = FileUpload(url, resources)
+                        if 'dvwa' in url:
+                            a = FileUpload(url, resources, isDVWA=True)
+                        else:
+                            a = FileUpload(url, resources)
                         vuln = a.main()
-                        print(vuln)
                         if vuln is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
@@ -203,8 +211,10 @@ class WebVuln:
                         listResult.append(resultURL)
                 print(listResult)
             elif module == "idor":
+                print('[+] Checking IDOR vulnerability...')
                 pass
             elif module == "pathtraversal":
+                print('[+] Checking path traversal vulnerability...')
                 pass
             else:
                 raise ValueError(f"Invalid module {module}")
