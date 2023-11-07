@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/main.dart';
 import 'package:webvuln/items/drawer.dart';
 import 'package:get/get.dart';
-import 'package:webvuln/items/categoryButton.dart';
+// import 'package:webvuln/items/categoryButton.dart';
 import '../items/pieGraph.dart';
 
 class resultScreen extends StatefulWidget {
@@ -16,31 +16,39 @@ class resultScreen extends StatefulWidget {
 
 class _resultScreenState extends State<resultScreen> {
   @override
-  
   Widget build(BuildContext context) {
     bool _isVisibled = true;
     double screenWidth = MediaQuery.of(context).size.width;
-    final TextStyle textStyle = GoogleFonts.montserrat(fontSize: 24,fontWeight: FontWeight.bold,color: Colors.black);
-      List<DataColumn> dataColumns = [
-        DataColumn(
-            label: Text(
-          'Percent',
-          style: textStyle,
-        )),
-        DataColumn(label: Text('Error',style: textStyle,)),
-      ];
-      List<DataRow> dataRows = [
-        DataRow(cells: [DataCell(Text("20%")), DataCell(Text("SQl Injection"))]),
-        DataRow(cells: [
-          DataCell(Text('50%')),
-          DataCell(Text('XSS error')),
-        ]),
-        DataRow(cells: [
-          DataCell(Text('30%')),
-          DataCell(Text('LFI error')),
-        ]),
-        DataRow(cells: [DataCell(Text('30%')), DataCell(Text('RCE error'))])
-      ];
+    final TextStyle textStyle = GoogleFonts.montserrat(
+        fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black);
+
+    //information for column table details
+    List<DataColumn> dataColumns = [
+      DataColumn(
+          label: Text(
+        'Percent',
+        style: textStyle,
+      )),
+      DataColumn(
+          label: Text(
+        'Error',
+        style: textStyle,
+      )),
+    ];
+
+    //information for row table details
+    List<DataRow> dataRows = [
+      DataRow(cells: [DataCell(Text("20%")), DataCell(Text("SQl Injection"))]),
+      DataRow(cells: [
+        DataCell(Text('50%')),
+        DataCell(Text('XSS error')),
+      ]),
+      DataRow(cells: [
+        DataCell(Text('30%')),
+        DataCell(Text('LFI error')),
+      ]),
+      DataRow(cells: [DataCell(Text('30%')), DataCell(Text('RCE error'))])
+    ];
 
     Get.testMode = true;
     return Scaffold(
@@ -56,6 +64,8 @@ class _resultScreenState extends State<resultScreen> {
           child: Container(
             margin: EdgeInsetsDirectional.symmetric(horizontal: 60),
             child: Column(children: [
+              //main component for screen result
+              /*component table error */
               ListTile(
                 title: Text(
                   'List Vulnerabilities',
@@ -65,10 +75,11 @@ class _resultScreenState extends State<resultScreen> {
                       color: Colors.black),
                 ),
               ),
-              categoryButton(),
+              tableError(),
               SizedBox(
                 height: 10,
               ),
+
               ListTile(
                 title: Text('Graphs',
                     style: GoogleFonts.montserrat(
@@ -76,6 +87,8 @@ class _resultScreenState extends State<resultScreen> {
                         fontWeight: FontWeight.w600,
                         color: Colors.black)),
               ),
+
+              //part for piechart and details
               Row(
                 children: [
                   pieGraph(),
@@ -96,5 +109,31 @@ class _resultScreenState extends State<resultScreen> {
             ]),
           ),
         ));
+  }
+}
+
+class tableError extends StatefulWidget {
+  const tableError({super.key});
+
+  @override
+  State<tableError> createState() => _tableErrorState();
+}
+
+class _tableErrorState extends State<tableError> {
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    List<DataColumn> dataColumns = [
+      DataColumn(label: Text("Serverity")),
+      DataColumn(label: Text("Type")),
+      DataColumn(label: Text('Vulnerabilities'))
+    ];
+    final List<Map<String, dynamic>> data = {};
+    return Container(
+      width: screenWidth - 500,
+      height: 500,
+      child: DataTable(columns: dataColumns, rows: dataRows),
+    );
   }
 }
