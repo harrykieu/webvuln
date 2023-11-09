@@ -124,13 +124,13 @@ class WebVuln:
             # For using ffuf and dirsearch (if needed)
             if "ffuf" in modules:
                 modules.pop(modules.index("ffuf"))
-                print('[-] Running ffuf...')
+                print("[-] Running ffuf...")
                 commands.append(
                     f"{ROOTPATH}/source/tools/public/ffuf/ffuf.exe -u {url}/FUZZ -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -of json -o {filename} -p 0.2 -mc 200,301"
                 )
             elif "dirsearch" in modules:
                 modules.pop(modules.index("dirsearch"))
-                print('[-] Running dirsearch...')
+                print("[-] Running dirsearch...")
                 commands.append(
                     f"python {ROOTPATH}/source/tools/public/dirsearch/dirsearch.py -u {url} -w {ROOTPATH}/source/tools/public/ffuf/fuzz-Bo0oM.txt -t 50 --format=json -x 404 -o {filename}"
                 )
@@ -148,37 +148,40 @@ class WebVuln:
             else:
                 dirURL[f"{url}"] = [f"{url}"]
             os.remove("result.txt")
-            print(f'[!] All URLs: {dirURL}')
-        for module in modules:
-            if module == "lfi":
-                print('[+] Checking LFI vulnerability...')
-                pass
-            elif module == "sqli":
-                print('[+] Checking SQLi vulnerability...')
-                pass
-            elif module == "xss":
-                print('[+] Checking XSS vulnerability...')
-                pass
-            elif module == "fileupload":
-                print('[+] Checking file upload vulnerability...')
-                resources = self.fileHandler("GET", {"description": ""})
-                if resources == "Failed":
-                    utils.log(
-                        "[backend.py-scanURL] Error: Failed to get resources", "ERROR"
-                    )
-                    if self.__debug:
-                        print("[backend.py-scanURL] Error: Failed to get resources")
-                    return "Failed"
-                # TODO: FIX THE LOGIC?
-                for key in dirURL:
-                    resultURL = {
-                        "domain": key,
-                        "scanDate": datetime.now(),
-                        "numVuln": 0,
-                        "vulnerabilities": [],
-                    }
-                    for url in dirURL[key]:
-                        if 'dvwa' in url:
+            print(f"[!] All URLs: {dirURL}")
+        for key in dirURL:
+            resultURL = {
+                "domain": key,
+                "scanDate": datetime.now(),
+                "numVuln": 0,
+                "vulnerabilities": [],
+            }
+            for url in dirURL[key]:
+                for module in modules:
+                    if module == "lfi":
+                        print("[+] Checking LFI vulnerability...")
+                        pass
+                    elif module == "sqli":
+                        print("[+] Checking SQLi vulnerability...")
+                        pass
+                    elif module == "xss":
+                        print("[+] Checking XSS vulnerability...")
+                        pass
+                    elif module == "fileupload":
+                        print("[+] Checking file upload vulnerability...")
+                        resources = self.fileHandler("GET", {"description": ""})
+                        if resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        # TODO: FIX THE LOGIC?
+                        if "dvwa" in url:
                             a = FileUpload(url, resources, isDVWA=True)
                         else:
                             a = FileUpload(url, resources)
@@ -210,23 +213,29 @@ class WebVuln:
                                 "INFO",
                             )
                         listResult.append(resultURL)
-                print(listResult)
-            elif module == "idor":
-                print('[+] Checking IDOR vulnerability...')
-                pass
-            elif module == "pathtraversal":
-                print('[+] Checking path traversal vulnerability...')
-                resources = self.resourceHandler(
-                    'GET', {"vulnType": "PathTraversal", "resType": "payload"})
-                for key in dirURL:
-                    for url in dirURL[key]:
-                        a = PathTraversal(url, resources)
-                        if a.checkPathTraversal() is True:
-                            print(f'[backend.py-scanURL] {url} is vulnerable to path traversal')
-                        else:
-                            print(f'[backend.py-scanURL] {url} is not vulnerable to path traversal')
-            else:
-                raise ValueError(f"Invalid module {module}")
+                        print(listResult)
+                    elif module == "idor":
+                        print("[+] Checking IDOR vulnerability...")
+                        pass
+                    elif module == "pathtraversal":
+                        print("[+] Checking path traversal vulnerability...")
+                        resources = self.resourceHandler(
+                            "GET", {"vulnType": "PathTraversal", "resType": "payload"}
+                        )
+                        for key in dirURL:
+                            for url in dirURL[key]:
+                                a = PathTraversal(url, resources)
+                                if a.checkPathTraversal() is True:
+                                    print(
+                                        f"[backend.py-scanURL] {url} is vulnerable to path traversal"
+                                    )
+                                else:
+                                    print(
+                                        f"[backend.py-scanURL] {url} is not vulnerable to path traversal"
+                                    )
+                    else:
+                        raise ValueError(f"Invalid module {module}")
+        # FIX
         for res in listResult:
             res["resultSeverity"] = "High"
             try:
