@@ -8,6 +8,7 @@ import requests
 from source.core.database.dbutils import DatabaseUtils
 import source.core.utils as utils
 from source.tools.self_made.fileupload.fileupload import FileUpload
+from source.tools.self_made.pathtraversal.pathtraversal import PathTraversal
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [
@@ -215,7 +216,12 @@ class WebVuln:
                 pass
             elif module == "pathtraversal":
                 print('[+] Checking path traversal vulnerability...')
-                pass
+                resources = self.resourceHandler(
+                    'GET', {"vulnType": "PathTraversal", "resType": "payload"})
+                for key in dirURL:
+                    for url in dirURL[key]:
+                        a = PathTraversal(url, resources)
+                        a.scanWebsite()
             else:
                 raise ValueError(f"Invalid module {module}")
         for res in listResult:
