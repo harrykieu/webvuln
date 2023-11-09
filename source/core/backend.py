@@ -163,7 +163,10 @@ class WebVuln:
                 for key in dirURL:
                     for url in dirURL[key]:
                         a = PathTraversal(url, resources)
-                        a.scanWebsite()
+                        if a.checkPathTraversal() is True:
+                            print(f'[backend.py-scanURL] {url} is vulnerable to path traversal')
+                        else:
+                            print(f'[backend.py-scanURL] {url} is not vulnerable to path traversal')
             else:
                 raise ValueError(f'Invalid module {module}')
         # Missing the result handler

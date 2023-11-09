@@ -9,24 +9,9 @@ s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.
 class PathTraversal:
     def __init__(self, url, resources):
         self.url = url
-        self.resources = resources        
-
-
-    def scanWebsite(self):
-        results = {
-            "path_traversal": []
-        }
-
-        if self.checkPathTraversal():
-            results["path_traversal"].append({
-                "url": self.url,
-                "details": "[+] path traversal detected"
-            })
-
-        return results
+        self.resources = resources
 
     def checkPathTraversal(self):
-        
 
         print("\n[+] Checking path traversal")
 
@@ -44,9 +29,3 @@ class PathTraversal:
         print("[+] Check path traversal done")
 
         return False
-
-    def close(self):
-        self.client.close()
-
-
-
