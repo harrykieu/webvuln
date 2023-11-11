@@ -3,18 +3,6 @@ def calculateWebsiteSafetyRate(websiteVulns):
     :param websiteVulns: A list of vulnerabilities defined in the list vulnerabilities.
     :return: A tuple containing the website safety rate and its severity.
     """
-    websiteVulns = [
-        {
-            "type": "File Upload",
-            "description": "http://localhost:12001 is vulnerable to file upload",
-            "severity": "High",
-        },
-        {
-            "type": "Path Traversal",
-            "description": "http://localhost:12001 is vulnerable to path traversal",
-            "severity": "High",
-        },
-    ]
     # Define the CVSS scores for each vulnerability
     # FIX
     vulnerabilities = {
@@ -28,14 +16,16 @@ def calculateWebsiteSafetyRate(websiteVulns):
         "Insecure Deserialization": 8.1,
         "Using Components with Known Vulnerabilities": 9.6,
         "Insufficient Logging & Monitoring": 5.3,
+        # FIX LATER
+        "File Upload": 9.8,
+        "Path Traversal": 9.8,
     }
 
     total_score = 0
-
-    for vuln, isVulnerable in websiteVulns.items():
-        if isVulnerable:
-            total_score += vulnerabilities.get(vuln, 0)
-
+    if not websiteVulns:
+        return 0, "None"
+    for vuln in websiteVulns:
+        total_score += vulnerabilities.get(vuln["type"], 0)
     totalScore = 100
     webSafetyRate = (1 - (total_score / totalScore)) * 100
 
@@ -52,5 +42,4 @@ def calculateWebsiteSafetyRate(websiteVulns):
     for (lower, upper), label in severity_conversion.items():
         if lower <= webSafetyRate <= upper:
             severity = label
-
     return webSafetyRate, severity

@@ -295,18 +295,18 @@ class WebVuln:
                     else:
                         raise ValueError(f"Invalid module {module}")
             listResult.append(resultURL)
-            print(listResult)
-        # FIX
         for res in listResult:
-            res["resultSeverity"] = "High"
-            # #Fix later
+            res["resultPoint"], res["resultSeverity"] = calculateWebsiteSafetyRate(
+                res["vulnerabilities"]
+            )
+            print(res)
             try:
                 self.__database.addDocument("scanResult", res)
             except Exception as e:
                 if self.__debug:
                     print(f"[backend.py-scanURL] Error: {e}")
                 utils.log(f"[backend.py-scanURL] Error: {e}", "ERROR")
-                return "Failed"
+                raise e
         result = {"result": listResult}
         try:
             self.sendResultFlask(json.dumps(result, default=str))
@@ -314,7 +314,7 @@ class WebVuln:
             if self.__debug:
                 print(f"[backend.py-scanURL] Error: {e}")
             utils.log(f"[backend.py-scanURL] Error: {e}", "ERROR")
-            return "Failed"
+            raise e
         return "Success"
 
     def resourceHandler(self, method, data) -> str | list:
@@ -335,7 +335,7 @@ class WebVuln:
                 f"[backend.py-resourceHandler] Error: {method} is not a valid method",
                 "ERROR",
             )
-            return "Failed"
+            raise ValueError(f"{method} is not a valid method")
         # Parse JSON object
         if method == "GET":
             if (
