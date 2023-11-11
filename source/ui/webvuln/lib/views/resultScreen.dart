@@ -6,6 +6,8 @@ import 'package:webvuln/items/drawer.dart';
 import 'package:get/get.dart';
 // import 'package:webvuln/items/categoryButton.dart';
 import '../items/pieGraph.dart';
+import 'scanScreen.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 class resultScreen extends StatefulWidget {
   const resultScreen({super.key});
@@ -20,8 +22,9 @@ class _resultScreenState extends State<resultScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    table = tableSQLerror();
+    table = const tableSQLerror();
   }
+
   @override
   Widget build(BuildContext context) {
     bool _isVisibled = true;
@@ -45,16 +48,17 @@ class _resultScreenState extends State<resultScreen> {
 
     //information for row table details
     List<DataRow> dataRows = [
-      DataRow(cells: [DataCell(Text("20%")), DataCell(Text("SQl Injection"))]),
-      DataRow(cells: [
+      const DataRow(
+          cells: [DataCell(Text("20%")), DataCell(Text("SQl Injection"))]),
+      const DataRow(cells: [
         DataCell(Text('50%')),
         DataCell(Text('XSS error')),
       ]),
-      DataRow(cells: [
+      const DataRow(cells: [
         DataCell(Text('30%')),
         DataCell(Text('LFI error')),
       ]),
-      DataRow(cells: [DataCell(Text('30%')), DataCell(Text('RCE error'))])
+      const DataRow(cells: [DataCell(Text('30%')), DataCell(Text('RCE error'))])
     ];
     Get.testMode = true;
     return Scaffold(
@@ -65,13 +69,36 @@ class _resultScreenState extends State<resultScreen> {
             textAlign: TextAlign.center,
           ),
           actions: [
-            IconButton(onPressed: (){}, icon: Icon(Icons.question_mark_rounded))
+            IconButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return const AlertDialog(
+                          backgroundColor: Colors.white,
+                          title: Text('Some info'),
+                          content: Column(
+                            children: [
+                              Text('XSS (Cross-site scripting) ......'),
+                              ListTile(
+                                title: Text('Method to calculate serverity :'),
+                              )
+                            ],
+                          ),
+                        );
+                      });
+                },
+                icon: const Icon(Icons.question_mark_rounded))
           ],
-          leading: IconButton(onPressed: () {}, icon: Icon(Icons.arrow_back)),
+          leading: IconButton(
+              onPressed: () {
+                Get.to(const scanScreen());
+              },
+              icon: const Icon(Icons.arrow_back)),
         ),
         body: SingleChildScrollView(
           child: Container(
-            margin: EdgeInsetsDirectional.symmetric(horizontal: 60),
+            margin: const EdgeInsetsDirectional.symmetric(horizontal: 60),
             child: Column(children: [
               //main component for screen result
               /*component table error */
@@ -84,48 +111,73 @@ class _resultScreenState extends State<resultScreen> {
                       color: Colors.black),
                 ),
               ),
+
+              ///ta
               Container(
                 width: double.infinity,
                 height: 100,
-                child:Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    // dropdownButton(),
                     Container(
-                      width: 200,
-                      height: 50,
-                      // padding: EdgeInsets.all(10),
-                      margin: EdgeInsets.all(10),
-                      child: ElevatedButton(onPressed: (){
-                        setState(() {
-                          table = tableXSSError();
-                        });
-                      }, child: Text('XSS error',style:GoogleFonts.montserrat(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black)),
-                      style:ButtonStyle(
-                        backgroundColor: MaterialStateProperty<>.all(
-                          LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Colors.blue, Colors.green],
-                          ) as Linear,
-                          )
-                      ), )
-                    ),
+                        width: 200,
+                        height: 50,
+                        padding: const EdgeInsets.all(10),
+                        decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                                colors: [Colors.cyan, Colors.indigo]),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        margin: const EdgeInsets.all(10),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                table = const tableXSSError();
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                shape: const BeveledRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)))),
+                            child: Text('XSS error',
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white)))),
                     Container(
-                      width: 200,
-                      height: 50,
-                      padding: EdgeInsets.all(10),
-                      margin: EdgeInsets.all(10),
-                      child: ElevatedButton(onPressed: (){
-                        setState(() {
-                          table = tableSQLerror();
-                        });
-                      }, child: Text('SQL injection',style:GoogleFonts.montserrat(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black)), )
-                    ),
+                        width: 250,
+                        height: 50,
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.all(10),
+                        decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                                colors: [Colors.cyan, Colors.indigo]),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                table = const tableSQLerror();
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              // shape: BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))
+                            ),
+                            child: Text('SQL injection',
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white)))),
                   ],
-                ) ,
+                ),
               ),
               table,
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
 
@@ -140,7 +192,7 @@ class _resultScreenState extends State<resultScreen> {
               //part for piechart and details
               Row(
                 children: [
-                  pieGraph(),
+                  const pieGraph(),
                   Visibility(
                     visible: screenWidth > 1200,
                     child: Container(
@@ -174,37 +226,65 @@ class _tableXSSErrorState extends State<tableXSSError> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     List<DataColumn> dataColumns = [
-      DataColumn(label: Text("Serverity",style: GoogleFonts.montserrat(fontSize: 20,fontWeight: FontWeight.bold))),
-      DataColumn(label: Text("Type",style: GoogleFonts.montserrat(fontSize: 20,fontWeight: FontWeight.bold))),
-      DataColumn(label: Text('Vulnerabilities',style: GoogleFonts.montserrat(fontSize: 20,fontWeight: FontWeight.bold)))
+      DataColumn(
+          label: Text("Serverity",
+              style: GoogleFonts.montserrat(
+                  fontSize: 24, fontWeight: FontWeight.bold))),
+      DataColumn(
+          label: Text("Type",
+              style: GoogleFonts.montserrat(
+                  fontSize: 24, fontWeight: FontWeight.bold))),
+      DataColumn(
+          label: Text('Vulnerabilities',
+              style: GoogleFonts.montserrat(
+                  fontSize: 24, fontWeight: FontWeight.bold)))
     ];
     final List<Map<String, dynamic>> data = [
-        {'Serverity': Icons.warning_rounded, 'Type': 'XSS error', 'Vulnerabilities': 'google.com'},
-        {'Serverity':Icons.warning_rounded, 'Type': 'XSS error', 'Vulnerabilities': 'google.com'},
-        {'Serverity': Icons.warning_rounded, 'Type': 'XSS error', 'Vulnerabilities': 'google.com'},
-        {'Serverity': Icons.warning_rounded, 'Type': 'XSS error', 'Vulnerabilities': 'google.com'},
-        {'Serverity': Icons.warning_rounded, 'Type': 'XSS error', 'Vulnerabilities': 'google.com'},
-      ];
+      {
+        'Serverity': Icons.warning_rounded,
+        'Type': 'XSS error',
+        'Vulnerabilities': 'google.com'
+      },
+      {
+        'Serverity': Icons.warning_rounded,
+        'Type': 'XSS error',
+        'Vulnerabilities': 'google.com'
+      },
+      {
+        'Serverity': Icons.warning_rounded,
+        'Type': 'XSS error',
+        'Vulnerabilities': 'google.com'
+      },
+      {
+        'Serverity': Icons.warning_rounded,
+        'Type': 'XSS error',
+        'Vulnerabilities': 'google.com'
+      },
+      {
+        'Serverity': Icons.warning_rounded,
+        'Type': 'XSS error',
+        'Vulnerabilities': 'google.com'
+      },
+    ];
     return Container(
       width: screenWidth - 500,
       height: 500,
-      decoration: BoxDecoration(
-        color: Color(0xFFD9D9D9),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black45,
-            blurRadius: 2,
-            offset: Offset(0, 4)
-          )
-        ]
-      ),
-      child: DataTable(columns: dataColumns, rows:data.map((item) =>
-        DataRow(cells: [
-          DataCell(Icon(item['Serverity'])),
-          DataCell(Text(item['Type'])),
-          DataCell(Text(item['Vulnerabilities']))
-        ]) ).toList() ),
+      decoration: const BoxDecoration(
+          color: Color(0xFFD9D9D9),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black45, blurRadius: 2, offset: Offset(0, 4))
+          ]),
+      child: DataTable(
+          columns: dataColumns,
+          rows: data
+              .map((item) => DataRow(cells: [
+                    DataCell(Icon(item['Serverity'])),
+                    DataCell(Text(item['Type'])),
+                    DataCell(Text(item['Vulnerabilities']))
+                  ]))
+              .toList()),
     );
   }
 }
@@ -221,33 +301,88 @@ class _tableSQLerrorState extends State<tableSQLerror> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    final List<DataColumn> dataColumns =[
-      DataColumn(label: Text('Serverity',style: GoogleFonts.montserrat(fontSize: 24,fontWeight: FontWeight.bold))),
-      DataColumn(label: Text('Type',style: GoogleFonts.montserrat(fontSize: 24,fontWeight: FontWeight.bold))),
-      DataColumn(label: Text('Vulnerabilities',style: GoogleFonts.montserrat(fontSize: 24,fontWeight: FontWeight.bold)))
+    final List<DataColumn> dataColumns = [
+      DataColumn(
+          label: Text('Serverity',
+              style: GoogleFonts.montserrat(
+                  fontSize: 24, fontWeight: FontWeight.bold))),
+      DataColumn(
+          label: Text('Type',
+              style: GoogleFonts.montserrat(
+                  fontSize: 24, fontWeight: FontWeight.bold))),
+      DataColumn(
+          label: Text('Vulnerabilities',
+              style: GoogleFonts.montserrat(
+                  fontSize: 24, fontWeight: FontWeight.bold)))
     ];
-    final List<Map<String,dynamic>> dataRows =[
-      {'Serverity':Icons.warning_rounded,'Type':'SQL Injection','Vulnerabilities':'wikipedia.com'},
-      {'Serverity':Icons.warning_rounded,'Type':'SQL Injection','Vulnerabilities':'wikipedia.com'},
-      {'Serverity':Icons.warning_rounded,'Type':'SQL Injection','Vulnerabilities':'wikipedia.com'},
-      {'Serverity':Icons.warning_rounded,'Type':'SQL Injection','Vulnerabilities':'wikipedia.com'},
-      {'Serverity':Icons.warning_rounded,'Type':'SQL Injection','Vulnerabilities':'wikipedia.com'}
+    final List<Map<String, dynamic>> dataRows = [
+      {
+        'Serverity': Icons.warning_rounded,
+        'Type': 'SQL Injection',
+        'Vulnerabilities': 'wikipedia.com'
+      },
+      {
+        'Serverity': Icons.warning_rounded,
+        'Type': 'SQL Injection',
+        'Vulnerabilities': 'wikipedia.com'
+      },
+      {
+        'Serverity': Icons.warning_rounded,
+        'Type': 'SQL Injection',
+        'Vulnerabilities': 'wikipedia.com'
+      },
+      {
+        'Serverity': Icons.warning_rounded,
+        'Type': 'SQL Injection',
+        'Vulnerabilities': 'wikipedia.com'
+      },
+      {
+        'Serverity': Icons.warning_rounded,
+        'Type': 'SQL Injection',
+        'Vulnerabilities': 'wikipedia.com'
+      }
     ];
     return Container(
       width: screenWidth - 500,
       height: 500,
-      decoration: BoxDecoration(
-        color: Color(0xFFD9D9D9),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        boxShadow: [
-          BoxShadow(color: Colors.black45,offset: Offset(0, 4),blurRadius: 2)
-        ]
+      decoration: const BoxDecoration(
+          color: Color(0xFFD9D9D9),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black45, offset: Offset(0, 4), blurRadius: 2)
+          ]),
+      child: DataTable(
+        columns: dataColumns,
+        rows: dataRows
+            .map((item) => DataRow(cells: [
+                  DataCell(Icon(item['Serverity'])),
+                  DataCell(Text(item['Type'])),
+                  DataCell(Text(item['Vulnerabilities']))
+                ]))
+            .toList(),
       ),
-      child: DataTable(columns:dataColumns,rows: dataRows.map((item) => DataRow(cells: [
-        DataCell(Icon(item['Serverity'])),
-        DataCell(Text(item['Type'])),
-        DataCell(Text(item['Vulnerabilities']))
-      ]) ).toList(),),
     );
+  }
+}
+
+class dropdownButton extends StatefulWidget {
+  const dropdownButton({super.key});
+
+  @override
+  State<dropdownButton> createState() => _dropdownButtonState();
+}
+
+class _dropdownButtonState extends State<dropdownButton> {
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonHideUnderline(
+        child: DropdownButton2<String>(
+      isExpanded: true,
+      hint: const Row(
+        children: [Icon(Icons.list), Text('Select vulnerability')],
+      ),
+      items: [],
+    ));
   }
 }

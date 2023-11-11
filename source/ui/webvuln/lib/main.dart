@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:line_icons/line_icon.dart';
+import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/historyScreen.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
 import 'package:webvuln/views/resultScreen.dart';
 import 'package:webvuln/views/scanScreen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:webvuln/views/settingScreen.dart';
 
 // import '../views/scanScreen2.dart';
 // import 'views/draft.dart';
@@ -15,9 +17,6 @@ void main() {
   runApp(const mainScreen());
 }
 
-// Copyright 2019 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file
 class mainScreen extends StatefulWidget {
   const mainScreen({super.key});
 
@@ -27,94 +26,122 @@ class mainScreen extends StatefulWidget {
 
 class _mainScreenState extends State<mainScreen> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _selectedIndex = 0;
+  }
+
+  @override
   int _selectedIndex = 0;
-  List _selectedItem = [
+  final List _selectedItem = [
     const scanScreen(),
     const resultScreen(),
+    const resourceScreen(),
     const historyScreen(),
-    const resourceScreen()
+    const settingScreen()
   ];
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double heightWidth = MediaQuery.of(context).size.height;
-    int numberPage = 0;
     Get.testMode = true;
     return GetMaterialApp(
       home: Scaffold(
         body: Row(
           children: [
             Container(
-              width: 150,
+              width: screenWidth * 0.1,
               height: double.infinity,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(10),
-                      bottomRight: Radius.circular(10)),
+                      topRight: Radius.circular(-10),
+                      bottomRight: Radius.circular(-10)),
                   color: Color(0xFFDCE8F6)),
-              child: NavigationRail(
-                  backgroundColor: Color(0xFF080848),
-                  indicatorShape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(screenWidth * 0.03),
+                    child: Image.asset('lib/assets/logo.png'),
                   ),
-                  leading: Container(
-                      width: 150,
-                      height: 200,
-                      padding: EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          Image.asset('lib/assets/logo.png'),
-                          Text(
-                            'WEB VULN',
-                            style: TextStyle(color: Colors.white),
-                          )
-                        ],
-                      )),
-                  trailing: ElevatedButton(
-                      onPressed: () {}, child: Icon(Icons.settings)),
-                  destinations: const [
-                    NavigationRailDestination(
-                      icon: Icon(Ionicons.scan_sharp),
-                      label: Text('scan'),
+                  Padding(
+                    padding: const EdgeInsets.all(30),
+                    child: Column(
+                      children: [
+                        ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedIndex = 0;
+                              });
+                            },
+                            child: const Column(
+                              children: [Icon(Ionicons.scan), Text('Scan')],
+                            ),
+                            style: ElevatedButton.styleFrom(
+                                maximumSize: const Size(100, 100))),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _selectedIndex = 1;
+                            });
+                          },
+                          child: const Column(
+                            children: [
+                              Icon(Ionicons.analytics),
+                              Text('Result Scan')
+                            ],
+                          ),
+                        ),
+                        ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedIndex = 2;
+                              });
+                            },
+                            child: const Column(
+                              children: [
+                                Icon(Ionicons.accessibility),
+                                Text('Resource')
+                              ],
+                            )),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _selectedIndex = 3;
+                            });
+                          },
+                          child: const Column(
+                            children: [
+                              Icon(Ionicons.hammer_sharp),
+                              Text('History')
+                            ],
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _selectedIndex = 4;
+                            });
+                          },
+                          child: const Column(
+                            children: [
+                              Icon(Ionicons.settings),
+                              Text('Setting')
+                            ],
+                          ),
+                        )
+                      ],
                     ),
-                    NavigationRailDestination(
-                        icon: Icon(Ionicons.analytics), label: Text('result')),
-                    NavigationRailDestination(
-                        icon: Icon(FontAwesomeIcons.clockRotateLeft),
-                        label: Text('History')),
-                    NavigationRailDestination(
-                        icon: LineIcon.addressBook(), label: Text('Resources'))
-                  ],
-                  selectedIndex: _selectedIndex,
-                  onDestinationSelected: (int index) {
-                    setState(() {
-                      _selectedIndex = index;
-                      numberPage = _selectedIndex;
-                      print(numberPage);
-                      print(_selectedIndex);
-                    });
-                  }),
+                  ),
+                ],
+              ),
             ),
-            StreamBuilder<int>(
-              stream: _selectedIndexStream,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Container(
-                    width: screenWidth - 150,
-                    height: heightWidth,
-                    // margin: EdgeInsetsDirectional.symmetric(horizontal: 20),
-                    // padding: EdgeInsetsDirectional.symmetric(horizontal: 20),
-                    child: _selectedItem[snapshot.data as int],
-                  );
-                } else {
-                  return Container(
-                    width: 1000,
-                    height: 1000,
-                    child: _selectedItem[0],
-                  );
-                }
-              },
+            Container(
+              width: screenWidth * 0.9,
+              height: double.infinity,
+              color: Colors.black,
+              child: _selectedItem[_selectedIndex],
             )
           ],
         ),
@@ -123,7 +150,7 @@ class _mainScreenState extends State<mainScreen> {
   }
 
   Stream<int> get _selectedIndexStream =>
-      Stream.fromFuture(Future.delayed(const Duration(milliseconds: 100), () {
+      Stream.fromFuture(Future.delayed(const Duration(milliseconds: 500), () {
         return _selectedIndex;
       }));
 }

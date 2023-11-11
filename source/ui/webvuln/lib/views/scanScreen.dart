@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,10 +32,14 @@ class _scanScreenState extends State<scanScreen> {
   @override
   final TextEditingController urlController = TextEditingController();
   final _moduleController = TextEditingController();
-  final _historyURLController = TextEditingController();
-  final _dateScanController = TextEditingController();
+  // final _historyURLController = TextEditingController();
+  // final _dateScanController = TextEditingController();
   final _checkboxController = GroupController();
-  Widget contentChild = Text('Scan',style: GoogleFonts.montserrat(color: Colors.white,fontWeight: FontWeight.normal),);
+  Widget contentChild = Text(
+    'Scan',
+    style: GoogleFonts.montserrat(
+        color: Colors.white, fontWeight: FontWeight.normal),
+  );
   String buttonContent = 'Scan';
   bool isLoading = false;
   String notice = "";
@@ -54,13 +60,13 @@ class _scanScreenState extends State<scanScreen> {
   ];
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color(0xFFDCE8F6),
+        backgroundColor: const Color(0xFFDCE8F6),
         body: Column(
           children: [
             // send scan URL and number module to backend
             Container(
               margin:
-                  EdgeInsets.only(top: 200, left: 80, right: 80, bottom: 10),
+                  const EdgeInsets.only(top: 200, left: 80, right: 80, bottom: 10),
               child: Text(
                 'Scan URL',
                 style: GoogleFonts.montserrat(
@@ -71,15 +77,15 @@ class _scanScreenState extends State<scanScreen> {
               width: 800,
               height: 1,
               color: Colors.black,
-              margin: EdgeInsetsDirectional.only(bottom: 40),
+              margin: const EdgeInsetsDirectional.only(bottom: 40),
             ),
             Container(
-              margin: EdgeInsetsDirectional.symmetric(horizontal: 100),
+              margin: const EdgeInsetsDirectional.symmetric(horizontal: 100),
               // height: 100,
               decoration: BoxDecoration(boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.5),
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                   blurRadius: 10,
                 )
               ]),
@@ -91,31 +97,30 @@ class _scanScreenState extends State<scanScreen> {
 
             // tu day den dong 150
             Padding(
-              padding: EdgeInsetsDirectional.symmetric(
+              padding: const EdgeInsetsDirectional.symmetric(
                   horizontal: 100, vertical: 10),
               child: Container(
                 decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.5),
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                         blurRadius: 5,
                       )
                     ]),
                 child: SimpleGroupedCheckbox(
                   controller: _checkboxController,
-                  itemsTitle: [
+                  itemsTitle: const [
                     'Module scan 1',
                     'Module scan 2',
                     'Module scan 3',
                     'Module scan 4'
                   ],
-                  values: [1, 2, 3, 4],
+                  values: const [1, 2, 3, 4],
                   onItemSelected: (values) {
                     _moduleController.text = values.toString();
-                    print(values);
                     setState(() {
                       contentContainer = content[values - 1];
                     });
@@ -124,21 +129,21 @@ class _scanScreenState extends State<scanScreen> {
               ),
             ),
             Padding(
-              padding: EdgeInsetsDirectional.symmetric(
+              padding: const EdgeInsetsDirectional.symmetric(
                   horizontal: 100, vertical: 10),
               child: Container(
                 width: double.infinity,
                 height: 100,
                 // margin: EdgeInsetsDirectional.symmetric(horizontal: ),
-                padding: EdgeInsetsDirectional.symmetric(
+                padding: const EdgeInsetsDirectional.symmetric(
                     horizontal: 10, vertical: 10),
                 decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.5),
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                         blurRadius: 5,
                       )
                     ]),
@@ -158,10 +163,11 @@ class _scanScreenState extends State<scanScreen> {
                     moduleNumber: int.parse(_moduleController.text));
                 // Get.to(resultScreen());
                 setState(() {
-                  contentChild = CircularProgressIndicator.adaptive(
+                  contentChild = const CircularProgressIndicator.adaptive(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   );
                 });
+                
               },
               childButton: contentChild,
             ),
@@ -171,5 +177,5 @@ class _scanScreenState extends State<scanScreen> {
 }
 // viet them ham nhan data tu backend de setState cho widget trong contentChild
 
-
+// viết hàm truyền giá trị của 1 biến từ màn scanScreen sang màn main để màn main nhận định được _selectedIndex của nó chuyển thành 1 
 
