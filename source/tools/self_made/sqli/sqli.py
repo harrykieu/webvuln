@@ -47,7 +47,7 @@ class SQli:
                 "url": url,
                 "details": "[+] SQL Injection detected"
             })
-        return results
+        return True
 
     # -----------------------------------------------------
 
@@ -107,7 +107,7 @@ class SQli:
         details["action"] = action
         details["method"] = method
         details["inputs"] = inputs
-        return details
+        return 0
 
     # -------------------------------------------------------------
 

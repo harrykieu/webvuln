@@ -32,7 +32,7 @@ class LFI:
                 "details": "[+] Local File Injection detected"
             })
 
-        return results
+        return True
 
 # ------------------------------------------------
 
@@ -61,7 +61,7 @@ class LFI:
         details["action"] = action
         details["method"] = method
         details["inputs"] = inputs
-        return details
+        return 0
 
 # --------------------------------------------------
 
