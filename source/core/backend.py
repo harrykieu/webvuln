@@ -7,8 +7,13 @@ import pymongo
 import requests
 from source.core.database.dbutils import DatabaseUtils
 import source.core.utils as utils
-from source.tools.self_made.fileupload.fileupload import FileUpload
-from source.tools.self_made.pathtraversal.pathtraversal import PathTraversal
+from source.tools.self_made.fileupload.scan_fileupload import FileUpload
+from source.tools.self_made.pathtraversal.scan_pathtraversal import PathTraversal
+from source.tools.self_made.lfi.scan_lfi import LFI
+from source.tools.self_made.sqli.scan_sqli import SQLi
+from source.tools.self_made.xss.scan_xss import XSS
+from source.tools.self_made.idor.scan_idor import IDOR
+from source.core.calSeverity import calculateWebsiteSafetyRate
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [
@@ -85,12 +90,18 @@ class WebVuln:
         ```
         {
             "result": [
-                "url1":  {
-                    "module": "vulnerable/not vulnerable"
-                },
-                "url2": {
-                    "module": "vulnerable/not vulnerable"
-                }
+                {
+                    "domain": url,
+                    "scanDate": datetime.now(),
+                    "numVuln": "number of vulnerabilities",
+                    "vulnerabilities": [
+                        {
+                            "type": "type of vulnerability",
+                            "description": "description of the vulnerability",
+                            "severity": "severity of the vulnerability"
+                        }
+                    ]
+                }, ...
             ]
         }
         ```
@@ -145,9 +156,9 @@ class WebVuln:
                             dirURL[f"{url}"].append(res["url"])
                     f.close()
                     os.remove(jsonFile)
+                    os.remove("result.txt")
             else:
                 dirURL[f"{url}"] = [f"{url}"]
-            os.remove("result.txt")
             print(f"[!] All URLs: {dirURL}")
         for key in dirURL:
             resultURL = {
@@ -180,13 +191,11 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        # TODO: FIX THE LOGIC?
                         if "dvwa" in url:
                             a = FileUpload(url, resources, isDVWA=True)
                         else:
                             a = FileUpload(url, resources)
-                        vuln = a.main()
-                        if vuln is True:
+                        if a.main() is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
                                 {
@@ -212,32 +221,85 @@ class WebVuln:
                                 f"[backend.py-scanURL] {url} is not vulnerable to file upload",
                                 "INFO",
                             )
-                        listResult.append(resultURL)
-                        print(listResult)
                     elif module == "idor":
                         print("[+] Checking IDOR vulnerability...")
-                        pass
+                        a = IDOR(url)
+                        if a.check_idor() is True:
+                            resultURL["numVuln"] += 1
+                            resultURL["vulnerabilities"].append(
+                                {
+                                    "type": "IDOR",
+                                    "description": f"{url} is vulnerable to IDOR",
+                                    "severity": "High",
+                                }
+                            )
+                            if self.__debug:
+                                print(
+                                    f"[backend.py-scanURL] {url} is vulnerable to IDOR"
+                                )
+                            utils.log(
+                                f"[backend.py-scanURL] {url} is vulnerable to IDOR",
+                                "INFO",
+                            )
+                        else:
+                            if self.__debug:
+                                print(
+                                    f"[backend.py-scanURL] {url} is not vulnerable to IDOR"
+                                )
+                            utils.log(
+                                f"[backend.py-scanURL] {url} is not vulnerable to IDOR",
+                                "INFO",
+                            )
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
                         resources = self.resourceHandler(
-                            "GET", {"vulnType": "PathTraversal", "resType": "payload"}
+                            "GET", {"vulnType": "Path Traversal", "resType": "payload"}
                         )
-                        for key in dirURL:
-                            for url in dirURL[key]:
-                                a = PathTraversal(url, resources)
-                                if a.checkPathTraversal() is True:
-                                    print(
-                                        f"[backend.py-scanURL] {url} is vulnerable to path traversal"
-                                    )
-                                else:
-                                    print(
-                                        f"[backend.py-scanURL] {url} is not vulnerable to path traversal"
-                                    )
+                        if resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        a = PathTraversal(url, resources)
+                        if a.checkPathTraversal() is True:
+                            resultURL["numVuln"] += 1
+                            resultURL["vulnerabilities"].append(
+                                {
+                                    "type": "Path Traversal",
+                                    "description": f"{url} is vulnerable to path traversal",
+                                    "severity": "High",
+                                }
+                            )
+                            if self.__debug:
+                                print(
+                                    f"[backend.py-scanURL] {url} is vulnerable to path traversal"
+                                )
+                            utils.log(
+                                f"[backend.py-scanURL] {url} is vulnerable to path traversal",
+                                "INFO",
+                            )
+                        else:
+                            if self.__debug:
+                                print(
+                                    f"[backend.py-scanURL] {url} is not vulnerable to path traversal"
+                                )
+                            utils.log(
+                                f"[backend.py-scanURL] {url} is not vulnerable to path traversal",
+                                "INFO",
+                            )
                     else:
                         raise ValueError(f"Invalid module {module}")
+            listResult.append(resultURL)
+            print(listResult)
         # FIX
         for res in listResult:
             res["resultSeverity"] = "High"
+            # #Fix later
             try:
                 self.__database.addDocument("scanResult", res)
             except Exception as e:

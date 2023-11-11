@@ -3,7 +3,8 @@ from bs4 import BeautifulSoup
 import re
 import random
 
-class IDOR_check:
+
+class IDOR:
     def __init__(self, url):
         self.url = url
         self.session = requests.Session()
@@ -12,24 +13,19 @@ class IDOR_check:
         }
 
     def scan_website(self, url):
-        results = {
-            "idor": [] 
-        }
+        results = {"idor": []}
 
         if self.check_idor(url):
-            results["idor"].append({
-                "url": url,
-                "details": "[+] IDOR detected"
-            })
+            results["idor"].append({"url": url, "details": "[+] IDOR detected"})
             return True, results
         return False, results
-    
+
     def extract_urls(self):
         response = self.session.get(self.url)
-        soup = BeautifulSoup(response.content, 'html.parser')
+        soup = BeautifulSoup(response.content, "html.parser")
         urls = []
-        for url in soup.find_all('a'):
-            url = url.get('href')
+        for url in soup.find_all("a"):
+            url = url.get("href")
             if url:
                 urls.append(url)
         return urls
@@ -41,22 +37,22 @@ class IDOR_check:
 
     # Code for compare two responses HTML
     def compare_responses(self, resp1, resp2):
-    # So sánh nội dung 2 response
-    # Nếu khác nhau => có thể là IDOR
+        # So sánh nội dung 2 response
+        # Nếu khác nhau => có thể là IDOR
         html1 = resp1.content
         html2 = resp2.content
 
         if html1 != html2:
             return False
 
-        return False
-    
+        return True
+
     def check_unauthorized_access(self, response):
         # Check status code
         if response.status_code == 401 or response.status_code == 403:
             return True
-        
-        # Check HTML for error messages 
+
+        # Check HTML for error messages
         errors = ["Access denied", "Unauthorized", "Permission denied"]
 
         for error in errors:
@@ -67,25 +63,23 @@ class IDOR_check:
 
     def check_idor(self, url):
         urls = self.extract_urls()
-        
+
         for url in urls:
-            if re.search(r'user_id=(\d+)', url):
-                original_id = re.search(r'user_id=(\d+)', url).group(1)  
-                original_url = url 
-            
-            
+            if re.search(r"user_id=(\d+)", url):
+                original_id = re.search(r"user_id=(\d+)", url).group(1)
+                original_url = url
+
                 test_id = self.generate_random_id()
-                test_url = re.sub(r'user_id=\d+', 'user_id=' + test_id, url)
+                test_url = re.sub(r"user_id=\d+", "user_id=" + test_id, url)
                 test_resp = self.session.get(test_url)
                 original_resp = self.session.get(original_url)
 
                 if self.compare_responses(original_resp, test_resp):
                     print("[!] IDOR detected on url:", test_url)
                     return True
-                
+
                 if self.check_unauthorized_access(test_resp):
                     print("[!] IDOR detected on url:", test_url)
                     return True
-                
+
         return False
-        

@@ -46,7 +46,6 @@ class FileUpload:
             print(f"{self.red}[-] CSRF token not found!{self.white}")
             return None
 
-    # ================================DVWA=======================================
     def dvwaLogin(self) -> str:
         """(For DVWA only) Login to DVWA and return a session object."""
         if not self.isDVWA:
@@ -68,8 +67,6 @@ class FileUpload:
         r = self.session.post("http://localhost/dvwa/security.php", data=data)
         print("Security level changed to " + level)
         return r
-
-    # ===========================================================================
 
     def getAllForms(self, url):
         r = self.session.get(url, cookies=self.cookies)
@@ -121,7 +118,7 @@ class FileUpload:
                 validMH.append(res)
             else:
                 pass
-        print(f'{self.blue}[-] Uploading valid files...{self.white}')
+        print(f"{self.blue}[-] Uploading valid files...{self.white}")
         for validFile in validFiles:
             for key in formField:
                 if formField[key] != "":
@@ -139,22 +136,27 @@ class FileUpload:
             if self.csrfExist and self.isDVWA:
                 payload.update({"user_token": self.getCSRFToken()})
             p = self.session.post(self.url, files=payload, cookies=self.cookies)
-            if p.history[0].status_code == 301 or p.history[0].status_code == 302:
-                print(f'{self.red}[!] File upload failed! Check the URL!{self.white}')
-                return self.result
+            if p.history != []:
+                if p.history[0].status_code == 301 or p.history[0].status_code == 302:
+                    print(
+                        f"{self.red}[!] File upload failed! Check the URL!{self.white}"
+                    )
+                    return self.result
             if p.status_code != 200:
-                print(f'{self.red}[!] File upload failed!{self.white}')
+                print(f"{self.red}[!] File upload failed!{self.white}")
                 self.result = False
             elif self.checkSuccess(p.text) is False:
-                print(f'{self.red}[!] File upload failed!{self.white}')
+                print(f"{self.red}[!] File upload failed!{self.white}")
                 self.result = False
             else:
-                print(f'{self.green}[!] Valid file upload success!{self.white}')
+                print(f"{self.green}[!] Valid file upload success!{self.white}")
                 self.result = True
         if self.result is False:
-            print(f'{self.red} [!] Valid file upload failed! Quitting...{self.white}')
+            print(f"{self.red} [!] Valid file upload failed! Quitting...{self.white}")
             return self.result
-        print(f'{self.blue}[-] Uploading invalid files with valid extension...{self.white}')
+        print(
+            f"{self.blue}[-] Uploading invalid files with valid extension...{self.white}"
+        )
         for validExtFile in validExtension:
             for key in formField:
                 if formField[key] != "":
@@ -173,16 +175,20 @@ class FileUpload:
                 payload.update({"user_token": self.getCSRFToken()})
             p = self.session.post(self.url, files=payload, cookies=self.cookies)
             if p.status_code != 200:
-                print(f'{self.red}[!] File upload failed!{self.white}')
+                print(f"{self.red}[!] File upload failed!{self.white}")
                 self.result = False
             elif self.checkSuccess(p.text) is False:
-                print(f'{self.red}[!] File upload failed!{self.white}')
+                print(f"{self.red}[!] File upload failed!{self.white}")
                 self.result = False
             else:
-                print(f'{self.green}[!] Invalid file with valid extension upload success!{self.white}')
+                print(
+                    f"{self.green}[!] Invalid file with valid extension upload success!{self.white}"
+                )
                 self.result = True
         if self.result is False:
-            print(f'{self.blue}[-] Uploading invalid files with valid magic number...{self.white}')
+            print(
+                f"{self.blue}[-] Uploading invalid files with valid magic number...{self.white}"
+            )
             for validMHFile in validMH:
                 for key in formField:
                     if formField[key] != "":
@@ -204,13 +210,15 @@ class FileUpload:
                     files=payload,
                 )
                 if p.status_code != 200:
-                    print(f'{self.red}[!] File upload failed!{self.white}')
+                    print(f"{self.red}[!] File upload failed!{self.white}")
                     self.result = False
                 elif self.checkSuccess(p.text) is False:
-                    print(f'{self.red}[!] File upload failed!{self.white}')
+                    print(f"{self.red}[!] File upload failed!{self.white}")
                     self.result = False
                 else:
-                    print(f'{self.green}[!] Invalid file with valid magic number upload success!{self.white}')
+                    print(
+                        f"{self.green}[!] Invalid file with valid magic number upload success!{self.white}"
+                    )
                     self.result = True
 
     def checkSuccess(self, responseContent) -> bool:
@@ -220,11 +228,11 @@ class FileUpload:
             signature = soup.find_all(string=re.compile(s, re.IGNORECASE))
             if signature:
                 for htmlSig in signature:
-                    print(f'{self.green}[+] Signature found: {htmlSig}{self.white}')
-                print(f'{self.green}[+] File upload success!{self.white}')
+                    print(f"{self.green}[+] Signature found: {htmlSig}{self.white}")
+                print(f"{self.green}[+] File upload success!{self.white}")
                 return True
             else:
-                print(f'{self.red}[+] Signature not found!{self.white}')
+                print(f"{self.red}[+] Signature not found!{self.white}")
                 return False
 
     def main(self) -> bool:
