@@ -9,6 +9,9 @@ from source.core.database.dbutils import DatabaseUtils
 import source.core.utils as utils
 from source.tools.self_made.fileupload.fileupload import FileUpload
 from source.tools.self_made.pathtraversal.pathtraversal import PathTraversal
+from source.tools.self_made.xss.xss import XSS
+from source.tools.self_made.sqli.sqli import SQLi
+from source.tools.self_made.lfi.lfi import LFI
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = ['ffuf', 'dirsearch', 'lfi', 'sqli',
@@ -127,11 +130,38 @@ class WebVuln:
             elif module == 'dirsearch':
                 pass
             elif module == 'lfi':
-                pass
+                lfi_resources = self.resourceHandler(
+                    'GET', {"vulnType": "LFI", "resType": "payload"})
+                for key in dirURL:
+                    for url in dirURL[key]:
+                        a = LFI(url, lfi_resources)
+                        if a.check_lfi() is True:
+                            print(f'[backend.py-scanURL] {url} is vulnerable to lfi')
+                        else:
+                            print(f'[backend.py-scanURL] {url} is not vulnerable to lfi')
+
             elif module == 'sqli':
-                pass
+                sqli_resources = self.resourceHandler(
+                    'GET', {"vulnType": "SQLI", "resType": "payload"})
+                for key in dirURL:
+                    for url in dirURL[key]:
+                        a = SQLi(url, sqli_resources)
+                        if a.check_sqli() is True:
+                            print(f'[backend.py-scanURL] {url} is vulnerable to sql')
+                        else:
+                            print(f'[backend.py-scanURL] {url} is not vulnerable to sqli')
+
             elif module == 'xss':
-                pass
+                xss_resources = self.resourceHandler(
+                    'GET', {"vulnType": "XSS", "resType": "payload"})
+                for key in dirURL:
+                    for url in dirURL[key]:
+                        a = XSS(url, xss_resources)
+                        if a.checkXSS() is True:
+                            print(f'[backend.py-scanURL] {url} is vulnerable to xss')
+                        else:
+                            print(f'[backend.py-scanURL] {url} is not vulnerable to xss')
+
             elif module == 'fileupload':
                 # Get all the resources first
                 resources = self.fileHandler(
@@ -157,6 +187,7 @@ class WebVuln:
                                 f'[backend.py-scanURL] {url} is vulnerable to file upload', "INFO")
             elif module == 'idor':
                 pass
+
             elif module == 'pathtraversal':
                 resources = self.resourceHandler(
                     'GET', {"vulnType": "PathTraversal", "resType": "payload"})
