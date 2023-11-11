@@ -15,11 +15,11 @@ for a in lista:
     print(lista.index(a)) """
 # NOTE: dvwa url must have / at the end
 # print(a.scanURL(['http://localhost/dvwa/vulnerabilities/upload'], ['fileupload']))
-# a.scanURL(['http://localhost:12001'], ['fileupload'])
-a.scanURL(
+a.scanURL(["http://localhost:12001"], ["fileupload"])
+""" a.scanURL(
     ["http://localhost:8091/loadImage.php", "http://localhost:12001"],
     ["pathtraversal", "fileupload"],
-)
+) """
 
 # Push resource to db
 """ with open(f'{ROOTPATH}/source/core/database/data_resources.json', 'r') as f:

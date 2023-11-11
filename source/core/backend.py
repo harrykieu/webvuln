@@ -32,6 +32,11 @@ class WebVuln:
     def __init__(self) -> None:
         self.__debug = False
         self.__database = DatabaseUtils()
+        os.system("color")
+        self.red = "\033[31m"  # Red color code for text output
+        self.white = "\033[0m"  # White color code for text output
+        self.green = "\033[32m"  # Green color code for text output
+        self.blue = "\033[94m"  # Light blue color code for text output
 
     def setDebug(self, debug: bool) -> None:
         self.__debug = debug
@@ -46,8 +51,9 @@ class WebVuln:
         keys = json.loads(data).keys()
         if "result" in keys and len(keys) == 1:
             try:
+                utils.log(f"/api/result: Sending data to Flask: {data}", "INFO")
                 if self.__debug:
-                    utils.log(f"/api/result: Sending data to Flask: {data}", "DEBUG")
+                    print(f"{self.blue}/api/result: Sending data to Flask: {data}")
                 requests.post(
                     url="http://localhost:5000/api/result",
                     data=data,
@@ -55,12 +61,12 @@ class WebVuln:
                 )
             except Exception as e:
                 if self.__debug:
-                    print(f"[backend.py-sendResultFlask] Error: {e}")
+                    print(f"{self.red}[backend.py-sendResultFlask] Error: {e}")
                 utils.log(f"[backend.py-sendResultFlask] Error: {e}", "ERROR")
                 return "Failed"
             return "Success"
 
-    def recvFlask(self, route, method, jsonData) -> None | str:
+    def recvFlask(self, route, method, jsonData):
         """Receive data from Flask based on the route.
 
         :param route: The route of the request
@@ -68,7 +74,7 @@ class WebVuln:
         :param jsonData: JSON object
         """
         if self.__debug:
-            print(f"{method} {route}: {jsonData.keys()}")
+            print(f"{self.blue}{method} {route}: {jsonData.keys()}")
         if route == "/api/history":
             return self.getScanResult(method, jsonData)
         elif route == "/api/resourcesnormal":
@@ -78,8 +84,10 @@ class WebVuln:
         elif route == "/api/scan":
             return self.scanURL(jsonData["urls"])
         else:
-            utils.log(f"Error: Invalid route {route}", "ERROR")
-            return "Failed"
+            utils.log(f"[backend.py-recvFlask] Error: Invalid route {route}", "ERROR")
+            if self.__debug:
+                print(f"{self.red}[backend.py-recvFlask] Error: Invalid route {route}")
+            raise ValueError(f"Invalid route {route}")
 
     def scanURL(self, urls, modules):
         """Scan the URLs.
@@ -132,7 +140,7 @@ class WebVuln:
         for url in urls:
             filename = f"scanresult_url{urls.index(url)}.json"
             jsonFiles.append(filename)
-            # For using ffuf and dirsearch (if needed)
+            # For using ffuf or dirsearch (if needed)
             if "ffuf" in modules:
                 modules.pop(modules.index("ffuf"))
                 print("[-] Running ffuf...")
@@ -200,7 +208,9 @@ class WebVuln:
                             resultURL["vulnerabilities"].append(
                                 {
                                     "type": "File Upload",
-                                    "description": f"{url} is vulnerable to file upload",
+                                    "logs": open(
+                                        f"{ROOTPATH}/logs/fileupload.txt", "r"
+                                    ).read(),
                                     "severity": "High",
                                 }
                             )
@@ -208,19 +218,12 @@ class WebVuln:
                                 print(
                                     f"[backend.py-scanURL] {url} is vulnerable to file upload"
                                 )
-                            utils.log(
-                                f"[backend.py-scanURL] {url} is vulnerable to file upload",
-                                "INFO",
-                            )
                         else:
                             if self.__debug:
                                 print(
                                     f"[backend.py-scanURL] {url} is not vulnerable to file upload"
                                 )
-                            utils.log(
-                                f"[backend.py-scanURL] {url} is not vulnerable to file upload",
-                                "INFO",
-                            )
+                        os.remove(f"{ROOTPATH}/logs/fileupload.txt")
                     elif module == "idor":
                         print("[+] Checking IDOR vulnerability...")
                         a = IDOR(url)
@@ -237,19 +240,11 @@ class WebVuln:
                                 print(
                                     f"[backend.py-scanURL] {url} is vulnerable to IDOR"
                                 )
-                            utils.log(
-                                f"[backend.py-scanURL] {url} is vulnerable to IDOR",
-                                "INFO",
-                            )
                         else:
                             if self.__debug:
                                 print(
                                     f"[backend.py-scanURL] {url} is not vulnerable to IDOR"
                                 )
-                            utils.log(
-                                f"[backend.py-scanURL] {url} is not vulnerable to IDOR",
-                                "INFO",
-                            )
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
                         resources = self.resourceHandler(
@@ -279,19 +274,11 @@ class WebVuln:
                                 print(
                                     f"[backend.py-scanURL] {url} is vulnerable to path traversal"
                                 )
-                            utils.log(
-                                f"[backend.py-scanURL] {url} is vulnerable to path traversal",
-                                "INFO",
-                            )
                         else:
                             if self.__debug:
                                 print(
                                     f"[backend.py-scanURL] {url} is not vulnerable to path traversal"
                                 )
-                            utils.log(
-                                f"[backend.py-scanURL] {url} is not vulnerable to path traversal",
-                                "INFO",
-                            )
                     else:
                         raise ValueError(f"Invalid module {module}")
             listResult.append(resultURL)
@@ -369,7 +356,7 @@ class WebVuln:
                 and "value" in data.keys()
                 and "action" in data.keys()
                 and len(data.keys()) == 4
-            ):  # refactor later
+            ):
                 action = data["action"]
                 if action == "add":
                     # Note: if the value is a file, it must be encoded in base64 string before sending to the server (client side)

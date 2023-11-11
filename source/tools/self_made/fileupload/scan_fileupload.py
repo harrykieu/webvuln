@@ -14,24 +14,13 @@ class FileUpload:
         self.csrfExist = False
         self.isDVWA = isDVWA
         self.resources = resources
-        self.result = False
+        self.isVuln = False
+        # Color codes for text output
         os.system("color")
         self.red = "\033[31m"  # Red color code for text output
         self.white = "\033[0m"  # White color code for text output
         self.green = "\033[32m"  # Green color code for text output
         self.blue = "\033[94m"  # Light blue color code for text output
-
-    def checkCSRF(self) -> str:
-        """Check if CSRF is enabled on the website."""
-        r = self.session.get(self.url)
-        soup = BeautifulSoup(r.text, "html.parser")
-        usrtkSoup = soup.find_all("input", attrs={"name": "user_token"})
-        if usrtkSoup:
-            self.csrfExist = True
-            return "CSRF is enabled on the website"
-        else:
-            self.csrfExist = False
-            return "CSRF is not enabled on the website"
 
     def getCSRFToken(self) -> str:
         """Get CSRF token for the login page of the website."""
@@ -44,6 +33,7 @@ class FileUpload:
             return userToken
         else:
             print(f"{self.red}[-] CSRF token not found!{self.white}")
+            utils.log("[FileUpload] CSRF token not found!", "ERROR", "fileUpload.txt")
             return None
 
     def dvwaLogin(self) -> str:
@@ -57,6 +47,8 @@ class FileUpload:
             payload["user_token"] = token
             c.post("http://localhost/dvwa/login.php", data=payload)
             self.cookies = c.cookies
+            print(f"{self.green}[+] Logged in to DVWA!{self.white}")
+            utils.log("[FileUpload] Logged in to DVWA!", "INFO", "fileUpload.txt")
 
     def dvwaChangeSecurity(self, level):
         """(For DVWA only) Change DVWA security level."""
@@ -65,7 +57,13 @@ class FileUpload:
         userToken = self.getCSRFToken()
         data = {"security": level, "seclev_submit": "Submit", "user_token": userToken}
         r = self.session.post("http://localhost/dvwa/security.php", data=data)
-        print("Security level changed to " + level)
+        if r.status_code == 200:
+            print(f"{self.green}[+] Security level changed to {level}!{self.white}")
+            utils.log(
+                "[FileUpload] Security level changed to " + level + "!",
+                "INFO",
+                "fileUpload.txt",
+            )
         return r
 
     def getAllForms(self, url):
@@ -73,10 +71,50 @@ class FileUpload:
         soup = BeautifulSoup(r.text, "html.parser")
         forms = soup.find_all("form", attrs={"enctype": "multipart/form-data"})
         if not forms:
-            print("URL is not valid for file upload")
+            print(f"{self.red}[-] URL is not valid for file upload!{self.white}")
+            utils.log(
+                "[FileUpload] URL is not valid for file upload!",
+                "ERROR",
+                "fileUpload.txt",
+            )
             return None
-        print("URL is valid for file upload")
+        print(f"{self.green}[+] URL is valid for file upload!{self.white}")
+        utils.log(
+            "[FileUpload] URL is valid for file upload!!",
+            "INFO",
+            "fileUpload.txt",
+        )
         return forms
+
+    def uploadFile(self) -> bool:
+        """Upload file to the website."""
+        forms = self.getAllForms(self.url)
+        if not forms:
+            print(f"{self.red}[-] URL is not valid for file upload!{self.white}")
+            utils.log(
+                "[FileUpload] URL is not valid for file upload!",
+                "ERROR",
+                "fileUpload.txt",
+            )
+            return self.isVuln
+        for form in forms:
+            self.sendPayload(self.getFormDetails(form))
+        # Get return value and conclusion
+        if self.isVuln:
+            print(f"{self.green}[+] File upload vulnerability found!{self.white}")
+            utils.log(
+                "[FileUpload] File upload vulnerability found!",
+                "INFO",
+                "fileUpload.txt",
+            )
+        else:
+            print(f"{self.red}[-] File upload vulnerability not found!{self.white}")
+            utils.log(
+                "[FileUpload] File upload vulnerability not found!",
+                "INFO",
+                "fileUpload.txt",
+            )
+        return self.isVuln
 
     def getFormDetails(self, form) -> dict:
         inputs = form.find_all("input")
@@ -93,17 +131,7 @@ class FileUpload:
                     formDetails[i["name"]] = i["value"]
         return formDetails
 
-    def uploadFile(self) -> bool:
-        """Upload file to the website."""
-        forms = self.getAllForms(self.url)
-        if not forms:
-            utils.log("[FileUpload] URL is not valid for file upload", "ERROR")
-            return self.result
-        for form in forms:
-            self.craftPayload(self.getFormDetails(form))
-        return self.result
-
-    def craftPayload(self, formField) -> None:
+    def sendPayload(self, formField) -> None:
         payload = {}
         # Add file
         validFiles = []
@@ -119,6 +147,7 @@ class FileUpload:
             else:
                 pass
         print(f"{self.blue}[-] Uploading valid files...{self.white}")
+        utils.log("[FileUpload] Uploading valid files...", "INFO", "fileUpload.txt")
         for validFile in validFiles:
             for key in formField:
                 if formField[key] != "":
@@ -141,21 +170,43 @@ class FileUpload:
                     print(
                         f"{self.red}[!] File upload failed! Check the URL!{self.white}"
                     )
-                    return self.result
+                    utils.log(
+                        "[FileUpload] File upload failed! Check the URL!",
+                        "ERROR",
+                        "fileUpload.txt",
+                    )
+                    return self.isVuln
             if p.status_code != 200:
                 print(f"{self.red}[!] File upload failed!{self.white}")
-                self.result = False
+                utils.log("[FileUpload] File upload failed!", "ERROR", "fileUpload.txt")
+                self.isVuln = False
             elif self.checkSuccess(p.text) is False:
                 print(f"{self.red}[!] File upload failed!{self.white}")
-                self.result = False
+                utils.log("[FileUpload] File upload failed!", "ERROR", "fileUpload.txt")
+                self.isVuln = False
             else:
                 print(f"{self.green}[!] Valid file upload success!{self.white}")
-                self.result = True
-        if self.result is False:
+                utils.log(
+                    "[FileUpload] Valid file upload success!",
+                    "INFO",
+                    "fileUpload.txt",
+                )
+                self.isVuln = True
+        if self.isVuln is False:
             print(f"{self.red} [!] Valid file upload failed! Quitting...{self.white}")
-            return self.result
+            utils.log(
+                "[FileUpload] Valid file upload failed! Quitting...",
+                "ERROR",
+                "fileUpload.txt",
+            )
+            return self.isVuln
         print(
             f"{self.blue}[-] Uploading invalid files with valid extension...{self.white}"
+        )
+        utils.log(
+            "[FileUpload] Uploading invalid files with valid extension...",
+            "INFO",
+            "fileUpload.txt",
         )
         for validExtFile in validExtension:
             for key in formField:
@@ -176,18 +227,30 @@ class FileUpload:
             p = self.session.post(self.url, files=payload, cookies=self.cookies)
             if p.status_code != 200:
                 print(f"{self.red}[!] File upload failed!{self.white}")
-                self.result = False
+                utils.log("[FileUpload] File upload failed!", "ERROR", "fileUpload.txt")
+                self.isVuln = False
             elif self.checkSuccess(p.text) is False:
                 print(f"{self.red}[!] File upload failed!{self.white}")
-                self.result = False
+                utils.log("[FileUpload] File upload failed!", "ERROR", "fileUpload.txt")
+                self.isVuln = False
             else:
                 print(
                     f"{self.green}[!] Invalid file with valid extension upload success!{self.white}"
                 )
-                self.result = True
-        if self.result is False:
+                utils.log(
+                    "[FileUpload] Invalid file with valid extension upload success!",
+                    "INFO",
+                    "fileUpload.txt",
+                )
+                self.isVuln = True
+        if self.isVuln is False:
             print(
                 f"{self.blue}[-] Uploading invalid files with valid magic number...{self.white}"
+            )
+            utils.log(
+                "[FileUpload] Uploading invalid files with valid magic number...",
+                "INFO",
+                "fileUpload.txt",
             )
             for validMHFile in validMH:
                 for key in formField:
@@ -211,15 +274,30 @@ class FileUpload:
                 )
                 if p.status_code != 200:
                     print(f"{self.red}[!] File upload failed!{self.white}")
-                    self.result = False
+                    utils.log(
+                        "[FileUpload] File upload failed!",
+                        "ERROR",
+                        "fileUpload.txt",
+                    )
+                    self.isVuln = False
                 elif self.checkSuccess(p.text) is False:
                     print(f"{self.red}[!] File upload failed!{self.white}")
-                    self.result = False
+                    utils.log(
+                        "[FileUpload] File upload failed!",
+                        "ERROR",
+                        "fileUpload.txt",
+                    )
+                    self.isVuln = False
                 else:
                     print(
                         f"{self.green}[!] Invalid file with valid magic number upload success!{self.white}"
                     )
-                    self.result = True
+                    utils.log(
+                        "[FileUpload] Invalid file with valid magic number upload success!",
+                        "INFO",
+                        "fileUpload.txt",
+                    )
+                    self.isVuln = True
 
     def checkSuccess(self, responseContent) -> bool:
         signatureList = ["uploaded", "successfully", "uploaded successfully"]
@@ -228,15 +306,37 @@ class FileUpload:
             signature = soup.find_all(string=re.compile(s, re.IGNORECASE))
             if signature:
                 for htmlSig in signature:
-                    print(f"{self.green}[+] Signature found: {htmlSig}{self.white}")
-                print(f"{self.green}[+] File upload success!{self.white}")
+                    print(f"{self.green}[+] Signature found: '{htmlSig}'{self.white}")
+                    utils.log(
+                        "[FileUpload] Signature found: '" + htmlSig + "'",
+                        "INFO",
+                        "fileUpload.txt",
+                    )
                 return True
             else:
                 print(f"{self.red}[+] Signature not found!{self.white}")
+                utils.log(
+                    "[FileUpload] Signature not found!",
+                    "INFO",
+                    "fileUpload.txt",
+                )
                 return False
 
     def main(self) -> bool:
+        """Main function for file upload scanner."""
+        print(f"{self.blue}[-] Checking the domain {self.url}...{self.white}")
+        utils.log(
+            "[FileUpload] Checking the domain " + self.url + "...",
+            "INFO",
+            "fileUpload.txt",
+        )
         self.dvwaLogin()
         self.dvwaChangeSecurity("low")
         self.uploadFile()
-        return self.result
+        print(f"{self.blue}[-] File upload scan completed!{self.white}")
+        utils.log(
+            "[FileUpload] File upload scan completed!",
+            "INFO",
+            "fileUpload.txt",
+        )
+        return self.isVuln

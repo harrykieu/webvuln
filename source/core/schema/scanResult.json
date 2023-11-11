@@ -18,12 +18,12 @@
                 "bsonType": ["array"],
                 "items": {
                     "bsonType": "object",
-                    "required": ["type", "description", "severity"],
+                    "required": ["type", "logs", "severity"],
                     "properties": {
                         "type": {
                             "bsonType": "string"
                         },
-                        "description": {
+                        "logs": {
                             "bsonType": "string"
                         },
                         "severity": {
