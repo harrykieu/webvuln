@@ -12,8 +12,9 @@ s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.
 
 class SQli:
 
-    def __init__(self, url):
+    def __init__(self, url, sqli_resources):
         self.url = url
+        self.sqli_resources = sqli_resources
 
     # Uncomment the code below for DWVA
     # login_payload = {
@@ -113,11 +114,9 @@ class SQli:
 
     def check_sqli(self, url):
 
-        with open('sqli_payload.txt') as f:
-            sqli_payloads = f.read().splitlines()
-            print("\n[+] Checking SQLi")
+        print("\n[+] Checking SQLi")
 
-        for payload in sqli_payloads:
+        for payload in self.sqli_resources:
             encoded_payload = urllib.parse.quote(payload)
             new_url = f"{url}?id={encoded_payload}"
             print("[!] Trying", new_url)
@@ -133,7 +132,7 @@ class SQli:
 
         for form in forms:
             form_details = self.get_form_details(form)
-            for payload in sqli_payloads:
+            for payload in self.sqli_resources:
                 data = {}
 
                 for input_tag in form_details["inputs"]:

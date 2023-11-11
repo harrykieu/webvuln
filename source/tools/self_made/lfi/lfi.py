@@ -13,8 +13,9 @@ s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.
 
 class LFI:
 
-    def __init__(self, url):
+    def __init__(self, url, lfi_resources):
         self.url = url
+        self.lfi_resources = lfi_resources
 
     forms = []
 
@@ -89,8 +90,9 @@ class LFI:
 
         for form in forms:
             form_details = self.get_form_details(form)
+            print("\n[+] Checking path LFI")
 
-            for payload in lfi_payloads:
+            for payload in self.lfi_resources:
                 data = {}
 
                 for input_tag in form_details["inputs"]:
