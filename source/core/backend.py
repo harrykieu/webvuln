@@ -135,7 +135,7 @@ class WebVuln:
                 for key in dirURL:
                     for url in dirURL[key]:
                         a = LFI(url, lfi_resources)
-                        if a.check_lfi() is True:
+                        if a.scan_website() is True:
                             print(f'[backend.py-scanURL] {url} is vulnerable to lfi')
                         else:
                             print(f'[backend.py-scanURL] {url} is not vulnerable to lfi')
@@ -146,7 +146,7 @@ class WebVuln:
                 for key in dirURL:
                     for url in dirURL[key]:
                         a = SQLi(url, sqli_resources)
-                        if a.check_sqli() is True:
+                        if a.scan_website() is True:
                             print(f'[backend.py-scanURL] {url} is vulnerable to sql')
                         else:
                             print(f'[backend.py-scanURL] {url} is not vulnerable to sqli')
@@ -157,7 +157,7 @@ class WebVuln:
                 for key in dirURL:
                     for url in dirURL[key]:
                         a = XSS(url, xss_resources)
-                        if a.checkXSS() is True:
+                        if a.scan_website() is True:
                             print(f'[backend.py-scanURL] {url} is vulnerable to xss')
                         else:
                             print(f'[backend.py-scanURL] {url} is not vulnerable to xss')
