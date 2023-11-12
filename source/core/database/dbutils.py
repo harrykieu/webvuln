@@ -27,9 +27,6 @@ class DatabaseUtils:
                     )
                 },
             )
-            self.__db.get_collection("resources").create_index(
-                [("value", pymongo.TEXT)], unique=True
-            )
         if "scanResult" not in self.__db.list_collection_names():
             self.__db.create_collection(
                 "scanResult",

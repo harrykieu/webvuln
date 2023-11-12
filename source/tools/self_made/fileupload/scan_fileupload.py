@@ -15,6 +15,7 @@ class FileUpload:
         self.isDVWA = isDVWA
         self.resources = resources
         self.isVuln = False
+        self.filePayload = []
         # Color codes for text output
         os.system("color")
         self.red = "\033[31m"  # Red color code for text output
@@ -137,6 +138,14 @@ class FileUpload:
         validFiles = []
         validExtension = []
         validMH = []
+        if not self.resources:
+            print(f"{self.red}[-] Resources not found!{self.white}")
+            utils.log(
+                "[FileUpload] Resources not found!",
+                "ERROR",
+                "fileUpload.txt",
+            )
+            return self.isVuln
         for res in self.resources:
             if res["description"] == "valid":
                 validFiles.append(res)
@@ -193,7 +202,7 @@ class FileUpload:
                 )
                 self.isVuln = True
         if self.isVuln is False:
-            print(f"{self.red} [!] Valid file upload failed! Quitting...{self.white}")
+            print(f"{self.red}[!] Valid file upload failed! Quitting...{self.white}")
             utils.log(
                 "[FileUpload] Valid file upload failed! Quitting...",
                 "ERROR",
@@ -242,6 +251,7 @@ class FileUpload:
                     "INFO",
                     "fileUpload.txt",
                 )
+                self.filePayload.append(validExtFile["fileName"])
                 self.isVuln = True
         if self.isVuln is False:
             print(
@@ -297,6 +307,7 @@ class FileUpload:
                         "INFO",
                         "fileUpload.txt",
                     )
+                    self.filePayload.append(validMHFile["fileName"])
                     self.isVuln = True
 
     def checkSuccess(self, responseContent) -> bool:
@@ -339,4 +350,9 @@ class FileUpload:
             "INFO",
             "fileUpload.txt",
         )
-        return self.isVuln
+        utils.log(
+            f"[FileUpload] Payloads used: {self.filePayload}",
+            "INFO",
+            "fileUpload.txt",
+        )
+        return self.isVuln, self.filePayload

@@ -26,6 +26,12 @@
                         "logs": {
                             "bsonType": "string"
                         },
+                        "payload": {
+                            "bsonType": ["array"],
+                            "items": {
+                                "bsonType": "string"
+                            }
+                        },
                         "severity": {
                             "bsonType": "string",
                             "enum": ["Low", "Medium", "High", "Critical"]
