@@ -556,7 +556,7 @@ class WebVuln:
             )
             return "Failed"
         # Parse JSON object
-        if method == "GET":
+        else:
             if (
                 "domain" in data.keys()
                 and "scanDate" in data.keys()
