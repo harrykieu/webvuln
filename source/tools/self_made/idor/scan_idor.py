@@ -13,12 +13,13 @@ class IDOR:
         }
 
     def scan_website(self, url):
+        # FIX
         results = {"idor": []}
 
         if self.check_idor(url):
             results["idor"].append({"url": url, "details": "[+] IDOR detected"})
-            return True, results
-        return False, results
+            return True
+        return False
 
     def extract_urls(self):
         response = self.session.get(self.url)
@@ -32,20 +33,20 @@ class IDOR:
 
     # Code for check for unauthorized access patterns
     def generate_random_id(self):
-        # Tạo ngẫu nhiên một ID
+        # Randomly generate an ID
         return str(random.randint(1, 9999))
 
     # Code for compare two responses HTML
     def compare_responses(self, resp1, resp2):
-        # So sánh nội dung 2 response
-        # Nếu khác nhau => có thể là IDOR
+        # Compare the content of 2 responses
+        # If different => probably IDOR
         html1 = resp1.content
         html2 = resp2.content
 
         if html1 != html2:
-            return False
+            return True
 
-        return True
+        return False
 
     def check_unauthorized_access(self, response):
         # Check status code
