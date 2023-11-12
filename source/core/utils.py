@@ -25,11 +25,10 @@ def multiprocess(result, *processes):
     subprocessList = []
     for p in processes:
         try:
-            p_args = p.split(' ')
+            p_args = p.split(" ")
             tempf = tempfile.TemporaryFile()
             try:
-                sp = subprocess.Popen(
-                    p_args, stdout=tempf, stderr=tempf, shell=True)
+                sp = subprocess.Popen(p_args, stdout=tempf, stderr=tempf, shell=True)
                 pollRes = sp.poll()
                 while pollRes is None:
                     pollRes = sp.poll()
@@ -52,7 +51,7 @@ def multiprocess(result, *processes):
     return True
 
 
-def log(data, type):
+def log(data, type, logFile="log.txt"):
     """Log data to a file.
 
     :param `data`: The data to be logged.
@@ -64,26 +63,26 @@ def log(data, type):
         raise ValueError("Empty data")
     if platform.system() == "Windows":
         logFolder = "\\logs"
-        logFile = "\\log.txt"
-        logLocation = f'{logFolder}{logFile}'
+        logLocation = f"{logFolder}\\{logFile}"
     else:
         logFolder = "/logs"
-        logFile = "/log.txt"
-        logLocation = f'{logFolder}{logFile}'
-    if not os.path.exists(f'{ROOTPATH}{logFolder}'):
-        os.mkdir(f'{ROOTPATH}{logFolder}')
-    if not os.path.exists(f'{ROOTPATH}{logLocation}'):
+        logLocation = f"{logFolder}/{logFile}"
+    if not os.path.exists(f"{ROOTPATH}{logFolder}"):
+        os.mkdir(f"{ROOTPATH}{logFolder}")
+    if not os.path.exists(f"{ROOTPATH}{logLocation}"):
         # Create the log file
-        open(f'{ROOTPATH}{logLocation}', "x")
-        with open(f'{ROOTPATH}{logLocation}', "a") as f:
-            f.write("[INFO] Log file created\n")
+        tz = pytz.timezone("Asia/Bangkok")
+        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(tz)
+        open(f"{ROOTPATH}{logLocation}", "x")
+        with open(f"{ROOTPATH}{logLocation}", "a") as f:
+            f.write(f"{now} [INFO] Log file created\n")
         f.close()
     try:
         # Convert UTC time to GMT+7 timezone
-        tz = pytz.timezone('Asia/Bangkok')
+        tz = pytz.timezone("Asia/Bangkok")
         now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(tz)
-        with open(f'{ROOTPATH}{logLocation}', "a") as f:
-            f.write(f'{now} [{type}] {data}\n')
+        with open(f"{ROOTPATH}{logLocation}", "a") as f:
+            f.write(f"{now} [{type}] {data}\n")
         f.close()
     except Exception as e:
         raise RuntimeError("Failed to write to log file") from e
