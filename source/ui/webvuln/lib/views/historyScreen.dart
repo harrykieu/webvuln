@@ -28,8 +28,8 @@ class _historyScreenState extends State<historyScreen> {
             style: GoogleFonts.montserrat(
                 fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          inputUser(controller: _historyURLController, hintName: 'URL'),
-          inputUser(controller: _dateScanController, hintName: 'Date & Time'),
+          inputUser(controller: _historyURLController, hintName: 'URL',underIcon: Icon(Icons.text_fields),),
+          inputUser(controller: _dateScanController, hintName: 'Date & Time',underIcon: Icon(Icons.text_fields),),
           submitButton(
               onPressed: () {
                 postHistory(

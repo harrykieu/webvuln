@@ -64,7 +64,7 @@ class _resourceScreenState extends State<resourceScreen> {
       width: 400,
       height:200,
       margin: EdgeInsetsDirectional.symmetric(horizontal: 10),
-      child: inputUser(controller: controller, hintName: content),
+      child: inputUser(controller: controller, hintName: content,underIcon: Icon(Icons.text_fields),),
     );
   }
 }

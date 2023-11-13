@@ -49,20 +49,16 @@ class _mainScreenState extends State<mainScreen> {
     Get.testMode = true;
     return GetMaterialApp(
       home: Scaffold(
+        backgroundColor: Color(0xFF03112e),
         body: Row(
           children: [
             Container(
-              width: screenWidth * 0.1,
+              width: screenWidth * 0.13,
               height: double.infinity,
-              decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(-10),
-                      bottomRight: Radius.circular(-10)),
-                  color: Color(0xFFDCE8F6)),
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(screenWidth * 0.03),
+                    padding: EdgeInsets.all(10),
                     child: Image.asset('lib/assets/logo.png'),
                   ),
                   Padding(
@@ -138,9 +134,19 @@ class _mainScreenState extends State<mainScreen> {
               ),
             ),
             Container(
-              width: screenWidth * 0.9,
+              width: screenWidth * 0.87,
               height: double.infinity,
-              color: Colors.black,
+              // color: Colors.black,
+              decoration:const BoxDecoration(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(20),bottomLeft: Radius.circular(20)),
+                gradient: LinearGradient(
+                  begin:AlignmentDirectional.topCenter,
+                  end: AlignmentDirectional.center,
+                colors: [
+                  Color(0xFF0620A6),
+                  Color(0xFFF0F0F0)
+                ])
+              ),
               child: _selectedItem[_selectedIndex],
             )
           ],

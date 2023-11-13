@@ -54,6 +54,7 @@ dependencies:
   dropdown_button2: ^2.3.9
   lite_rolling_switch: ^1.0.1
   flutter_advanced_switch: ^3.0.1
+  flutter_resizable_container: ^0.1.2
 
 dev_dependencies:
   flutter_test:
