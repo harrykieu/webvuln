@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:webvuln/items/drawer.dart';
 import 'package:get/get.dart';
 import 'scanScreen.dart';
 import 'package:webvuln/service/api.dart';

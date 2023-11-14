@@ -62,71 +62,55 @@ class _mainScreenState extends State<mainScreen> {
                     child: Image.asset('lib/assets/logo.png'),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(30),
+                    padding: const EdgeInsets.all(10),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // crossAxisAlignment: CrossAxisAlignment.baseline,
                       children: [
-                        ElevatedButton(
+                        button(
                             onPressed: () {
                               setState(() {
                                 _selectedIndex = 0;
                               });
                             },
-                            child: const Column(
-                              children: [Icon(Ionicons.scan), Text('Scan')],
-                            ),
-                            style: ElevatedButton.styleFrom(
-                                maximumSize: const Size(100, 100))),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedIndex = 1;
-                            });
-                          },
-                          child: const Column(
-                            children: [
-                              Icon(Ionicons.analytics),
-                              Text('Result Scan')
-                            ],
-                          ),
-                        ),
-                        ElevatedButton(
+                            icon: Icons.abc,
+                            name: 'Scan'),
+                        SizedBox(height: 20,),
+                        button(
+                            onPressed: () {
+                              setState(() {
+                                _selectedIndex = 1;
+                              });
+                            },
+                            icon: Icons.ac_unit,
+                            name: 'Result'),
+                            SizedBox(height: 20,),
+                        button(
                             onPressed: () {
                               setState(() {
                                 _selectedIndex = 2;
                               });
                             },
-                            child: const Column(
-                              children: [
-                                Icon(Ionicons.accessibility),
-                                Text('Resource')
-                              ],
-                            )),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedIndex = 3;
-                            });
-                          },
-                          child: const Column(
-                            children: [
-                              Icon(Ionicons.hammer_sharp),
-                              Text('History')
-                            ],
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedIndex = 4;
-                            });
-                          },
-                          child: const Column(
-                            children: [
-                              Icon(Ionicons.settings),
-                              Text('Setting')
-                            ],
-                          ),
-                        )
+                            icon: Icons.access_alarm_rounded,
+                            name: 'Resource'),
+                            SizedBox(height: 20,),
+                        button(
+                            onPressed: () {
+                              setState(() {
+                                _selectedIndex = 3;
+                              });
+                            },
+                            icon: Icons.accessibility_rounded,
+                            name: 'History'),
+                            SizedBox(height: 20,),
+                        button(
+                            onPressed: () {
+                              setState(() {
+                                _selectedIndex = 4;
+                              });
+                            },
+                            icon: Icons.ad_units_sharp,
+                            name: 'Settings')
                       ],
                     ),
                   ),
@@ -137,22 +121,32 @@ class _mainScreenState extends State<mainScreen> {
               width: screenWidth * 0.87,
               height: double.infinity,
               // color: Colors.black,
-              decoration:const BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(20),bottomLeft: Radius.circular(20)),
-                gradient: LinearGradient(
-                  begin:AlignmentDirectional.topCenter,
-                  end: AlignmentDirectional.center,
-                colors: [
-                  Color(0xFF0620A6),
-                  Color(0xFFF0F0F0)
-                ])
-              ),
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      bottomLeft: Radius.circular(30)),
+                  gradient: LinearGradient(
+                      begin: AlignmentDirectional.topCenter,
+                      end: AlignmentDirectional.center,
+                      colors: [Color(0xFF0620A6), Color(0xFFF0F0F0)])),
               child: _selectedItem[_selectedIndex],
             )
           ],
         ),
       ),
     );
+  }
+
+  ElevatedButton button(
+      {required Function() onPressed,
+      required IconData icon,
+      required String name}) {
+    return ElevatedButton(
+        onPressed: onPressed,
+        child: Column(
+          children: [Icon(icon), Text(name)],
+        ),
+        style: ElevatedButton.styleFrom(minimumSize: const Size(200, 80),backgroundColor: Colors.transparent,foregroundColor: Colors.white));
   }
 
   Stream<int> get _selectedIndexStream =>
