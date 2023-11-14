@@ -105,7 +105,8 @@ class WebVuln:
                     "vulnerabilities": [
                         {
                             "type": "type of vulnerability",
-                            "description": "description of the vulnerability",
+                            "log": "scan log",
+                            "payload": "payload",
                             "severity": "severity of the vulnerability"
                         }
                     ]
@@ -273,6 +274,7 @@ class WebVuln:
                 utils.log(f"[backend.py-scanURL] Error: {e}", "ERROR")
                 raise e
         result = {"result": listResult}
+        # MISSING VISUALIZER
         try:
             self.sendResultFlask(json.dumps(result, default=str))
         except Exception as e:
