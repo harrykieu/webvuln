@@ -108,7 +108,8 @@ class WebVuln:
                     "vulnerabilities": [
                         {
                             "type": "type of vulnerability",
-                            "description": "description of the vulnerability",
+                            "log": "scan log",
+                            "payload": "payload",
                             "severity": "severity of the vulnerability"
                         }
                     ]
@@ -171,6 +172,7 @@ class WebVuln:
             else:
                 dirURL[f"{url}"] = [f"{url}"]
             print(f"[!] All URLs: {dirURL}")
+        # Generate scan result
         for key in dirURL:
             resultURL = {
                 "domain": key,
@@ -178,6 +180,7 @@ class WebVuln:
                 "numVuln": 0,
                 "vulnerabilities": [],
             }
+            # Call modules to scan
             for url in dirURL[key]:
                 for module in modules:
                     if module == "lfi":
@@ -283,7 +286,8 @@ class WebVuln:
                 print(f"[backend.py-scanURL] Error: {e}")
             utils.log(f"[backend.py-scanURL] Error: {e}", "ERROR")
             raise e
-        return "Success"
+        return json.dumps(result, default=str)
+        # return "Success"
 
     def resourceHandler(self, method, data) -> str | list:
         """Handle the resources.
@@ -591,14 +595,12 @@ class WebVuln:
                 if self.__debug:
                     print("[backend.py-getScanResult] Error: Invalid JSON object")
                 return "Failed"
-            
-    # Get scan results 
-    scan_results = self.scanURL(urls, modules)
-    results = json.loads(scan_results)["result"]
 
-    # Generate XML report    
-    def generate_xml_report(results):
+    def generateXMLReport(self, results):
+        """Generate XML report from the JSON result.
 
+        :param results: JSON result
+        """
         root = ET.Element("scan_results")
 
         for result in results:
@@ -606,7 +608,7 @@ class WebVuln:
             domain.text = result["domain"]
             scan_date = ET.SubElement(root, "scan_date")
             scan_date.text = result["scanDate"]
-            
+
             vulns = ET.SubElement(root, "vulnerabilities")
             for vuln in result["vulnerabilities"]:
                 vuln_node = ET.SubElement(vulns, "vulnerability")
@@ -617,31 +619,36 @@ class WebVuln:
         with open("report.xml", "wb") as f:
             f.write(xml_report)
 
-    generate_xml_report(results)
+    def generatePDFReport(self, results):
+        """Generate PDF report from the JSON result.
 
-    # Generate PDF report     
-    def generate_pdf_report(results):
-
-        html = "<h1>Report</h1>" 
+        :param results: JSON result
+        """
+        html = "<h1>Report</h1>"
 
         for item in results:
             html += f"<h3>{item['domain']}</h3>"
             html += f"<p>Scan Date: {item['scanDate']}</p>"
-        
+
             html += "<ul>"
             for vuln in item["vulnerabilities"]:
-                html += f"<li>{vuln['name']} - {vuln['severity']}</li>" 
+                html += f"<li>{vuln['type']} - {vuln['severity']}</li>"
+                html += "<li>Log:<br><div><p>"
+                for line in vuln["logs"].split("\n"):
+                    html += f"{line}<br>"
             html += "</ul>"
-    
-        pdfkit.from_string(html, 'scan_results.pdf')
+        with open("test.html", "w") as f:
+            f.writelines(html)
+        f.close()
+        # BUG
+        # pdfkit.from_string(html, "scan_results.pdf")
 
-    generate_pdf_report(results) 
+    # Generate JSON report
+    def generateJSONReport(self, results):
+        """Generate JSON report from the JSON result.
 
-    # Generate JSON report    
-    def generate_json_report(results):
-
+        :param results: JSON result
+        """
         json_report = json.dumps(results)
         with open("report.json", "w") as f:
             f.write(json_report)
-
-    generate_json_report(results)

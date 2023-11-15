@@ -17,10 +17,14 @@ for a in lista:
 # print(a.scanURL(['http://localhost/dvwa/vulnerabilities/upload'], ['fileupload']))
 # a.scanURL(["http://localhost:12001"], ["fileupload"])
 # a.scanURL(["http://google.com/"], ["fileupload"])
-a.scanURL(
-    ["http://localhost:8091/loadImage.php", "http://localhost:12001"],
+scan_results = a.scanURL(
+    # ["http://localhost:8091/loadImage.php", "http://localhost:12001"],
+    ["http://localhost:8091/loadImage.php"],
     ["pathtraversal", "fileupload"],
 )
+results = loads(scan_results)["result"]
+a.generateJSONReport(results)
+
 
 # Push resource to db
 """ with open(f'{ROOTPATH}/source/core/database/data_resources.json', 'r') as f:

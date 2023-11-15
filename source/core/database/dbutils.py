@@ -45,9 +45,6 @@ class DatabaseUtils:
                     )
                 },
             )
-            self.__db.get_collection("fileResources").create_index(
-                [("fileName", pymongo.TEXT), ("base64value", pymongo.TEXT)], unique=True
-            )
 
     def addDocument(self, collectionName, data) -> bool:
         """Add a document to the collection in the database.

@@ -102,7 +102,7 @@ class FileUpload:
             self.sendPayload(self.getFormDetails(form))
         # Get return value and conclusion
         if self.isVuln:
-            print(f"{self.green}[+] File upload vulnerability found!{self.white}")
+            print(f"{self.green}[-] File upload vulnerability found!{self.white}")
             utils.log(
                 "[FileUpload] File upload vulnerability found!",
                 "INFO",
