@@ -1,40 +1,49 @@
 import requests
 from bs4 import BeautifulSoup as bs
 from urllib.parse import urlparse, urljoin
-import re
 import urllib.parse
 
-# 06/09/2023 : CODE Can cai thien them mot so phuong dien de chen tim ra dia file (can cai tien tu dong 110 tro di)
+# 06/09/2023 : CODE Can cai thien them tinh nang check submit selection
 # maker : RBKING
 
 s = requests.Session()
 s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.5938.92"
 
 
-class LFI:
+class XSS:
 
-    def __init__(self, url):
+    def __init__(self, url, xss_resources):
         self.url = url
+        self.xss_resources = xss_resources
+# login_payload = {
+#     "username": "admin",
+#     "password": "password",
+#     "Login": "Login",
+# }
+# # change URL to the login page of your DVWA login URL
+# login_url = "http://192.168.168.105/dvwa/login.php"
+
+# # login
+# r = s.get(login_url)
+# token = re.search("user_token'\s*value='(.*?)'", r.text).group(1)
+# login_payload['user_token'] = token
+# s.post(login_url, data=login_payload)
+
+    # ---------------------------------------------------------------
 
     forms = []
 
     def scan_website(self, url):
-        results = {
-            "lif": []
-        }
-        urlparse(url)
+        soup = bs(s.get(url).content, "html.parser")
         global forms
         forms = bs(s.get(url).content, "html.parser").find_all("form")
 
-        if self.check_lfi(url):
-            results["lfi"].append({
-                "url": url,
-                "details": "[+] Local File Injection detected"
-            })
+        # Scan XSS
+        if self.check_xss(url):
+            return True
+        return False
 
-        return results
-
-# ------------------------------------------------
+    # ---------------------------------
 
     def get_all_forms(self, url):
         soup = bs(s.get(url).content, "html.parser")
@@ -47,7 +56,6 @@ class LFI:
             action = form.attrs.get("action").lower()
         except:
             action = None
-
         method = form.attrs.get("method", "get").lower()
 
         inputs = []
@@ -63,34 +71,31 @@ class LFI:
         details["inputs"] = inputs
         return details
 
-# --------------------------------------------------
+    # ---------------------------------------------------------------------
 
-    def check_lfi(self, url):
-        with open('lfi_payloads.txt') as f:
-            lfi_payloads = f.read().splitlines()
+    def check_xss(self, url):
 
-        print("\n[+] Checking LFI")
+        print("\n[+] Checking XSS")
 
-        for payload in lfi_payloads:
+        for payload in self.xss_resources:
             encoded_payload = urllib.parse.quote(payload)
-            new_url = f"{url}?page={encoded_payload}"
+            new_url = f"{url}?q={encoded_payload}"
 
             print("[!] Trying", new_url)
             res = s.get(new_url)
 
-            if re.search(rb"root:x:0:0", res.content):
-                print("[+] LFI vulnerability detected, link:", new_url)
+            if payload in res.text:
+                print("[+] XSS vulnerability detected, link:", new_url)
                 return True
 
         forms = self.get_all_forms(url)
-        print(f"[+] Detected {len(forms)} forms on {url}.")
-
-# -------------
+        print(
+            f"[+] Detected {len(forms)} forms on {url}, form found: {forms}\n")
 
         for form in forms:
             form_details = self.get_form_details(form)
 
-            for payload in lfi_payloads:
+            for payload in self.xss_resources:
                 data = {}
 
                 for input_tag in form_details["inputs"]:
@@ -108,10 +113,10 @@ class LFI:
                 elif form_details["method"] == "get":
                     res = s.get(url, params=data)
 
-                if re.search(rb"root:x:0:0", res.content):
-                    print("[+] LFI vulnerability detected, link:", url)
+                if payload in res.text:
+                    print("[+] XSS vulnerability detected, link:", url)
                     return True
 
-        print("[+] Check LFI done")
+        print("[+] Check XSS done")
 
         return False
