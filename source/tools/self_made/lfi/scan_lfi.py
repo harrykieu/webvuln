@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup as bs
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urljoin
 import re
 import urllib.parse
 
@@ -8,11 +8,12 @@ import urllib.parse
 # maker : RBKING
 
 s = requests.Session()
-s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.5938.92"
+s.headers[
+    "User-Agent"
+] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.5938.92"
 
 
 class LFI:
-
     def __init__(self, url, lfi_resources):
         self.url = url
         self.lfi_resources = lfi_resources
@@ -27,8 +28,7 @@ class LFI:
             return True
         return False
 
-
-# ------------------------------------------------
+    # ------------------------------------------------
 
     def get_all_forms(self, url):
         soup = bs(s.get(url).content, "html.parser")
@@ -50,17 +50,18 @@ class LFI:
             input_name = input_tag.attrs.get("name")
             input_value = input_tag.attrs.get("value", "")
             inputs.append(
-                {"type": input_type, "name": input_name, "value": input_value})
+                {"type": input_type, "name": input_name, "value": input_value}
+            )
 
         details["action"] = action
         details["method"] = method
         details["inputs"] = inputs
         return details
 
-# --------------------------------------------------
+    # --------------------------------------------------
 
     def check_lfi(self, url):
-        with open('lfi_payloads.txt') as f:
+        with open("lfi_payloads.txt") as f:
             lfi_payloads = f.read().splitlines()
 
         print("\n[+] Checking LFI")
@@ -79,7 +80,7 @@ class LFI:
         forms = self.get_all_forms(url)
         print(f"[+] Detected {len(forms)} forms on {url}.")
 
-# -------------
+        # -------------
 
         for form in forms:
             form_details = self.get_form_details(form)
