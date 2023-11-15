@@ -52,15 +52,25 @@ class _pieGraphState extends State<pieGraph> {
     ];
     // List<Color> colorsList = [Colors.redAccent[700], Colors.orangeAccent[700]];
     return Container(
-        width: 500,
+        width: 700,
         height: 500,
-        child: PieChart(
-          PieChartData(
-            sections: dataError,
-            // borderData: FlBorderData(),
-            sectionsSpace: 1,
-            centerSpaceRadius:0,
-          ),
+        child: Column(
+          children: [
+            ListTile(
+              title: Row(
+                children: [
+                  Icon(Icons.pie_chart),
+                  Text('Pie Chart',style: GoogleFonts.montserrat(fontSize: 20,fontWeight: FontWeight.bold),)
+                ],
+              ),
+            ),PieChart(
+                PieChartData(
+                  sections: dataError,
+                  // borderData: FlBorderData(),
+                  sectionsSpace: 1,
+                  centerSpaceRadius:0,
+                ),)
+          ],
         ));
   }
 }

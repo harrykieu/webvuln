@@ -89,6 +89,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.5.8"
+  decorated_dropdownbutton:
+    dependency: "direct main"
+    description:
+      name: decorated_dropdownbutton
+      sha256: "03844d031650f2561cf74b3480734bab5b8b40cc52bdf2af197f3345ab0e9418"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   dio:
     dependency: "direct main"
     description:
@@ -105,6 +113,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.9"
+  dropdown_search:
+    dependency: "direct main"
+    description:
+      name: dropdown_search
+      sha256: "55106e8290acaa97ed15bea1fdad82c3cf0c248dd410e651f5a8ac6870f783ab"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.6"
   easy_loader:
     dependency: "direct main"
     description:
@@ -166,6 +182,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  flutter_dropdown:
+    dependency: "direct main"
+    description:
+      name: flutter_dropdown
+      sha256: "154dda79cf9787b3c4b7565f2ae52dd42d8935d7255b2bbf660b2bf2d63e5daa"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1+hotfix.1"
   flutter_easyloading:
     dependency: "direct main"
     description:
@@ -174,6 +198,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.5"
+  flutter_expandable_table:
+    dependency: "direct main"
+    description:
+      name: flutter_expandable_table
+      sha256: e1b1cea69f733d585f6fb469ef1787dba04e4cb0e0f85823be04cba1ab007ad2
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -190,6 +222,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.2"
+  flutter_scroll_shadow:
+    dependency: transitive
+    description:
+      name: flutter_scroll_shadow
+      sha256: a822a2ddd5dba4e76e8958b8d64e1a8436429a5236df93ce93f28d0968731aa4
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.3"
   flutter_spinkit:
     dependency: transitive
     description:
@@ -291,6 +331,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
+  linked_scroll_controller:
+    dependency: transitive
+    description:
+      name: linked_scroll_controller
+      sha256: e6020062bcf4ffc907ee7fd090fa971e65d8dfaac3c62baf601a3ced0b37986a
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   lints:
     dependency: transitive
     description:
@@ -339,6 +387,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+  nested:
+    dependency: transitive
+    description:
+      name: nested
+      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   path:
     dependency: transitive
     description:
@@ -451,6 +507,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.2"
+  provider:
+    dependency: transitive
+    description:
+      name: provider
+      sha256: "9a96a0a19b594dbc5bf0f1f27d2bc67d5f95957359b461cd9feb44ed6ae75096"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.1"
   rxdart:
     dependency: transitive
     description:

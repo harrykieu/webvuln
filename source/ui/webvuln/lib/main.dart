@@ -49,7 +49,7 @@ class _mainScreenState extends State<mainScreen> {
     Get.testMode = true;
     return GetMaterialApp(
       home: Scaffold(
-        backgroundColor: Color(0xFF03112e),
+        backgroundColor: const Color(0xFF03112e),
         body: Row(
           children: [
             Container(
@@ -58,7 +58,7 @@ class _mainScreenState extends State<mainScreen> {
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
                     child: Image.asset('lib/assets/logo.png'),
                   ),
                   Padding(
@@ -75,7 +75,7 @@ class _mainScreenState extends State<mainScreen> {
                             },
                             icon: Icons.abc,
                             name: 'Scan'),
-                        SizedBox(height: 20,),
+                        const SizedBox(height: 20,),
                         button(
                             onPressed: () {
                               setState(() {
@@ -84,7 +84,7 @@ class _mainScreenState extends State<mainScreen> {
                             },
                             icon: Icons.ac_unit,
                             name: 'Result'),
-                            SizedBox(height: 20,),
+                            const SizedBox(height: 20,),
                         button(
                             onPressed: () {
                               setState(() {
@@ -93,7 +93,7 @@ class _mainScreenState extends State<mainScreen> {
                             },
                             icon: Icons.access_alarm_rounded,
                             name: 'Resource'),
-                            SizedBox(height: 20,),
+                            const SizedBox(height: 20,),
                         button(
                             onPressed: () {
                               setState(() {
@@ -102,7 +102,7 @@ class _mainScreenState extends State<mainScreen> {
                             },
                             icon: Icons.accessibility_rounded,
                             name: 'History'),
-                            SizedBox(height: 20,),
+                            const SizedBox(height: 20,),
                         button(
                             onPressed: () {
                               setState(() {
@@ -125,10 +125,9 @@ class _mainScreenState extends State<mainScreen> {
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
                       bottomLeft: Radius.circular(30)),
-                  gradient: LinearGradient(
-                      begin: AlignmentDirectional.topCenter,
-                      end: AlignmentDirectional.center,
-                      colors: [Color(0xFF0620A6), Color(0xFFF0F0F0)])),
+                  image:DecorationImage(
+                    fit: BoxFit.cover,
+                    image:AssetImage('lib/assets/background.png') )),
               child: _selectedItem[_selectedIndex],
             )
           ],

@@ -48,6 +48,8 @@ class _scanScreenState extends State<scanScreen> {
   ];
   int _numberModule = 0;
   bool _isVisibled = true;
+
+
   List<String> value = [
     "Module scan 1",
     "Module scan 2",
@@ -121,33 +123,33 @@ class _scanScreenState extends State<scanScreen> {
                       children: [
                         module(),
                         buttonError(
-                                    name: value[0],
-                                    onPressed: () {
-                                      setState(() {
-                                        _numberModule = 0;
-                                      });
-                                    }),
-                                buttonError(
-                                    name: value[1],
-                                    onPressed: () {
-                                      setState(() {
-                                        _numberModule = 1;
-                                      });
-                                    }),
-                                buttonError(
-                                    name: value[2],
-                                    onPressed: () {
-                                      setState(() {
-                                        _numberModule = 2;
-                                      });
-                                    }),
-                                buttonError(
-                                    name: value[3],
-                                    onPressed: () {
-                                      setState(() {
-                                        _numberModule = 3;
-                                      });
-                                    }),
+                            name: value[0],
+                            onPressed: () {
+                              setState(() {
+                                _numberModule = 0;
+                              });
+                            }),
+                        buttonError(
+                            name: value[1],
+                            onPressed: () {
+                              setState(() {
+                                _numberModule = 1;
+                              });
+                            }),
+                        buttonError(
+                            name: value[2],
+                            onPressed: () {
+                              setState(() {
+                                _numberModule = 2;
+                              });
+                            }),
+                        buttonError(
+                            name: value[3],
+                            onPressed: () {
+                              setState(() {
+                                _numberModule = 3;
+                              });
+                            }),
                         // buttonError(name: value[4]),
                       ],
                     )),
@@ -204,35 +206,44 @@ class _scanScreenState extends State<scanScreen> {
   }
 
   Container buttonError(
-          {required String name, required Function() onPressed}) =>
+          {required String name,
+          required Function() onPressed}) =>
       Container(
           width: 200,
           height: 50,
           margin: EdgeInsetsDirectional.all(10),
           decoration: BoxDecoration(
+              // color: bgButton,
               borderRadius: BorderRadius.all(Radius.circular(30)),
               border: Border.all(color: Colors.black)),
           child: TextButton(
               onPressed: onPressed,
+              // style: ,
               child: Text(name,
                   style: GoogleFonts.inter(
                       fontSize: 16,
                       color: Color(0xFF2B425C),
                       fontWeight: FontWeight.w600))));
   Visibility module() => Visibility(
-        child: Container(
-            width: 200,
-            height: 50,
-            padding: EdgeInsets.all(10),
-            decoration: const BoxDecoration(
-                // border:Border.all(color: ),
-                gradient: LinearGradient(colors: [
-                  Color(0xFF6147FF),
-                  Color(0xFF408BFC),
-                  Color(0xFFAE73DD)
-                ]),
-                borderRadius: BorderRadius.all(Radius.circular(30))),
-            child: Text('Module scan ',textAlign: TextAlign.center,style: GoogleFonts.montserrat(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.white),),));
+          child: Container(
+        width: 200,
+        height: 50,
+        padding: EdgeInsets.all(10),
+        decoration: const BoxDecoration(
+            // border:Border.all(color: ),
+            gradient: LinearGradient(colors: [
+              Color(0xFF6147FF),
+              Color(0xFF408BFC),
+              Color(0xFFAE73DD)
+            ]),
+            borderRadius: BorderRadius.all(Radius.circular(30))),
+        child: Text(
+          'Module scan ',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.montserrat(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+      ));
 }
 // viet them ham nhan data tu backend de setState cho widget trong contentChild
 
