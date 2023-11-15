@@ -13,7 +13,6 @@ class IDOR:
         }
 
     def scan_website(self, url):
-        # FIX
         results = {"idor": []}
 
         if self.check_idor(url):
