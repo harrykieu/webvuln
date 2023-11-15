@@ -15,6 +15,9 @@ from source.tools.self_made.xss.scan_xss import XSS
 from source.tools.self_made.idor.scan_idor import IDOR
 from source.core.calSeverity import calculateWebsiteSafetyRate
 
+import xml.etree.ElementTree as ET
+import pdfkit
+
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [
     "ffuf",
@@ -588,3 +591,57 @@ class WebVuln:
                 if self.__debug:
                     print("[backend.py-getScanResult] Error: Invalid JSON object")
                 return "Failed"
+            
+    # Get scan results 
+    scan_results = self.scanURL(urls, modules)
+    results = json.loads(scan_results)["result"]
+
+    # Generate XML report    
+    def generate_xml_report(results):
+
+        root = ET.Element("scan_results")
+
+        for result in results:
+            domain = ET.SubElement(root, "domain")
+            domain.text = result["domain"]
+            scan_date = ET.SubElement(root, "scan_date")
+            scan_date.text = result["scanDate"]
+            
+            vulns = ET.SubElement(root, "vulnerabilities")
+            for vuln in result["vulnerabilities"]:
+                vuln_node = ET.SubElement(vulns, "vulnerability")
+                ET.SubElement(vuln_node, "type").text = vuln["type"]
+                ET.SubElement(vuln_node, "severity").text = vuln["severity"]
+
+        xml_report = ET.tostring(root)
+        with open("report.xml", "wb") as f:
+            f.write(xml_report)
+
+    generate_xml_report(results)
+
+    # Generate PDF report     
+    def generate_pdf_report(results):
+
+        html = "<h1>Report</h1>" 
+
+        for item in results:
+            html += f"<h3>{item['domain']}</h3>"
+            html += f"<p>Scan Date: {item['scanDate']}</p>"
+        
+            html += "<ul>"
+            for vuln in item["vulnerabilities"]:
+                html += f"<li>{vuln['name']} - {vuln['severity']}</li>" 
+            html += "</ul>"
+    
+        pdfkit.from_string(html, 'scan_results.pdf')
+
+    generate_pdf_report(results) 
+
+    # Generate JSON report    
+    def generate_json_report(results):
+
+        json_report = json.dumps(results)
+        with open("report.json", "w") as f:
+            f.write(json_report)
+
+    generate_json_report(results)
