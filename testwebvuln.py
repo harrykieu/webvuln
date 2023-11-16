@@ -18,8 +18,8 @@ for a in lista:
 # a.scanURL(["http://localhost:12001"], ["fileupload"])
 # a.scanURL(["http://google.com/"], ["fileupload"])
 scan_results = a.scanURL(
-    # ["http://localhost:8091/loadImage.php", "http://localhost:12001"],
-    ["http://localhost:8091/loadImage.php"],
+    ["http://localhost:8091/loadImage.php", "http://localhost:12001"],
+    # ["http://localhost:8091/loadImage.php"],
     ["pathtraversal", "fileupload"],
 )
 results = loads(scan_results)["result"]
