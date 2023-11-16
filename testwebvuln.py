@@ -2,6 +2,7 @@ import base64
 from json import dumps, loads
 from source.core.backend import WebVuln
 from pathlib import Path
+
 ROOTPATH = Path(__file__).parent
 
 
@@ -12,9 +13,18 @@ print(len(lista))
 print(lista[0])
 for a in lista:
     print(lista.index(a)) """
+# NOTE: dvwa url must have / at the end
+# print(a.scanURL(['http://localhost/dvwa/vulnerabilities/upload'], ['fileupload']))
+# a.scanURL(["http://localhost:12001"], ["fileupload"])
+# a.scanURL(["http://google.com/"], ["fileupload"])
+scan_results = a.scanURL(
+    # ["http://localhost:8091/loadImage.php", "http://localhost:12001"],
+    ["http://localhost:8091/loadImage.php"],
+    ["pathtraversal", "fileupload"],
+)
+results = loads(scan_results)["result"]
+a.generateJSONReport(results)
 
-print(a.scanURL(['http://localhost:12001'], ['fileupload']))
-# a.scanURL(['http://localhost/formtest.html'], ['fileupload'])
 
 # Push resource to db
 """ with open(f'{ROOTPATH}/source/core/database/data_resources.json', 'r') as f:
@@ -24,6 +34,26 @@ jsondata = loads(data)
 jsondata[0]["action"] = "add"
 print(jsondata)
 print(a.resourceHandler('POST', data=jsondata[0]))"""
+# Push normal resource to db
+""" with open(
+    f"{ROOTPATH}/source/tools/self_made/pathtraversal/pathTraversalPayload.txt", "r"
+) as f:
+    data = f.readlines()
+f.close()
+for line in data:
+    jsondata = {
+        "vulnType": "Path Traversal",
+        "resType": "payload",
+        "value": line.strip(),
+        "action": "add",
+    }
+    a.resourceHandler("POST", data=jsondata)
+# print(data) """
+""" jsondata = loads(data)
+jsondata[0]["action"] = "add"
+print(jsondata)
+print(a.resourceHandler('POST', data=jsondata[0]))
+"""
 # Update resource in db
 """ with open(f'{ROOTPATH}/source/core/database/data_resources.json', 'r') as f:
     data = f.read()

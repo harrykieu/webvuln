@@ -11,8 +11,8 @@ services:
     # Set environment variables for the database name and password
     environment:
       - MONGO_INITDB_DATABASE=webvuln
-    #  - MONGO_INITDB_ROOT_USERNAME=root
-    #  - MONGO_INITDB_ROOT_PASSWORD=secret
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=secret
     # Mount a volume to persist the data
     volumes:
       - mongo-data:/data/db

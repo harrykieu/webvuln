@@ -7,13 +7,15 @@ import urllib.parse
 # maker : RBKING
 
 s = requests.Session()
-s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.5938.92"
+s.headers[
+    "User-Agent"
+] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.5938.92"
 
 
-class SQli:
-
-    def __init__(self, url):
+class SQLi:
+    def __init__(self, url, sqli_resources):
         self.url = url
+        self.sqli_resources = sqli_resources
 
     # Uncomment the code below for DWVA
     # login_payload = {
@@ -35,24 +37,15 @@ class SQli:
     forms = []
 
     def scan_website(self, url):
-        soup = bs(s.get(url).content, "html.parser")
-        results = {
-            "sqli": []
-        }
-        urls = urlparse(url)
         global forms
         forms = bs(s.get(url).content, "html.parser").find_all("form")
         if self.check_sqli(url):
-            results["sqli"].append({
-                "url": url,
-                "details": "[+] SQL Injection detected"
-            })
-        return results
+            return True
+        return False
 
     # -----------------------------------------------------
 
     def is_vulnerable_sqli(self, response):
-
         errors = {
             "you have an error in your sql syntax;",
             "warning: mysql",
@@ -102,7 +95,8 @@ class SQli:
             input_name = input_tag.attrs.get("name")
             input_value = input_tag.attrs.get("value", "")
             inputs.append(
-                {"type": input_type, "name": input_name, "value": input_value})
+                {"type": input_type, "name": input_name, "value": input_value}
+            )
 
         details["action"] = action
         details["method"] = method
@@ -112,12 +106,9 @@ class SQli:
     # -------------------------------------------------------------
 
     def check_sqli(self, url):
+        print("\n[+] Checking SQLi")
 
-        with open('sqli_payload.txt') as f:
-            sqli_payloads = f.read().splitlines()
-            print("\n[+] Checking SQLi")
-
-        for payload in sqli_payloads:
+        for payload in self.sqli_resources:
             encoded_payload = urllib.parse.quote(payload)
             new_url = f"{url}?id={encoded_payload}"
             print("[!] Trying", new_url)
@@ -128,12 +119,11 @@ class SQli:
                 return True
 
         forms = self.get_all_forms(url)
-        print(
-            f"[+] Detected {len(forms)} forms on {url} and form found: {forms}")
+        print(f"[+] Detected {len(forms)} forms on {url} and form found: {forms}")
 
         for form in forms:
             form_details = self.get_form_details(form)
-            for payload in sqli_payloads:
+            for payload in self.sqli_resources:
                 data = {}
 
                 for input_tag in form_details["inputs"]:
@@ -152,15 +142,12 @@ class SQli:
                     res = s.get(url, params=data)
 
                 curr_url = url
-                results = {
-                    "sqli": []
-                }
+                results = {"sqli": []}
 
                 if self.is_vulnerable_sqli(res):
-                    results["sqli"].append({
-                        "url": curr_url,
-                        "details": "[+] SQLi vulnerability detected"
-                    })
+                    results["sqli"].append(
+                        {"url": curr_url, "details": "[+] SQLi vulnerability detected"}
+                    )
 
                     return True
 

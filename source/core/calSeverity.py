@@ -1,9 +1,10 @@
-def calculateWebsiteSafetyRate(website_vulnerabilities):
-    """Calculate the website's safety rate and severity 
-    :param website_vulnerabilities: A list of vulnerabilities defined in the list vulnerabilities.
+def calculateWebsiteSafetyRate(websiteVulns):
+    """Calculate the website's safety rate and severity
+    :param websiteVulns: A list of vulnerabilities defined in the list vulnerabilities.
     :return: A tuple containing the website safety rate and its severity.
     """
     # Define the CVSS scores for each vulnerability
+    # FIX
     vulnerabilities = {
         "sql injection": 8.6,
         "broken authentication": 9.8,
@@ -14,30 +15,31 @@ def calculateWebsiteSafetyRate(website_vulnerabilities):
         "Cross-Site Scripting (XSS)": 6.1,
         "Insecure Deserialization": 8.1,
         "Using Components with Known Vulnerabilities": 9.6,
-        "Insufficient Logging & Monitoring": 5.3
+        "Insufficient Logging & Monitoring": 5.3,
+        # FIX LATER
+        "File Upload": 9.8,
+        "Path Traversal": 9.8,
     }
 
     total_score = 0
-
-    for vuln, is_vulnerable in website_vulnerabilities.items():
-        if is_vulnerable:
-            total_score += vulnerabilities.get(vuln, 0)
-
-    total_original_score = 100
-    website_safety_rate = (1 - (total_score / total_original_score)) * 100
+    if not websiteVulns:
+        return 0, "None"
+    for vuln in websiteVulns:
+        total_score += vulnerabilities.get(vuln["type"], 0)
+    totalScore = 100
+    webSafetyRate = (1 - (total_score / totalScore)) * 100
 
     # Define the conversion table for severity
     severity_conversion = {
-        (0, 39): "Critical",
-        (40, 69): "High",
+        (0, 39): "None",
+        (40, 69): "Low",
         (70, 89): "Medium",
-        (90, 99): "Low",
-        (100, 100): "None",
+        (90, 99): "High",
+        (100, 100): "Critical",
     }
 
     severity = None
     for (lower, upper), label in severity_conversion.items():
-        if lower <= website_safety_rate <= upper:
+        if lower <= webSafetyRate <= upper:
             severity = label
-
-    return website_safety_rate, severity
+    return webSafetyRate, severity

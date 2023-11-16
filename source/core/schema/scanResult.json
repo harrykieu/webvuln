@@ -1,41 +1,50 @@
     {
         "bsonType": "object",
         "required": ["_id","domain","scanDate","numVuln","vulnerabilities","resultSeverity"],
-        "properties":{
-            "_id":{
-                "bsonType":"objectId"
+        "properties": {
+            "_id": {
+                "bsonType": "objectId"
             },
-            "domain":{
-                "bsonType":"string"
+            "domain": {
+                "bsonType": "string"
             },
-            "scanDate": {
-                "bsonType":"date"
+            "scanDate":  {
+                "bsonType": "date"
             },
-            "numVuln":{
-                "bsonType":"int"
+            "numVuln": {
+                "bsonType": "int"
             },
-            "vulnerabilities":{
-                "bsonType":["array"],
-                "items":{
-                    "bsonType":"object",
-                    "required":["type","description","severity"],
-                    "properties":{
-                        "type":{
-                            "bsonType":"string"
+            "vulnerabilities": {
+                "bsonType": ["array"],
+                "items": {
+                    "bsonType": "object",
+                    "required": ["type", "logs", "severity"],
+                    "properties": {
+                        "type": {
+                            "bsonType": "string"
                         },
-                        "description":{
-                            "bsonType":"string"
+                        "logs": {
+                            "bsonType": "string"
                         },
-                        "severity":{
-                            "bsonType":"string",
-                            "enum":["Low","Medium","High","Critical"]
+                        "payload": {
+                            "bsonType": ["array"],
+                            "items": {
+                                "bsonType": "string"
+                            }
+                        },
+                        "severity": {
+                            "bsonType": "string",
+                            "enum": ["Low", "Medium", "High", "Critical"]
                         }
                     }
                 }
             },
-            "resultSeverity":{
-                "bsonType":"string",
-                "enum":["None","Low","Medium","High","Critical"]
+            "resultPoint": {
+                "bsonType":"number"
+            },
+            "resultSeverity": {
+                "bsonType": "string",
+                "enum": ["None", "Low", "Medium", "High", "Critical"]
             }
         }
     }

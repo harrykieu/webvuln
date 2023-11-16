@@ -38,3 +38,5 @@ A website vulnerability scanner for coders without any knowledge of web security
 - Install Docker
 - Run `docker-compose up` at the `source\\core\\database` directory
 - Add mongoURI to the `.env_example` file at the root directory and rename it to `.env`
+- Run `setup.py` file to add all resources to the database
+- Run `webvuln.py` file to start the API server and backend
