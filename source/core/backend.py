@@ -16,7 +16,7 @@ from source.tools.self_made.idor.scan_idor import IDOR
 from source.core.calSeverity import calculateWebsiteSafetyRate
 
 import xml.etree.ElementTree as ET
-import pdfkit
+#import pdfkit
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [
@@ -236,8 +236,10 @@ class WebVuln:
                             )
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
+                        whitelist = self.resourceHandler(
+                            'GET', {"vulnType": "pathTraversal", "resType": "whitelist"})
                         resources = self.resourceHandler(
-                            "GET", {"vulnType": "Path Traversal", "resType": "payload"}
+                            "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
                         if resources == "Failed":
                             utils.log(
@@ -250,7 +252,7 @@ class WebVuln:
                                 )
                             return "Failed"
                         PTResult, PTPayload = PathTraversal(
-                            url, resources
+                            url, resources,whitelist
                         ).checkPathTraversal()
                         if PTResult is True:
                             resultURL["numVuln"] += 1
