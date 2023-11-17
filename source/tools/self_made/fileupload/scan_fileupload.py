@@ -157,6 +157,14 @@ class FileUpload:
                 pass
         print(f"{self.blue}[-] Uploading valid files...{self.white}")
         utils.log("[FileUpload] Uploading valid files...", "INFO", "fileUpload.txt")
+        if len(validFiles) == 0 or len(validExtension) == 0 or len(validMH) == 0:
+            print(f"{self.red}[-] Missing resources!{self.white}")
+            utils.log(
+                "[FileUpload] Missing resources!",
+                "ERROR",
+                "fileUpload.txt",
+            )
+            return self.isVuln
         for validFile in validFiles:
             for key in formField:
                 if formField[key] != "":
