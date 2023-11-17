@@ -237,7 +237,7 @@ class WebVuln:
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
                         resources = self.resourceHandler(
-                            "GET", {"vulnType": "Path Traversal", "resType": "payload"}
+                            "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
                         if resources == "Failed":
                             utils.log(
