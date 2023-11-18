@@ -118,7 +118,10 @@ class WebVuln:
         }
         ```
         """
-
+        # Remove all other log files
+        for file in Path(f"{ROOTPATH}/logs").iterdir():
+            if file.is_file() and file.name != "log.txt":
+                os.remove(file)
         commands = []
         jsonFiles = []
         dirURL = {}
@@ -237,7 +240,7 @@ class WebVuln:
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
                         resources = self.resourceHandler(
-                            "GET", {"vulnType": "Path Traversal", "resType": "payload"}
+                            "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
                         if resources == "Failed":
                             utils.log(
@@ -587,7 +590,7 @@ class WebVuln:
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
-                return str(listResult)
+                return listResult
             else:
                 utils.log(
                     "[backend.py-getScanResult] Error: Invalid JSON object", "ERROR"
