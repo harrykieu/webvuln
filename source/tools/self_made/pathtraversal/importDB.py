@@ -1,13 +1,13 @@
-import source.core.backend
+import source.core.backend 
 
 webvuln = source.core.backend.WebVuln()
-with open(f'{__file__}\\..\\white_list.txt') as f:
-    path_traversal_payloads = f.read().splitlines()
+with open(f'{__file__}\\..\\pathTraversalParameter.txt') as f:
+    path_traversal_parameter = f.read().splitlines()
 
-    for line in path_traversal_payloads:
+    for line in path_traversal_parameter:
         data = {
             "vulnType": "pathTraversal",
-            "resType": "whitelist",
+            "resType": "pathTraversalParameter",
             "value": line,
             "action": "add"
         }

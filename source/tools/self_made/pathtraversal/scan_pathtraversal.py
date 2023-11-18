@@ -4,12 +4,12 @@ import urllib.parse
 import source.core.utils as utils
 
 class PathTraversal:
-    def __init__(self, url, resources, whitelist):
+    def __init__(self, url, resources, parameter_list):
         self.url = url
         self.resources = resources
         self.payloads = []
         self.result = False
-        self.whitelist = whitelist
+        self.parameter_list = parameter_list
 
     def is_param_relevant(self, param):
         test_url = f"{self.url}?{param}=test"
@@ -27,7 +27,7 @@ class PathTraversal:
 
         stop_checking = False 
 
-        for param_info in self.whitelist:
+        for param_info in self.parameter_list:
             param = param_info['value']
 
             if stop_checking is True:
@@ -36,26 +36,26 @@ class PathTraversal:
             if not self.is_param_relevant(param):
                 print(f"[!] Skipping irrelevant parameter: {param}")
                 continue
+            else:    
+                for payload in self.resources:
+                    encoded_payload = urllib.parse.quote(payload["value"])
+                    new_url = f"{self.url}?{param}={encoded_payload}"
 
-            for payload in self.resources:
-                encoded_payload = urllib.parse.quote(payload["value"])
-                new_url = f"{self.url}?{param}={encoded_payload}"
-
-                print("[!] Trying", new_url)
-                utils.log(
-                    f"[PathTraversal] Trying {new_url}", "INFO", "pathTraversal.txt")
-                res = requests.get(new_url)
-                if re.search(rb"root:x:0:0", res.content):
-                    print("[+] Path Traversal vulnerability detected, link:", new_url)
+                    print("[!] Trying", new_url)
                     utils.log(
-                        f"[PathTraversal] Path Traversal vulnerability detected, link: {new_url}",
-                        "INFO",
-                        "pathTraversal.txt",
-                    )
-                    self.payloads.append(payload["value"])
-                    self.result = True
-                    stop_checking = True  
-                    break  
+                        f"[PathTraversal] Trying {new_url}", "INFO", "pathTraversal.txt")
+                    res = requests.get(new_url)
+                    if re.search(rb"root:x:0:0", res.content):
+                        print("[+] Path Traversal vulnerability detected, link:", new_url)
+                        utils.log(
+                            f"[PathTraversal] Path Traversal vulnerability detected, link: {new_url}",
+                            "INFO",
+                            "pathTraversal.txt",
+                        )
+                        self.payloads.append(payload["value"])
+                        self.result = True
+                        stop_checking = True  
+                        break  
 
         print("[+] Check path traversal done")
         utils.log(
