@@ -42,8 +42,6 @@ class PathTraversal:
                     new_url = f"{self.url}?{param}={encoded_payload}"
 
                     print("[!] Trying", new_url)
-                    utils.log(
-                        f"[PathTraversal] Trying {new_url}", "INFO", "pathTraversal.txt")
                     res = requests.get(new_url)
                     if re.search(rb"root:x:0:0", res.content):
                         print("[+] Path Traversal vulnerability detected, link:", new_url)
