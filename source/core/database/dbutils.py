@@ -1,13 +1,14 @@
 import json
 from pymongo import MongoClient
 import os
+
+import pymongo
 import source.core.utils as utils
 from dotenv import load_dotenv
 
 
 class DatabaseUtils:
-    """This class contains the functions to add, delete, find and edit the documents in the collection.
-    """
+    """This class contains the functions to add, delete, find and edit the documents in the collection."""
 
     def __init__(self, username=None, password=None) -> None:
         """Open the connection to the database.
@@ -18,18 +19,40 @@ class DatabaseUtils:
         self.__client = MongoClient(os.getenv("DATABASE_URI"))
         self.__db = self.__client.get_database("webvuln")
         if "resources" not in self.__db.list_collection_names():
-            self.__db.create_collection("resources", validator={
-                                        '$jsonSchema': json.load(open("./source/core/schema/resources.json"))})
+            self.__db.create_collection(
+                "resources",
+                validator={
+                    "$jsonSchema": json.load(
+                        open("./source/core/schema/resources.json")
+                    )
+                },
+            )
         if "scanResult" not in self.__db.list_collection_names():
-            self.__db.create_collection("scanResult", validator={
-                                        '$jsonSchema': json.load(open("./source/core/schema/scanResult.json"))})
+            self.__db.create_collection(
+                "scanResult",
+                validator={
+                    "$jsonSchema": json.load(
+                        open("./source/core/schema/scanResult.json")
+                    )
+                },
+            )
+        if "fileResources" not in self.__db.list_collection_names():
+            self.__db.create_collection(
+                "fileResources",
+                validator={
+                    "$jsonSchema": json.load(
+                        open("./source/core/schema/fileResources.json")
+                    )
+                },
+            )
 
     def addDocument(self, collectionName, data) -> bool:
         """Add a document to the collection in the database.
         - `collectionName`: name of the collection.
-        - `data`: data of the document. 
+        - `data`: data of the document.
         If there is more than one document, this function inserts the data using `insert_many()`, otherwise it uses `insert_one()`.
         """
+        # TODO: Fix insert duplicate
         try:
             collection = self.__db.get_collection(collectionName)
             if isinstance(data, list):
@@ -39,37 +62,38 @@ class DatabaseUtils:
                 collection.insert_one(data)
                 return True
         except Exception as e:
-            utils.log(f'Error: {e}', "ERROR")
+            utils.log(f"[dbutils.py-addDocument] Error: {e}", "ERROR")
             raise e
 
     def deleteDocument(self, collectionName, query):
         """Delete one document from the collection.
         - `collectionName`: name of the collection.
-        - `query`: a dictionary that specifies the criteria for finding the document to be deleted. 
+        - `query`: a dictionary that specifies the criteria for finding the document to be deleted.
         The format is `{"field_name:field_value"}`. Example: `{"domain":"example.com"}`
         """
         try:
             collection = self.__db.get_collection(collectionName)
             collection.delete_one(query)
-            return "Success"
+            return True
         except Exception as e:
-            utils.log(f'Error: {e}', "ERROR")
-            return "Failed"
+            utils.log(f"[dbutils.py-deleteDocument] Error: {e}", "ERROR")
+            raise e
 
     def updateDocument(self, collectionName, query, update):
         """Edit one document from the collection.
         - `collectionName`: name of the collection.
-        - `query`: a dictionary that specifies the criteria for finding the document to be edited. 
+        - `query`: a dictionary that specifies the criteria for finding the document to be edited.
         The format is `{"field_name:field_value"}`. Example: `{"domain":"example.com"}`.
-        - `update`: a dictionary that specifies the field to be updated and the new value. 
+        - `update`: a dictionary that specifies the field to be updated and the new value.
         The format will be `{"$set":{"field_name":"field_value"}}`. Example: `{"$set":{"domain":"example.com"}}`.
         """
         try:
             collection = self.__db.get_collection(collectionName)
             collection.update_one(query, update)
-            print("edit document successfully !")
+            return True
         except Exception as e:
-            print("exc", e)
+            utils.log(f"[dbutils.py-updateDocument] Error: {e}", "ERROR")
+            raise e
 
     def findDocument(self, collectionName, query):
         """Find one document from the collection.
@@ -81,9 +105,9 @@ class DatabaseUtils:
             collection = self.__db.get_collection(collectionName)
             return collection.find(query)
         except Exception as e:
-            print("exc", e)
+            utils.log(f"[dbutils.py-findDocument] Error: {e}", "ERROR")
+            raise e
 
     def disconnect(self):
-        """Disconnect from the database.
-        """
+        """Disconnect from the database."""
         self.__client.close()

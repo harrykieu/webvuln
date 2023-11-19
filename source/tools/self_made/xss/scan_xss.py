@@ -12,8 +12,9 @@ s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.
 
 class XSS:
 
-    def __init__(self, url):
+    def __init__(self, url, xss_resources):
         self.url = url
+        self.xss_resources = xss_resources
 # login_payload = {
 #     "username": "admin",
 #     "password": "password",
@@ -34,21 +35,13 @@ class XSS:
 
     def scan_website(self, url):
         soup = bs(s.get(url).content, "html.parser")
-        results = {
-            "xss": []
-        }
-        urls = urlparse(url)
         global forms
         forms = bs(s.get(url).content, "html.parser").find_all("form")
 
         # Scan XSS
         if self.check_xss(url):
-            results["xss"].append({
-                "url": url,
-                "details": "[+] Cross Site Scripting detected"
-            })
-
-        return results
+            return True
+        return False
 
     # ---------------------------------
 
@@ -81,12 +74,10 @@ class XSS:
     # ---------------------------------------------------------------------
 
     def check_xss(self, url):
-        with open('xss_payload.txt') as f:
-            xss_payloads = f.read().splitlines()
 
         print("\n[+] Checking XSS")
 
-        for payload in xss_payloads:
+        for payload in self.xss_resources:
             encoded_payload = urllib.parse.quote(payload)
             new_url = f"{url}?q={encoded_payload}"
 
@@ -104,7 +95,7 @@ class XSS:
         for form in forms:
             form_details = self.get_form_details(form)
 
-            for payload in xss_payloads:
+            for payload in self.xss_resources:
                 data = {}
 
                 for input_tag in form_details["inputs"]:
