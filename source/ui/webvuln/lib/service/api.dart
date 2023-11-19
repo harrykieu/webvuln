@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'model.dart';
+import '../model/model.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
@@ -10,6 +10,7 @@ Options _options = Options(
     headers: {'Content-Type': 'application/json', 'Origin': 'frontend'});
 
 //POST api/scan
+//Post url and number module to scan in screen scan
 Future<String> postURL(
     {required String nameURL, required int moduleNumber}) async {
   final data = jsonEncode(URL(url: nameURL, modules: moduleNumber));

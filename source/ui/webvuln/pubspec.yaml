@@ -59,6 +59,7 @@ dependencies:
   flutter_expandable_table: ^2.0.1
   decorated_dropdownbutton: ^0.0.3
   flutter_dropdown: ^1.0.1+hotfix.1
+  calendar_date_picker2: ^0.5.3
 
 dev_dependencies:
   flutter_test:

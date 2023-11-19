@@ -2,6 +2,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:webvuln/items/lineChart.dart';
 import 'package:webvuln/items/pieGraph.dart';
 import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
@@ -27,6 +28,7 @@ class resultScreen extends StatefulWidget {
 class _resultScreenState extends State<resultScreen> {
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -49,7 +51,45 @@ class _resultScreenState extends State<resultScreen> {
                   )),
             ),
             const listVulnerabilities(),
-            pieGraph()
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const containerPieChart(),
+                lineChart()
+              ],
+            ),
+            Container(
+              width:width - 100,
+              height: 200,
+              margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 30),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black38,
+                    offset: Offset(0, 4),
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  )
+                ]
+              ),
+              child:Column(
+                children: [
+                  ListTile(
+                    title: Row(
+                      children: [
+                        Image(image: AssetImage('lib/assets/Folders_light.png')),
+                        Text('  Description',style: GoogleFonts.montserrat(fontSize: 24,fontWeight: FontWeight.bold),)
+                      ],
+                    ),
+                  ),
+                  ListTile(
+                    title: Text('SQL injection, also known as SQLI, is a common attack vector that uses malicious SQL code for backend database manipulation to access information that was not intended to be displayed',style: GoogleFonts.montserrat(fontSize: 20,fontWeight: FontWeight.normal),),
+                  )
+                ],
+              ),
+            )
           ],
         ),
       ),
@@ -87,9 +127,9 @@ class _listVulnerabilitiesState extends State<listVulnerabilities> {
     double width = MediaQuery.of(context).size.width;
     Column table = tableXSS();
     return Container(
-      width: width - 200,
+      width: width - 100,
       height: 500,
-      margin: const EdgeInsets.symmetric(vertical: 30),
+      margin: const EdgeInsets.symmetric(vertical: 30,horizontal: 10),
       decoration: const BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -127,9 +167,11 @@ class _listVulnerabilitiesState extends State<listVulnerabilities> {
               ],
             ),
           ),
-          Container(
+          Stack(
+            children: [
+              Container(
               width: double.infinity,
-              height: 300,
+              height: 400,
               margin: const EdgeInsets.fromLTRB(30, 10, 30, 10),
               padding:
                   EdgeInsetsDirectional.symmetric(horizontal: 60, vertical: 20),
@@ -138,7 +180,17 @@ class _listVulnerabilitiesState extends State<listVulnerabilities> {
                   borderRadius: BorderRadius.all(Radius.circular(30))),
               child: SingleChildScrollView(
                 child: tableXSS(),
-              ))
+              )),
+          Positioned(
+            top: 355,
+            right: 40,
+            child: ElevatedButton(onPressed: (){}, child: Text('Details...'),style: ElevatedButton.styleFrom(
+              minimumSize: Size(150, 50),
+              maximumSize: Size(150, 50),
+              backgroundColor: Colors.white
+            ),))
+            ],
+          )
         ],
       ),
     );
@@ -170,6 +222,7 @@ class _listVulnerabilitiesState extends State<listVulnerabilities> {
             )
           ],
         ),
+        rowTable(nameError: rowsTableXSS[1], vuln: rowsTableXSS[2]),
         rowTable(nameError: rowsTableXSS[1], vuln: rowsTableXSS[2]),
         rowTable(nameError: rowsTableXSS[1], vuln: rowsTableXSS[2]),
         rowTable(nameError: rowsTableXSS[1], vuln: rowsTableXSS[2]),
