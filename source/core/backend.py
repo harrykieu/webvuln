@@ -598,60 +598,73 @@ class WebVuln:
                 if self.__debug:
                     print("[backend.py-getScanResult] Error: Invalid JSON object")
                 return "Failed"
+            
+    # Generate JSON report
+    def generate_json_report(results):
+
+        json_str = json.dumps(results, indent=4) 
+        json_str = json_str.replace(', ', ',\n')
+        json_str = json_str.replace('{', '{\n')
+        json_str = json_str.replace('}', '\n}')
+
+        with open("report.json", "w") as f:
+            f.write(json_str)
 
     def generateXMLReport(self, results):
         """Generate XML report from the JSON result.
 
         :param results: JSON result
         """
-        root = ET.Element("scan_results")
+        with open('report.json') as f:
+            data = json.load(f)
 
-        for result in results:
-            domain = ET.SubElement(root, "domain")
-            domain.text = result["domain"]
-            scan_date = ET.SubElement(root, "scan_date")
-            scan_date.text = result["scanDate"]
+        root = ET.Element('report')
 
-            vulns = ET.SubElement(root, "vulnerabilities")
-            for vuln in result["vulnerabilities"]:
-                vuln_node = ET.SubElement(vulns, "vulnerability")
-                ET.SubElement(vuln_node, "type").text = vuln["type"]
-                ET.SubElement(vuln_node, "severity").text = vuln["severity"]
+        for item in data:
+            domain = ET.SubElement(root, 'domain')
+            domain.text = item['domain']
 
-        xml_report = ET.tostring(root)
-        with open("report.xml", "wb") as f:
-            f.write(xml_report)
+            scan_date = ET.SubElement(root, 'scan_date')
+            scan_date.text = item['scanDate']
+
+            vulns = ET.SubElement(root, 'vulnerabilities')
+            for vuln in item['vulnerabilities']:
+                vuln_node = ET.SubElement(vulns, 'vulnerability')
+                ET.SubElement(vuln_node, 'type').text = vuln['type']
+                ET.SubElement(vuln_node, 'severity').text = vuln['severity']
+
+        tree = ET.ElementTree(root)
+        tree.write('report.xml')
 
     def generatePDFReport(self, results):
         """Generate PDF report from the JSON result.
 
         :param results: JSON result
         """
-        html = "<h1>Report</h1>"
+        with open('report.json') as f:
+            data = json.load(f)
 
-        for item in results:
-            html += f"<h3>{item['domain']}</h3>"
+        html = '''
+        <html>
+        <head>
+        <title>Report</title>
+        </head>
+        <body>
+        <h1>Vulnerability Report</h1>
+        '''
+
+        for item in data:
+            html += f"<h2>{item['domain']}</h2>"
             html += f"<p>Scan Date: {item['scanDate']}</p>"
 
+            html += "<h3>Vulnerabilities:</h3>"
             html += "<ul>"
-            for vuln in item["vulnerabilities"]:
+            for vuln in item['vulnerabilities']:
                 html += f"<li>{vuln['type']} - {vuln['severity']}</li>"
-                html += "<li>Log:<br><div><p>"
-                for line in vuln["logs"].split("\n"):
-                    html += f"{line}<br>"
             html += "</ul>"
-        with open("test.html", "w") as f:
-            f.writelines(html)
-        f.close()
-        # BUG
-        # pdfkit.from_string(html, "scan_results.pdf")
 
-    # Generate JSON report
-    def generateJSONReport(self, results):
-        """Generate JSON report from the JSON result.
+        html += "</body></html>"
 
-        :param results: JSON result
-        """
-        json_report = json.dumps(results)
-        with open("report.json", "w") as f:
-            f.write(json_report)
+        pdfkit.from_string(html, 'report.pdf')
+
+    
