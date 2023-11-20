@@ -14,7 +14,11 @@ def calculateWebsiteSafetyRate(websiteVulns):
         "Cross-Site Scripting (XSS)": 6.1,
         "Insecure Deserialization": 8.1,
         "Using Components with Known Vulnerabilities": 9.6,
-        "Insufficient Logging & Monitoring": 5.3
+        "Insufficient Logging & Monitoring": 5.3,
+        "Local file inclusion": 8.6,
+        "Path traversal": 5.8,
+        "IDOR": 7.5,
+        "File Upload": 3.3
     }
 
     total_score = 0
@@ -28,7 +32,7 @@ def calculateWebsiteSafetyRate(websiteVulns):
     website_safety_rate = (1 - (total_score / total_original_score)) * 100
 
     # Define the conversion table for severity
-    severity_conversion = {
+    safetyPercent = {
         (0, 39): "Critical",
         (40, 69): "High",
         (70, 89): "Medium",
@@ -37,7 +41,7 @@ def calculateWebsiteSafetyRate(websiteVulns):
     }
 
     severity = None
-    for (lower, upper), label in severity_conversion.items():
+    for (lower, upper), label in safetyPercent.items():
         if lower <= website_safety_rate <= upper:
             severity = label
 
