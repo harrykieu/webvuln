@@ -85,7 +85,7 @@ class WebVuln:
         elif route == "/api/resourcesfile":
             return self.fileHandler(method, jsonData)
         elif route == "/api/scan":
-            return self.scanURL(jsonData["urls"])
+            return self.scanURL(jsonData["urls"],jsonData["modules"])
         else:
             utils.log(f"[backend.py-recvFlask] Error: Invalid route {route}", "ERROR")
             if self.__debug:
