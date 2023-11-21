@@ -9,16 +9,23 @@ import 'package:webvuln/views/scanScreen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:webvuln/views/settingScreen.dart';
+import 'package:desktop_window/desktop_window.dart';
 
 // import '../views/scanScreen2.dart';
 // import 'views/draft.dart';
 
-void main() {
-  runApp(const mainScreen());
+void main() async {
+  // Size size = await DesktopWindow.getWindowSize();
+  // await DesktopWindow.setMinWindowSize(Size(1920, 1080));
+  // await DesktopWindow.setMaxWindowSize(Size(1920, 1080));
+  runApp(mainScreen(
+    changeScreen: 0,
+  ));
 }
 
 class mainScreen extends StatefulWidget {
-  const mainScreen({super.key});
+  const mainScreen({super.key, required int this.changeScreen});
+  final int changeScreen;
 
   @override
   State<mainScreen> createState() => _mainScreenState();
@@ -41,6 +48,14 @@ class _mainScreenState extends State<mainScreen> {
     const historyScreen(),
     const settingScreen()
   ];
+
+  void<Widget> returnWidget() {
+    if (widget.changeScreen == 1) {
+      return _selectedItem[widget.changeScreen];
+    } else {
+      return _selectedItem[_selectedIndex];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +90,9 @@ class _mainScreenState extends State<mainScreen> {
                             },
                             icon: Icons.abc,
                             name: 'Scan'),
-                        const SizedBox(height: 20,),
+                        const SizedBox(
+                          height: 20,
+                        ),
                         button(
                             onPressed: () {
                               setState(() {
@@ -84,7 +101,9 @@ class _mainScreenState extends State<mainScreen> {
                             },
                             icon: Icons.ac_unit,
                             name: 'Result'),
-                            const SizedBox(height: 20,),
+                        const SizedBox(
+                          height: 20,
+                        ),
                         button(
                             onPressed: () {
                               setState(() {
@@ -93,7 +112,9 @@ class _mainScreenState extends State<mainScreen> {
                             },
                             icon: Icons.access_alarm_rounded,
                             name: 'Resource'),
-                            const SizedBox(height: 20,),
+                        const SizedBox(
+                          height: 20,
+                        ),
                         button(
                             onPressed: () {
                               setState(() {
@@ -102,7 +123,9 @@ class _mainScreenState extends State<mainScreen> {
                             },
                             icon: Icons.accessibility_rounded,
                             name: 'History'),
-                            const SizedBox(height: 20,),
+                        const SizedBox(
+                          height: 20,
+                        ),
                         button(
                             onPressed: () {
                               setState(() {
@@ -125,10 +148,10 @@ class _mainScreenState extends State<mainScreen> {
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
                       bottomLeft: Radius.circular(30)),
-                  image:DecorationImage(
-                    fit: BoxFit.cover,
-                    image:AssetImage('lib/assets/background.png') )),
-              child: _selectedItem[_selectedIndex],
+                  image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: AssetImage('lib/assets/background.png'))),
+              child: returnWidget(),
             )
           ],
         ),
@@ -145,7 +168,10 @@ class _mainScreenState extends State<mainScreen> {
         child: Column(
           children: [Icon(icon), Text(name)],
         ),
-        style: ElevatedButton.styleFrom(minimumSize: const Size(200, 80),backgroundColor: Colors.transparent,foregroundColor: Colors.white));
+        style: ElevatedButton.styleFrom(
+            minimumSize: const Size(200, 80),
+            backgroundColor: Colors.transparent,
+            foregroundColor: Colors.white));
   }
 
   Stream<int> get _selectedIndexStream =>

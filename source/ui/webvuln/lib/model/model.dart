@@ -1,6 +1,6 @@
 class URL {
   final String url;
-  final int modules;
+  final List<String> modules;
   const URL({required this.url, required this.modules});
 
   Map<String, dynamic> toJson() {

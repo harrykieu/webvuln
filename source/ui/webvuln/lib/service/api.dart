@@ -4,7 +4,7 @@ import '../model/model.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
-final dio = Dio();
+Dio dio = Dio();
 String baseUrl = 'http://127.0.0.1:5000';
 Options _options = Options(
     headers: {'Content-Type': 'application/json', 'Origin': 'frontend'});
@@ -12,8 +12,8 @@ Options _options = Options(
 //POST api/scan
 //Post url and number module to scan in screen scan
 Future<String> postURL(
-    {required String nameURL, required int moduleNumber}) async {
-  final data = jsonEncode(URL(url: nameURL, modules: moduleNumber));
+    {required String nameURL, required List<String> moduleNumber}) async {
+  final data = jsonEncode(URL(url: nameURL, modules: moduleNumber).toJson());
   final url = baseUrl + '/api/scan';
 
   try {
@@ -21,6 +21,7 @@ Future<String> postURL(
 
     if (response.statusCode == 200) {
       print(data);
+      print('Sucessfull post data');
       return "Data posted successfull";
     } else {
       return "Failed post data";
@@ -29,6 +30,7 @@ Future<String> postURL(
     print(ContentType.json);
     print(nameURL);
     print(data);
+    print(e);
     return "Error: $e";
   }
 }

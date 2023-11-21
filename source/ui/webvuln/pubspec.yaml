@@ -60,6 +60,11 @@ dependencies:
   decorated_dropdownbutton: ^0.0.3
   flutter_dropdown: ^1.0.1+hotfix.1
   calendar_date_picker2: ^0.5.3
+  desktop_window: ^0.4.0
+  # window_size:
+  #     git:
+  #       url: git://github.com/google/flutter-desktop-embedding.git
+  #       path: plugins/window_size
 
 dev_dependencies:
   flutter_test:
@@ -88,6 +93,11 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+window_size:
+    git:
+      url: https://github.com/google/flutter-desktop-embedding
+      path: plugins/window_size
 
   # To add assets to your application, add an assets section, like this:
   # assets:
