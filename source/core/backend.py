@@ -16,7 +16,7 @@ from source.tools.self_made.idor.scan_idor import IDOR
 from source.core.calSeverity import calculateWebsiteSafetyRate
 
 import xml.etree.ElementTree as ET
-import pdfkit
+#import pdfkit
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [
@@ -227,8 +227,24 @@ class WebVuln:
                             )
                     elif module == "idor":
                         print("[+] Checking IDOR vulnerability...")
-                        a = IDOR(url)
-                        if a.check_idor() is True:
+                        idor_params = self.resourceHandler(
+                            "GET", {"vulnType": "idor", "resType": "parameter"}
+                        )
+                        resources = self.resourceHandler(
+                            "GET", {"vulnType": "idor", "resType": "payload"}
+                        )
+                        if resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        a = IDOR(url, resources, idor_params)
+                        if a.check_idor(url) is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
                                 {
