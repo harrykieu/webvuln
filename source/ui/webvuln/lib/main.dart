@@ -5,7 +5,7 @@ import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/historyScreen.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
 import 'package:webvuln/views/resultScreen.dart';
-import 'package:webvuln/views/scanScreen.dart';
+import 'package:webvuln/views/scan_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:webvuln/views/settingScreen.dart';
@@ -42,7 +42,7 @@ class _mainScreenState extends State<mainScreen> {
   @override
   int _selectedIndex = 0;
   final List _selectedItem = [
-    const scanScreen(),
+    const scan_screen(),
     const resultScreen(),
     const resourceScreen(),
     const historyScreen(),

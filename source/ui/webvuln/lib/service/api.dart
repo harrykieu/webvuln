@@ -31,7 +31,7 @@ Future<String> postURL(
     print(nameURL);
     print(data);
     print(e);
-    return "Error: $e";
+    return "Error";
   }
 }
 

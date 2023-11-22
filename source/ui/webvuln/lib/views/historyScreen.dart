@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:webvuln/items/table_history.dart';
-import 'scanScreen.dart';
+import 'scan_screen.dart';
 import 'package:webvuln/service/api.dart';
 import '../items/submitButton.dart';
 import '../items/input.dart';
