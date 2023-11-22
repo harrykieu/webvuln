@@ -79,13 +79,13 @@ List<String> nameModule = [
 Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width * (1-0.13); // 0.13 is width of sidebar
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(      
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
             // ScanURL text
             Container(
-                margin: const EdgeInsets.only(top: 50, left: 100),
+                margin: const EdgeInsets.symmetric(horizontal: 100),
                 child: ListTile(
                     title: Text(
                         'SCAN URL',
@@ -118,11 +118,11 @@ Widget build(BuildContext context) {
                         child: Image(image: AssetImage('lib/assets/suffixIcon.png'))),
                 ),
             ),
-            // Module scan choose + scrollbox
+            // Module scan choose + description
             Container(
                 width: double.infinity,
-                height: screenHeight - 600,
-                margin: const EdgeInsetsDirectional.symmetric(horizontal: 200, vertical: 30),
+                height: screenHeight / 2.2,
+                margin: const EdgeInsetsDirectional.symmetric(horizontal: 100),
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -136,8 +136,9 @@ Widget build(BuildContext context) {
                 ),
                 child: Row(
                     children: [
+                        // Module scan choose
                         Container(
-                            width: screenWidth / 8,
+                            width: screenWidth / 6,
                             height: double.infinity,
                             margin: const EdgeInsets.all(10),
                             decoration: const BoxDecoration(
@@ -161,6 +162,7 @@ Widget build(BuildContext context) {
                                                                 } else {
                                                                     _valueSelected.remove(nameModule[index]);
                                                                 }
+                                                                // for debug
                                                                 print(_valueSelected);
                                                             });
                                                         },
@@ -178,51 +180,64 @@ Widget build(BuildContext context) {
                             color: Color(0xFF021361),
                             thickness: 2,
                         ),
+                        // Description box
                         Container(
                             width: screenWidth / 3,
                             height: double.infinity,
-                            margin: EdgeInsetsDirectional.all(10),
+                            margin: const EdgeInsetsDirectional.all(10),
                             child: Column(
                                 children: [
-                                    ListTile(
-                                        leading: Icon(
-                                            Icons.document_scanner_rounded,
-                                            color: Color(0xFF1A35C3),
-                                        ),
-                                        title: Text(
-                                            'Description',
-                                            style: GoogleFonts.montserrat(
-                                                    fontSize: 20, fontWeight: FontWeight.bold),
-                                        ),
-                                    ),
-                                    ListTile(
-                                        title: Text(content[_numberModule]),
+                                    Flexible(
+                                        fit: FlexFit.tight,
+                                        child: Column(
+                                            children: [
+                                                ListTile(
+                                                    leading: const Icon(
+                                                        Icons.document_scanner_rounded,
+                                                        color: Color(0xFF1A35C3),
+                                                    ),
+                                                    title: Text(
+                                                        'Description',
+                                                        style: GoogleFonts.montserrat(
+                                                            fontSize: 20, 
+                                                            fontWeight: FontWeight.bold
+                                                        ),
+                                                    ),
+                                                ),
+                                                ListTile(
+                                                    title: Text(content[_numberModule]),
+                                                )
+                                            ],)
                                     )
                                 ],
                             ),
                         )
                     ],
                 )),
-            submitButton(
-                // urlController: urlController,
-                // moduleController: _moduleController,
-                onPressed: () {
-                    postURL(nameURL: urlController.text, moduleNumber: _valueSelected);
-                    Get.to(loadingScreen());
-                    setState(() {
-                        contentChild = const CircularProgressIndicator.adaptive(
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        );
-                    });
-                    // Navigator.push(context,
-                    //     MaterialPageRoute(builder: (BuildContext context) => mainScreen(changeScreen: 1,)));
-                },
-                childButton: contentChild,
-            ),
+            Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                child: submitButton(
+                    // urlController: urlController,
+                    // moduleController: _moduleController,
+                    onPressed: () {
+                        postURL(nameURL: urlController.text, moduleNumber: _valueSelected);
+                        Get.to(loadingScreen());
+                        setState(() {
+                            contentChild = const CircularProgressIndicator.adaptive(
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            );
+                        });
+                        // Navigator.push(context,
+                        //     MaterialPageRoute(builder: (BuildContext context) => mainScreen(changeScreen: 1,)));
+                    },
+                    childButton: contentChild,
+                ),
+            )
         ],
     );
 }
 
+// not implemented yet
 Visibility module() => Visibility(
                 child: Container(
             width: 200,
