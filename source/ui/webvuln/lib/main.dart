@@ -19,8 +19,8 @@ void main() async {
   // await DesktopWindow.setMinWindowSize(Size(1920, 1080));
   // await DesktopWindow.setMaxWindowSize(Size(1920, 1080));
   runApp(mainScreen(
-    // changeScreen: 0,
-  ));
+      // changeScreen: 0,
+      ));
 }
 
 class mainScreen extends StatefulWidget {
@@ -32,6 +32,7 @@ class mainScreen extends StatefulWidget {
 }
 
 class _mainScreenState extends State<mainScreen> {
+  int _selectedIndex = 0;
   @override
   void initState() {
     // TODO: implement initState
@@ -40,7 +41,6 @@ class _mainScreenState extends State<mainScreen> {
   }
 
   @override
-  int _selectedIndex = 0;
   final List _selectedItem = [
     const scanScreen(),
     const resultScreen(),
@@ -64,90 +64,93 @@ class _mainScreenState extends State<mainScreen> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double heightWidth = MediaQuery.of(context).size.height;
     Get.testMode = true;
     return GetMaterialApp(
       home: Scaffold(
         backgroundColor: const Color(0xFF03112e),
         body: Row(
           children: [
-            Container(
-              width: screenWidth * 0.13,
-              height: double.infinity,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Image.asset('lib/assets/logo.png'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      // crossAxisAlignment: CrossAxisAlignment.baseline,
-                      children: [
-                        button(
-                            onPressed: () {
-                              setState(() {
-                                _selectedIndex = 0;
-                              });
-                            },
-                            icon: Icons.abc,
-                            name: 'Scan'),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        button(
-                            onPressed: () {
-                              setState(() {
-                                _selectedIndex = 1;
-                              });
-                            },
-                            icon: Icons.ac_unit,
-                            name: 'Result'),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        button(
-                            onPressed: () {
-                              setState(() {
-                                _selectedIndex = 2;
-                              });
-                            },
-                            icon: Icons.access_alarm_rounded,
-                            name: 'Resource'),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        button(
-                            onPressed: () {
-                              setState(() {
-                                _selectedIndex = 3;
-                              });
-                            },
-                            icon: Icons.accessibility_rounded,
-                            name: 'History'),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        button(
-                            onPressed: () {
-                              setState(() {
-                                _selectedIndex = 4;
-                              });
-                            },
-                            icon: Icons.ad_units_sharp,
-                            name: 'Settings')
-                      ],
+            // Sidebar
+            SizedBox(
+              child: Container(
+                width: screenWidth * 0.13,
+                height: double.infinity,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Image.asset('lib/assets/logo.png'),
                     ),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        // crossAxisAlignment: CrossAxisAlignment.baseline,
+                        children: [
+                          button(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedIndex = 0;
+                                });
+                              },
+                              icon: Icons.abc,
+                              name: 'Scan'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          button(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedIndex = 1;
+                                });
+                              },
+                              icon: Icons.ac_unit,
+                              name: 'Result'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          button(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedIndex = 2;
+                                });
+                              },
+                              icon: Icons.access_alarm_rounded,
+                              name: 'Resource'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          button(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedIndex = 3;
+                                });
+                              },
+                              icon: Icons.accessibility_rounded,
+                              name: 'History'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          button(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedIndex = 4;
+                                });
+                              },
+                              icon: Icons.ad_units_sharp,
+                              name: 'Settings')
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
+            // Gradient background
             Container(
-              width: screenWidth * 0.87,
+              width: screenWidth - (screenWidth * 0.13),
+              // bug: failure in cropping background image 
               height: double.infinity,
-              // color: Colors.black,
               decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
@@ -169,13 +172,15 @@ class _mainScreenState extends State<mainScreen> {
       required String name}) {
     return ElevatedButton(
         onPressed: onPressed,
-        child: Column(
-          children: [Icon(icon), Text(name)],
-        ),
         style: ElevatedButton.styleFrom(
             minimumSize: const Size(200, 80),
             backgroundColor: Colors.transparent,
-            foregroundColor: Colors.white));
+            foregroundColor: Colors.white
+        ),
+        child: Column(
+          children: [Icon(icon), Text(name)],
+        )
+    );
   }
 
   Stream<int> get _selectedIndexStream =>
