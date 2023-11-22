@@ -5,7 +5,7 @@ class URL {
 
   Map<String, dynamic> toJson() {
     return {
-      'url': url,
+      'urls': url,
       'modules': modules,
     };
   }

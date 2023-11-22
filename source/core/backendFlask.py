@@ -20,7 +20,7 @@ def scan():
     This function is used for frontend to scan a website using `/api/scan` endpoint with `POST`.
 
     The request body should contain a JSON object with the following properties:
-    - `url`: The URL of the website.
+    - `urls`: The URL of the website.
     - `modules`: The name of the modules to use for the scan.
     """
     orgHeader = request.headers.get("Origin")
@@ -39,7 +39,7 @@ def scan():
             utils.log("/api/scan: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if "url" in keys and "modules" in keys and len(keys) == 2:
+    if "urls" in keys and "modules" in keys and len(keys) == 2:
         if app.debug:
             utils.log(f"/api/scan: Successfully received data: {data}", "DEBUG")
         backend.recvFlask("/api/scan", "POST", data)

@@ -29,68 +29,79 @@ class _resultScreenState extends State<resultScreen> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30), bottomLeft: Radius.circular(30))),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            ListTile(
-              title: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                      // maximumSize: Size(200, 80),
-                      minimumSize: const Size(100, 80)),
-                  child: const Row(
-                    children: [Icon(Icons.arrow_back), Text('Back')],
-                  )),
-            ),
-            const listVulnerabilities(),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                const containerPieChart(),
-                lineChart()
-              ],
-            ),
-            Container(
-              width:width - 100,
-              height: 200,
-              margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 30),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black38,
-                    offset: Offset(0, 4),
-                    blurRadius: 10,
-                    spreadRadius: 1,
-                  )
-                ]
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30), bottomLeft: Radius.circular(30))),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              ListTile(
+                title: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                        // maximumSize: Size(200, 80),
+                        minimumSize: const Size(100, 80)),
+                    child: const Row(
+                      children: [Icon(Icons.arrow_back), Text('Back')],
+                    )),
               ),
-              child:Column(
-                children: [
-                  ListTile(
-                    title: Row(
-                      children: [
-                        Image(image: AssetImage('lib/assets/Folders_light.png')),
-                        Text('  Description',style: GoogleFonts.montserrat(fontSize: 24,fontWeight: FontWeight.bold),)
-                      ],
+              const listVulnerabilities(),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [const containerPieChart(), lineChart()],
+              ),
+              Container(
+                width: width - 100,
+                height: 200,
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+                decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black38,
+                        offset: Offset(0, 4),
+                        blurRadius: 10,
+                        spreadRadius: 1,
+                      )
+                    ]),
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Row(
+                        children: [
+                          Image(
+                              image:
+                                  AssetImage('lib/assets/Folders_light.png')),
+                          Text(
+                            '  Description',
+                            style: GoogleFonts.montserrat(
+                                fontSize: 24, fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  ListTile(
-                    title: Text('SQL injection, also known as SQLI, is a common attack vector that uses malicious SQL code for backend database manipulation to access information that was not intended to be displayed',style: GoogleFonts.montserrat(fontSize: 20,fontWeight: FontWeight.normal),),
-                  )
-                ],
-              ),
-            )
-          ],
+                    ListTile(
+                      title: Text(
+                        'SQL injection, also known as SQLI, is a common attack vector that uses malicious SQL code for backend database manipulation to access information that was not intended to be displayed',
+                        style: GoogleFonts.montserrat(
+                            fontSize: 20, fontWeight: FontWeight.normal),
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -129,7 +140,7 @@ class _listVulnerabilitiesState extends State<listVulnerabilities> {
     return Container(
       width: width - 100,
       height: 500,
-      margin: const EdgeInsets.symmetric(vertical: 30,horizontal: 10),
+      margin: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
       decoration: const BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -170,32 +181,34 @@ class _listVulnerabilitiesState extends State<listVulnerabilities> {
           Stack(
             children: [
               Container(
-              width: double.infinity,
-              height: 400,
-              margin: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-              padding:
-                  EdgeInsetsDirectional.symmetric(horizontal: 60, vertical: 20),
-              decoration: BoxDecoration(
-                  color: Color(0xFFDEEDFF),
-                  borderRadius: BorderRadius.all(Radius.circular(30))),
-              child: SingleChildScrollView(
-                child: tableXSS(),
-              )),
-          Positioned(
-            top: 355,
-            right: 40,
-            child: ElevatedButton(onPressed: (){}, child: Text('Details...'),style: ElevatedButton.styleFrom(
-              minimumSize: Size(150, 50),
-              maximumSize: Size(150, 50),
-              backgroundColor: Colors.white
-            ),))
+                  width: double.infinity,
+                  height: 400,
+                  margin: const EdgeInsets.fromLTRB(30, 10, 30, 10),
+                  padding: EdgeInsetsDirectional.symmetric(
+                      horizontal: 60, vertical: 20),
+                  decoration: BoxDecoration(
+                      color: Color(0xFFDEEDFF),
+                      borderRadius: BorderRadius.all(Radius.circular(30))),
+                  child: SingleChildScrollView(
+                    child: tableXSS(),
+                  )),
+              Positioned(
+                  top: 355,
+                  right: 40,
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    child: Text('Details...'),
+                    style: ElevatedButton.styleFrom(
+                        minimumSize: Size(150, 50),
+                        maximumSize: Size(150, 50),
+                        backgroundColor: Colors.white),
+                  ))
             ],
           )
         ],
       ),
     );
   }
-
 
   Column tableXSS() {
     return Column(

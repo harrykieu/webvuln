@@ -15,7 +15,7 @@ Future<String> postURL(
     {required String nameURL, required List<String> moduleNumber}) async {
   final data = jsonEncode(URL(url: nameURL, modules: moduleNumber).toJson());
   final url = baseUrl + '/api/scan';
-
+  print(url);
   try {
     final response = await dio.post(url, data: data, options: _options);
 

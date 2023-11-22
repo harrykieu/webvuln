@@ -19,13 +19,13 @@ void main() async {
   // await DesktopWindow.setMinWindowSize(Size(1920, 1080));
   // await DesktopWindow.setMaxWindowSize(Size(1920, 1080));
   runApp(mainScreen(
-    changeScreen: 0,
+    // changeScreen: 0,
   ));
 }
 
 class mainScreen extends StatefulWidget {
-  const mainScreen({super.key, required int this.changeScreen});
-  final int changeScreen;
+  const mainScreen({super.key});
+  // final int changeScreen;
 
   @override
   State<mainScreen> createState() => _mainScreenState();
@@ -49,13 +49,17 @@ class _mainScreenState extends State<mainScreen> {
     const settingScreen()
   ];
 
-  void<Widget> returnWidget() {
-    if (widget.changeScreen == 1) {
-      return _selectedItem[widget.changeScreen];
-    } else {
-      return _selectedItem[_selectedIndex];
-    }
-  }
+  // void returnWidget() {
+  //   if (widget.changeScreen == 1) {
+  //     setState(() {
+  //       _selectedIndex = 1;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _selectedIndex = 0;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +155,7 @@ class _mainScreenState extends State<mainScreen> {
                   image: DecorationImage(
                       fit: BoxFit.cover,
                       image: AssetImage('lib/assets/background.png'))),
-              child: returnWidget(),
+              child: _selectedItem[_selectedIndex],
             )
           ],
         ),

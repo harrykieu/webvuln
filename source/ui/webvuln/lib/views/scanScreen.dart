@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/module_checkbox.dart';
 import 'package:webvuln/main.dart';
 import 'package:webvuln/service/api.dart';
+import 'package:webvuln/views/loadingScreen.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
 import 'package:checkbox_grouped/checkbox_grouped.dart';
 import 'package:webvuln/views/resultScreen.dart';
@@ -41,25 +42,38 @@ class _scanScreenState extends State<scanScreen> {
         color: Colors.white, fontWeight: FontWeight.normal),
   );
   List<String> content = [
-    "",
+    // "",
     "Module scan 1:\n SQL injection is a type of cyberattack that targets the application's database layer.",
     "Module scan 2:\n Cross-Site Scripting (XSS) is a type of security vulnerability commonly found in web applications.",
     "Module scan 3:\n LFI stands for Local File Inclusion, which is a type of security vulnerability that occurs when an application includes files on a server without properly validating user input",
     "Module scan 4:\n Description 4",
-    "Module scan 5:\n dagsjdadgkasgd "
+    "Module scan 5:\n dagsjdadgkasgd ",
+    "Module scan 6:\n dagsjdadgkasgd ",
+    "Module scan 7:\n dagsjdadgkasgd ",
+    "Module scan 8:\n dagsjdadgkasgd ",
+    "Module scan 9:\n dagsjdadgkasgd "
   ];
-  int _numberModule = 0;
-  List<bool> _valueCheckbox = [false, false, false, false, false];
+  List<bool> _valueCheckbox = [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+  ];
   List<String> _valueSelected = [];
+  int _numberModule = 0;
   List<String> nameModule = [
-    "ffuf",
-    "Lfi ",
+   "ffuf",
     "dirsearch",
-    "Sqli",
-    "XSS",
+    "lfi",
+    "sqli",
+    "xss",
     "fileupload",
     "idor",
-    "pathtraversal"
+    "pathtraversal",
   ];
 
   Widget build(BuildContext context) {
@@ -99,19 +113,84 @@ class _scanScreenState extends State<scanScreen> {
           ),
         ),
         Container(
-          width: double.infinity,
-          height: screenHeight - 600,
-          margin:
-              EdgeInsetsDirectional.symmetric(horizontal: 200, vertical: 30),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black, offset: Offset(0, 2), blurRadius: 4)
-              ]),
-          child: module_checkbox(valueSelect: _valueSelected,)
-        ),
+            width: double.infinity,
+            height: screenHeight - 600,
+            margin:
+                EdgeInsetsDirectional.symmetric(horizontal: 200, vertical: 30),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black, offset: Offset(0, 2), blurRadius: 4)
+                ]),
+            child: Row(
+              children: [
+                Container(
+                    width: screenWidth / 8,
+                    height: double.infinity,
+                    margin: EdgeInsets.all(10),
+                    decoration: const BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.all(Radius.circular(20))),
+                    child: Column(
+                      children: List.generate(
+                        nameModule.length,
+                        (index) {
+                          return Row(
+                            children: [
+                              Checkbox(
+                                value: _valueCheckbox[index],
+                                onChanged: (value) {
+                                  setState(() {
+                                    _valueCheckbox[index] = value!;
+                                    _numberModule = index;
+                                    if (value) {
+                                      _valueSelected.add(nameModule[index]);
+                                    } else {
+                                      _valueSelected.remove(nameModule[index]);
+                                    }
+                                    print(_valueSelected);
+                                  });
+                                },
+                              ),
+                              Text(nameModule[index]),
+                            ],
+                          );
+                        },
+                      ),
+                    )),
+                const VerticalDivider(
+                  indent: 40,
+                  endIndent: 40,
+                  color: Color(0xFF021361),
+                  thickness: 2,
+                ),
+                Container(
+                  width: screenWidth / 3,
+                  height: double.infinity,
+                  margin: EdgeInsetsDirectional.all(10),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: Icon(
+                          Icons.document_scanner_rounded,
+                          color: Color(0xFF1A35C3),
+                        ),
+                        title: Text(
+                          'Description',
+                          style: GoogleFonts.montserrat(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      ListTile(
+                        title: Text(content[_numberModule]),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            )),
         submitButton(
           // urlController: urlController,
           // moduleController: _moduleController,
@@ -119,14 +198,14 @@ class _scanScreenState extends State<scanScreen> {
             postURL(
                 nameURL: urlController.text,
                 moduleNumber: _valueSelected);
-            // Get.to(resultScreen());
+            Get.to(loadingScreen());
             setState(() {
               contentChild = const CircularProgressIndicator.adaptive(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               );
             });
-            Navigator.push(context,
-              MaterialPageRoute(builder: (BuildContext context) => mainScreen(changeScreen: 1,)));
+            // Navigator.push(context,
+            //   MaterialPageRoute(builder: (BuildContext context) => mainScreen(changeScreen: 1,)));
           },
           childButton: contentChild,
         ),

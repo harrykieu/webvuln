@@ -2,6 +2,11 @@
 
 A new Flutter project.
 
+# How to run:
+- Type `cd source/ui/webvuln` in terminal to go webvuln project
+- `flutter pub get`to update and get dependencies 
+- Run `flutter run -d windows` to build project in platform window
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
