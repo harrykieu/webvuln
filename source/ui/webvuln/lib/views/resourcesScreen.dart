@@ -6,6 +6,7 @@ import '../items/submitButton.dart';
 import '../items/input.dart';
 import 'package:data_table_2/data_table_2.dart';
 
+// TODO: Dropdown change screen
 class resourceScreen extends StatefulWidget {
   const resourceScreen({super.key});
 
@@ -14,6 +15,13 @@ class resourceScreen extends StatefulWidget {
 }
 
 class _resourceScreenState extends State<resourceScreen> {
+  late String state = '/fileResource';
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextEditingController _vulnTypeController = TextEditingController();
@@ -25,19 +33,20 @@ class _resourceScreenState extends State<resourceScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width *
         (1 - 0.13); // 0.13 is width of sidebar
-    String selectedText = '/fileResource';
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // dropdown
           SizedBox(
             width: 200,
+            height: 50,
             child: DropdownButtonFormField<String>(
                 focusColor: Colors.white,
                 icon: const Icon(Icons.arrow_drop_down),
                 dropdownColor: Colors.white,
-                value: selectedText,
+                value: state,
                 items: const [
                   DropdownMenuItem(
                       value: '/fileResource', child: Text('File Resource')),
@@ -46,22 +55,22 @@ class _resourceScreenState extends State<resourceScreen> {
                 ],
                 onSaved: (v) {
                   setState(() {
-                    selectedText = v!;
+                    state = v!;
                   });
                 },
                 onChanged: (v) {
                   setState(() {
-                    selectedText = v!;
+                    state = v!;
                   });
-                  print(selectedText);
+                  print(state);
                 }),
           ),
           //table
           Container(
             width: screenWidth,
             height: screenHeight / 2,
-            margin: const EdgeInsetsDirectional.symmetric(
-                horizontal: 40, vertical: 20),
+            margin:
+                const EdgeInsetsDirectional.only(start: 40, end: 40, top: 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: Colors.black38),
@@ -71,6 +80,12 @@ class _resourceScreenState extends State<resourceScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Container(
+                    margin: const EdgeInsetsDirectional.only(start: 40),
+                    child: Text("Enter search criteria:",
+                        style: GoogleFonts.montserrat(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
                   boxInput(
                       controller: _vulnTypeController,
                       content: "Vulnerability Type"),
@@ -88,7 +103,7 @@ class _resourceScreenState extends State<resourceScreen> {
                 ],
               ),
               Container(
-                  // calculate height of table using other element's height
+                  // TODO: calculate height of table using other element's height
                   // (need to find efficient way)
                   height: screenHeight / 2 - 50 - 20 - 20 - 10,
                   width: screenWidth,
@@ -97,68 +112,74 @@ class _resourceScreenState extends State<resourceScreen> {
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(10),
                           topRight: Radius.circular(10)),
-                      color: Colors.white),
+                      color: Colors.white24),
                   child: DataTable2(columnSpacing: 10, columns: const [
                     DataColumn2(
-                      label: Text('ID'),
-                      size: ColumnSize.S,
-                    ),
-                    DataColumn(
-                      label: Text('Name'),
-                    ),
-                    DataColumn(
-                      label: Text('Code'),
-                    ),
-                    DataColumn(
-                      label: Text('Quantity'),
-                    ),
-                    DataColumn(
-                      label: Text('Amount'),
-                    ),
+                        label: Text('Vulnerability'), size: ColumnSize.S),
+                    DataColumn2(
+                        label: Text('Resource Type'), size: ColumnSize.S),
+                    DataColumn2(label: Text('Value'), size: ColumnSize.L),
+                    DataColumn2(
+                        label: Text('Created Date'), size: ColumnSize.S),
+                    DataColumn2(label: Text('Edited Date'), size: ColumnSize.S),
                   ], rows: const [
-                    // generate 6 more rows
+                    // test
                     DataRow(cells: [
-                      DataCell(Text('1')),
-                      DataCell(Text('Arshik')),
-                      DataCell(Text('5644645')),
-                      DataCell(Text('3')),
-                      DataCell(Text('265\$')),
+                      DataCell(Text('SQL Injection')),
+                      DataCell(Text('File Resource')),
+                      DataCell(Text('"../../../../../etc/passwd"')),
+                      DataCell(Text('2021-10-10')),
+                      DataCell(Text('2021-10-10'))
                     ]),
                     DataRow(cells: [
-                      DataCell(Text('2')),
-                      DataCell(Text('Arshik')),
-                      DataCell(Text('5644645')),
-                      DataCell(Text('3')),
-                      DataCell(Text('265\$')),
+                      DataCell(Text('SQL Injection')),
+                      DataCell(Text('File Resource')),
+                      DataCell(Text('"../../../../../etc/passwd"')),
+                      DataCell(Text('2021-10-10')),
+                      DataCell(Text('2021-10-10'))
                     ]),
                     DataRow(cells: [
-                      DataCell(Text('3')),
-                      DataCell(Text('Arshik')),
-                      DataCell(Text('5644645')),
-                      DataCell(Text('3')),
-                      DataCell(Text('265\$')),
+                      DataCell(Text('SQL Injection')),
+                      DataCell(Text('File Resource')),
+                      DataCell(Text('"../../../../../etc/passwd"')),
+                      DataCell(Text('2021-10-10')),
+                      DataCell(Text('2021-10-10'))
                     ]),
                     DataRow(cells: [
-                      DataCell(Text('4')),
-                      DataCell(Text('Arshik')),
-                      DataCell(Text('5644645')),
-                      DataCell(Text('3')),
-                      DataCell(Text('265\$')),
+                      DataCell(Text('SQL Injection')),
+                      DataCell(Text('File Resource')),
+                      DataCell(Text('"../../../../../etc/passwd"')),
+                      DataCell(Text('2021-10-10')),
+                      DataCell(Text('2021-10-10'))
                     ]),
                     DataRow(cells: [
-                      DataCell(Text('5')),
-                      DataCell(Text('Arshik')),
-                      DataCell(Text('5644645')),
-                      DataCell(Text('3')),
-                      DataCell(Text('265\$')),
+                      DataCell(Text('SQL Injection')),
+                      DataCell(Text('File Resource')),
+                      DataCell(Text('"../../../../../etc/passwd"')),
+                      DataCell(Text('2021-10-10')),
+                      DataCell(Text('2021-10-10'))
                     ]),
                     DataRow(cells: [
-                      DataCell(Text('6')),
-                      DataCell(Text('Arshik')),
-                      DataCell(Text('5644645')),
-                      DataCell(Text('3')),
-                      DataCell(Text('265\$')),
-                    ])
+                      DataCell(Text('SQL Injection')),
+                      DataCell(Text('File Resource')),
+                      DataCell(Text('"../../../../../etc/passwd"')),
+                      DataCell(Text('2021-10-10')),
+                      DataCell(Text('2021-10-10'))
+                    ]),
+                    DataRow(cells: [
+                      DataCell(Text('SQL Injection')),
+                      DataCell(Text('File Resource')),
+                      DataCell(Text('"../../../../../etc/passwd"')),
+                      DataCell(Text('2021-10-10')),
+                      DataCell(Text('2021-10-10'))
+                    ]),
+                    DataRow(cells: [
+                      DataCell(Text('SQL Injection')),
+                      DataCell(Text('File Resource')),
+                      DataCell(Text('"../../../../../etc/passwd"')),
+                      DataCell(Text('2021-10-10')),
+                      DataCell(Text('2021-10-10'))
+                    ]),
                   ])),
             ]),
           ),
@@ -166,8 +187,9 @@ class _resourceScreenState extends State<resourceScreen> {
           // search box
           Container(
             width: screenWidth,
-            height: screenHeight / 4,
-            margin: const EdgeInsetsDirectional.symmetric(horizontal: 40),
+            height: screenHeight / 2 - 100 - 50,
+            margin: const EdgeInsetsDirectional.symmetric(
+                horizontal: 40, vertical: 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: Colors.black38),
@@ -175,31 +197,70 @@ class _resourceScreenState extends State<resourceScreen> {
             ),
             child: SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  boxInput(
-                      controller: _actionController, content: "Enter action"),
-                  boxInput(controller: _typeController, content: "Enter type"),
-                  boxInput(
-                      controller: _valueController, content: "Enter value"),
-                  boxInput(
-                      controller: _vulnTypeController,
-                      content: "Enter vulnerability type"),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          margin: const EdgeInsetsDirectional.only(start: 40),
+                          child: Text("Vulnerability type:",
+                              style: GoogleFonts.montserrat(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                        ),
+                        boxInput(
+                            controller: _actionController,
+                            content: "Type here...")
+                      ]),
+                  const Divider(
+                      color: Colors.black,
+                      thickness: 0.2,
+                      indent: 40,
+                      endIndent: 40),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          margin: const EdgeInsetsDirectional.only(start: 40),
+                          child: Text("Resource type:",
+                              style: GoogleFonts.montserrat(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                        ),
+                        boxInput(
+                            controller: _actionController,
+                            content: "Type here...")
+                      ]),
+                  const Divider(
+                      color: Colors.black,
+                      thickness: 0.2,
+                      indent: 40,
+                      endIndent: 40),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          margin: const EdgeInsetsDirectional.only(start: 40),
+                          child: Text("Value:",
+                              style: GoogleFonts.montserrat(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                        ),
+                        boxInput(
+                            controller: _actionController,
+                            content: "Type here...")
+                      ]),
+                  GradientButton(
+                      onPressed: () {
+                        print("Send");
+                      },
+                      horizontalMargin: 40,
+                      verticalMargin: 0,
+                      borderRadius: BorderRadius.circular(10),
+                      child: const Text(
+                        'Send',
+                        style: TextStyle(color: Colors.white),
+                      ))
                 ],
               ),
-            ),
-          ),
-          GradientButton(
-            onPressed: () {
-              postResources(
-                  vulnType: _valueController.text,
-                  action: _actionController.text,
-                  resType: _typeController.text,
-                  value: _valueController.text);
-            },
-            borderRadius: BorderRadius.circular(10),
-            child: const Text(
-              'Find',
-              style: TextStyle(color: Colors.white),
             ),
           ),
         ],
@@ -210,7 +271,7 @@ class _resourceScreenState extends State<resourceScreen> {
   Container boxInput(
       {required TextEditingController controller, required String content}) {
     return Container(
-      width: 300,
+      width: 400,
       height: 50,
       margin:
           const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 20),
