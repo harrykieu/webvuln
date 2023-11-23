@@ -1,3 +1,5 @@
+// ignore_for_file: camel_case_types
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:line_icons/line_icon.dart';
@@ -18,9 +20,7 @@ void main() async {
   // Size size = await DesktopWindow.getWindowSize();
   // await DesktopWindow.setMinWindowSize(Size(1920, 1080));
   // await DesktopWindow.setMaxWindowSize(Size(1920, 1080));
-  runApp(mainScreen(
-      // changeScreen: 0,
-      ));
+  runApp(const mainScreen());
 }
 
 class mainScreen extends StatefulWidget {
@@ -40,7 +40,6 @@ class _mainScreenState extends State<mainScreen> {
     _selectedIndex = 0;
   }
 
-  @override
   final List _selectedItem = [
     const scanScreen(),
     const resultScreen(),
@@ -48,18 +47,6 @@ class _mainScreenState extends State<mainScreen> {
     const historyScreen(),
     const settingScreen()
   ];
-
-  // void returnWidget() {
-  //   if (widget.changeScreen == 1) {
-  //     setState(() {
-  //       _selectedIndex = 1;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       _selectedIndex = 0;
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +136,7 @@ class _mainScreenState extends State<mainScreen> {
             // Gradient background
             Container(
               width: screenWidth - (screenWidth * 0.13),
-              // bug: failure in cropping background image 
+              // bug: failure in cropping background image
               height: double.infinity,
               decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
@@ -175,12 +162,10 @@ class _mainScreenState extends State<mainScreen> {
         style: ElevatedButton.styleFrom(
             minimumSize: const Size(200, 80),
             backgroundColor: Colors.transparent,
-            foregroundColor: Colors.white
-        ),
+            foregroundColor: Colors.white),
         child: Column(
           children: [Icon(icon), Text(name)],
-        )
-    );
+        ));
   }
 
   Stream<int> get _selectedIndexStream =>
