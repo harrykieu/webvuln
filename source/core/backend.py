@@ -187,14 +187,95 @@ class WebVuln:
             for url in dirURL[key]:
                 for module in modules:
                     if module == "lfi":
-                        print("[+] Checking LFI vulnerability...")
-                        pass
+                        print("[+] Checking LFI vulnerability...")                        
+                        lfi_resources = self.resourceHandler(
+                            "GET", {"vulnType": "lfi", "resType": "payload"}
+                        )
+                        if lfi_resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        LFIResult, LFIPayload = LFI(
+                            url, lfi_resources
+                        ).check_lfi()
+                        if LFIResult is True:
+                            resultURL["numVuln"] += 1
+                            resultURL["vulnerabilities"].append(
+                                {
+                                    "type": "LFI",
+                                    "logs": open(
+                                        f"{ROOTPATH}/logs/lfi_log.txt", "r"
+                                    ).read(),
+                                    "payload": LFIPayload,
+                                    "severity": "High",
+                                }
+                            )
                     elif module == "sqli":
                         print("[+] Checking SQLi vulnerability...")
-                        pass
+                        sqli_resources = self.resourceHandler(
+                            "GET", {"vulnType": "sqli", "resType": "payload"}
+                        )
+                        if sqli_resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        SQLiResult, SQLiPayload = LFI(
+                            url, sqli_resources
+                        ).check_sqli()
+                        if SQLiResult is True:
+                            resultURL["numVuln"] += 1
+                            resultURL["vulnerabilities"].append(
+                                {
+                                    "type": "SQLi",
+                                    "logs": open(
+                                        f"{ROOTPATH}/logs/sqli_log.txt", "r"
+                                    ).read(),
+                                    "payload": SQLiPayload,
+                                    "severity": "High",
+                                }
+                            )
                     elif module == "xss":
                         print("[+] Checking XSS vulnerability...")
-                        pass
+                        xss_resources = self.resourceHandler(
+                            "GET", {"vulnType": "sqli", "resType": "payload"}
+                        )
+                        if xss_resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        XSSResult, XSSPayload = LFI(
+                            url, xss_resources
+                        ).check_xss()
+                        if XSSResult is True:
+                            resultURL["numVuln"] += 1
+                            resultURL["vulnerabilities"].append(
+                                {
+                                    "type": "SQLi",
+                                    "logs": open(
+                                        f"{ROOTPATH}/logs/xss_log.txt", "r"
+                                    ).read(),
+                                    "payload": XSSPayload,
+                                    "severity": "High",
+                                }
+                            )
                     elif module == "fileupload":
                         print("[+] Checking file upload vulnerability...")
                         resources = self.fileHandler("GET", {"description": ""})
