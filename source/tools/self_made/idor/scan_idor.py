@@ -15,6 +15,7 @@ class IDOR:
         self.resources = resources
         self.idor_params = idor_params
         self.result = False
+        self.payloads = []
 
     def scan_website(self, url):
         results = {
@@ -90,7 +91,9 @@ class IDOR:
                             "INFO",
                             "idor.txt",
                         )
-                            
+                            self.result = True
+                            self.payloads.append(payload["value"])
+                            break
                         
                         if self.check_unauthorized_access(test_resp):
                             print("[!] IDOR detected on url:", test_url)
@@ -99,12 +102,14 @@ class IDOR:
                             "INFO",
                             "idor.txt",
                         )
-                        return True
-                        
+                            self.result = True
+                            self.payloads.append(payload["value"])
+                            break
+        print("[+] IDOR scan finished")                
         utils.log(
-            f"[IDOR] No IDOR vulnerability detected, link: {self.url}",
+            "[IDOR] IDOR scan finished",
             "INFO",
             "idor.txt",
         )
-        return False
+        return self.result, self.payloads
         

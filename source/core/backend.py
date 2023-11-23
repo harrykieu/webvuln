@@ -243,14 +243,15 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        a = IDOR(url, resources, idor_params)
-                        if a.check_idor(url) is True:
+                        idor_result, idor_payload = IDOR(url, resources, idor_params).check_idor(url)
+                        if idor_result.check_idor(url) is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
                                 {
                                     "type": "IDOR",
                                     "log": open(f"{ROOTPATH}/logs/idor.txt", "r").read(),
                                     "description": f"{url} is vulnerable to IDOR",
+                                    "payload": idor_payload,
                                     "severity": "High",
                                 }
                             )
