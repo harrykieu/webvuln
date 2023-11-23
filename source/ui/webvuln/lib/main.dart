@@ -1,37 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:line_icons/line_icon.dart';
-import 'package:webvuln/service/api.dart';
+import 'package:webvuln/items/drawer_bar.dart';
 import 'package:webvuln/views/historyScreen.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
 import 'package:webvuln/views/resultScreen.dart';
 import 'package:webvuln/views/scan_screen.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:ionicons/ionicons.dart';
 import 'package:webvuln/views/settingScreen.dart';
-import 'package:desktop_window/desktop_window.dart';
 
 // import '../views/scanScreen2.dart';
 // import 'views/draft.dart';
 
 void main() async {
-  // Size size = await DesktopWindow.getWindowSize();
-  // await DesktopWindow.setMinWindowSize(Size(1920, 1080));
-  // await DesktopWindow.setMaxWindowSize(Size(1920, 1080));
-  runApp(mainScreen(
-    // changeScreen: 0,
-  ));
+  runApp(const mainScreen());
 }
 
 class mainScreen extends StatefulWidget {
   const mainScreen({super.key});
-  // final int changeScreen;
 
   @override
   State<mainScreen> createState() => _mainScreenState();
 }
 
 class _mainScreenState extends State<mainScreen> {
+  int _selectedIndex = 0;
   @override
   void initState() {
     // TODO: implement initState
@@ -40,114 +31,80 @@ class _mainScreenState extends State<mainScreen> {
   }
 
   @override
-  int _selectedIndex = 0;
   final List _selectedItem = [
     const scan_screen(),
     const resultScreen(),
-    const resourceScreen(),
     const historyScreen(),
+    const resourceScreen(),
     const settingScreen()
   ];
-
-  // void returnWidget() {
-  //   if (widget.changeScreen == 1) {
-  //     setState(() {
-  //       _selectedIndex = 1;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       _selectedIndex = 0;
-  //     });
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double heightWidth = MediaQuery.of(context).size.height;
     Get.testMode = true;
     return GetMaterialApp(
       home: Scaffold(
+        drawerEnableOpenDragGesture: false,
         backgroundColor: const Color(0xFF03112e),
         body: Row(
           children: [
-            Container(
-              width: screenWidth * 0.13,
-              height: double.infinity,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Image.asset('lib/assets/logo.png'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      // crossAxisAlignment: CrossAxisAlignment.baseline,
-                      children: [
-                        button(
-                            onPressed: () {
-                              setState(() {
-                                _selectedIndex = 0;
-                              });
-                            },
-                            icon: Icons.abc,
-                            name: 'Scan'),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        button(
-                            onPressed: () {
-                              setState(() {
-                                _selectedIndex = 1;
-                              });
-                            },
-                            icon: Icons.ac_unit,
-                            name: 'Result'),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        button(
-                            onPressed: () {
-                              setState(() {
-                                _selectedIndex = 2;
-                              });
-                            },
-                            icon: Icons.access_alarm_rounded,
-                            name: 'Resource'),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        button(
-                            onPressed: () {
-                              setState(() {
-                                _selectedIndex = 3;
-                              });
-                            },
-                            icon: Icons.accessibility_rounded,
-                            name: 'History'),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        button(
-                            onPressed: () {
-                              setState(() {
-                                _selectedIndex = 4;
-                              });
-                            },
-                            icon: Icons.ad_units_sharp,
-                            name: 'Settings')
-                      ],
+            //Drawer Bar
+            Drawer(
+                width: screenWidth * 0.13,
+                backgroundColor: Colors.transparent,
+                child: ListView(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 200,
+                      margin: const EdgeInsets.symmetric(vertical: 30),
+                      child: const Image(image: AssetImage('lib/assets/logo.png')),
                     ),
-                  ),
-                ],
-              ),
-            ),
+                    button(
+                        onPressed: () {
+                          setState(() {
+                            _selectedIndex = 0;
+                          });
+                        },
+                        icon:'lib/assets/scanner.png',
+                        name: 'Scan'),
+                    const SizedBox(height: 20,),
+                    button(
+                        onPressed: () {
+                          setState(() {
+                            _selectedIndex = 1;
+                          });
+                        },
+                        icon: 'lib/assets/result.png',
+                        name: 'Result'),
+                    const SizedBox(height: 20,),
+                    button(
+                        onPressed: () {
+                          setState(() {
+                            _selectedIndex = 2;
+                          });
+                        },
+                        icon: 'lib/assets/history.png',
+                        name: 'History'),
+                    const SizedBox(height: 20,),
+                    button(onPressed: (){
+                      setState(() {
+                        _selectedIndex = 3;
+                      });
+                    }, icon: 'lib/assets/resources.png', name: 'Resources'),
+                    const SizedBox(height: 20,),
+                    button(onPressed: (){
+                      setState(() {
+                        _selectedIndex = 4;
+                      });
+                    }, icon: 'lib/assets/settings.png', name: 'Settings')
+                  ],
+                )),
+            // Gradient background
             Container(
-              width: screenWidth * 0.87,
+              width: screenWidth - (screenWidth * 0.13),
+              // bug: failure in cropping background image
               height: double.infinity,
-              // color: Colors.black,
               decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
@@ -165,17 +122,17 @@ class _mainScreenState extends State<mainScreen> {
 
   ElevatedButton button(
       {required Function() onPressed,
-      required IconData icon,
+      required String icon,
       required String name}) {
     return ElevatedButton(
         onPressed: onPressed,
-        child: Column(
-          children: [Icon(icon), Text(name)],
-        ),
         style: ElevatedButton.styleFrom(
             minimumSize: const Size(200, 80),
             backgroundColor: Colors.transparent,
-            foregroundColor: Colors.white));
+            foregroundColor: Colors.white),
+        child: Column(
+          children: [Image(image: AssetImage(icon)), Text(name)],
+        ));
   }
 
   Stream<int> get _selectedIndexStream =>
