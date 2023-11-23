@@ -16,19 +16,6 @@ class IDOR:
         self.idor_params = idor_params
         self.result = False
         self.payloads = []
-
-    def scan_website(self, url):
-        results = {
-            "idor": [] 
-        }
-
-        if self.check_idor(url):
-            results["idor"].append({
-                "url": url,
-                "details": "[+] IDOR detected"
-            })
-            return True
-        return False
     
     def extract_urls(self):
         response = self.session.get(self.url)
@@ -105,6 +92,11 @@ class IDOR:
                             self.result = True
                             self.payloads.append(payload["value"])
                             break
+                if self.result:
+                    break
+            if self.result:
+                break
+            
         print("[+] IDOR scan finished")                
         utils.log(
             "[IDOR] IDOR scan finished",
