@@ -1,7 +1,10 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 import 'dart:io';
+import 'package:webvuln/model/url.dart';
+
 import '../model/model.dart';
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 Dio dio = Dio();
@@ -14,7 +17,7 @@ Options _options = Options(
 Future<String> postURL(
     {required String nameURL, required List<String> moduleNumber}) async {
   final data = jsonEncode(URL(url: nameURL, modules: moduleNumber).toJson());
-  final url = baseUrl + '/api/scan';
+  final url = '$baseUrl/api/scan';
   print(url);
   try {
     final response = await dio.post(url, data: data, options: _options);
@@ -31,7 +34,7 @@ Future<String> postURL(
     print(nameURL);
     print(data);
     print(e);
-    return "Error: $e";
+    return "Error";
   }
 }
 
@@ -39,7 +42,7 @@ Future<String> postURL(
 Future<void> postHistory(
     {required String nameURL, required String datetime}) async {
   final data = jsonEncode(historyURL(domain: nameURL, scanDate: datetime));
-  final url = baseUrl + '/api/history';
+  final url = '$baseUrl/api/history';
   try {
     final response = await dio.get(url, data: data, options: _options);
 
@@ -63,9 +66,9 @@ Future<void> postResources(
     required String action,
     required String resType,
     required String value}) async {
-  final data = jsonEncode(resource(
+  final data = jsonEncode(ResourceNormal(
       vulnType: vulnType, action: action, resType: resType, value: value));
-  final url = baseUrl + '/api/resources';
+  final url = '$baseUrl/api/resources';
 
   try {
     final response = await dio.post(url, data: data, options: _options);
@@ -77,5 +80,24 @@ Future<void> postResources(
     }
   } catch (e) {
     print('Error post resources: $e');
+  }
+}
+
+Future<String> getResourcesNormal(
+    {required String vulnType, required String resType}) async {
+  final data = jsonEncode(ResourceNormal(vulnType: vulnType, resType: resType));
+  final url = '$baseUrl/api/resourcesnormal';
+  try {
+    final response = await dio.get(url, data: data, options: _options);
+    if (response.statusCode == 200) {
+      print('Get resources successfully');
+      return response.toString();
+    } else {
+      print('Failed to get resources');
+      return 'Failed to get resources';
+    }
+  } catch (e) {
+    print('Error get resources: $e');
+    return 'Error get resources';
   }
 }

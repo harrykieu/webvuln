@@ -1,10 +1,9 @@
-import 'dart:ui';
-
+// ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:webvuln/items/table_history.dart';
-import 'scanScreen.dart';
+import 'scan_screen.dart';
 import 'package:webvuln/service/api.dart';
 import '../items/submitButton.dart';
 import '../items/input.dart';
@@ -93,22 +92,21 @@ class _historyScreenState extends State<historyScreen> {
                 Stack(
                   children: [
                     Container(
-                      width: double.infinity,
-                      height: height - 300,
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 10),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black, width: 2),
-                        gradient: const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [Color(0xFFDEEDFF), Colors.white]),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: SortableTable()
-                    ),
+                        width: double.infinity,
+                        height: height - 300,
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black, width: 2),
+                          gradient: const LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Color(0xFFDEEDFF), Colors.white]),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(20)),
+                        ),
+                        child: SortableTable()),
                   ],
                 )
               ],

@@ -1,5 +1,9 @@
+// ignore_for_file: camel_case_types, avoid_print
+
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
+import 'package:webvuln/model/model.dart';
 import 'package:webvuln/service/api.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../items/input.dart';
@@ -14,11 +18,28 @@ class resourceScreen extends StatefulWidget {
 }
 
 class _resourceScreenState extends State<resourceScreen> {
-  late String state = '/fileResource';
-
+  late String state;
+  List<ResourceNormalTableData> tableDataList = [];
+  List<DataRow> dataRowList = [];
   @override
   void initState() {
+    state = '/normalResource';
     super.initState();
+  }
+
+  void updateTable(List<ResourceNormalTableData> newData) {
+    setState(() {
+      tableDataList = newData;
+      dataRowList = tableDataList
+          .map((tableData) => DataRow(cells: [
+                DataCell(Text(tableData.vulnType)),
+                DataCell(Text(tableData.type)),
+                DataCell(Text(tableData.value)),
+                DataCell(Text(tableData.createdDate)),
+                DataCell(Text(tableData.editedDate)),
+              ]))
+          .toList();
+    });
   }
 
   @override
@@ -32,7 +53,7 @@ class _resourceScreenState extends State<resourceScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width *
         (1 - 0.13); // 0.13 is width of sidebar
-
+    List<ResourceNormalTableData> tableDataList;
     Widget selectedWidget;
     if (state == '/fileResource') {
       selectedWidget = fileResource(
@@ -65,9 +86,9 @@ class _resourceScreenState extends State<resourceScreen> {
                 value: state,
                 items: const [
                   DropdownMenuItem(
-                      value: '/fileResource', child: Text('File Resource')),
+                      value: '/normalResource', child: Text('Normal Resource')),
                   DropdownMenuItem(
-                      value: '/normalResource', child: Text('Normal Resource'))
+                      value: '/fileResource', child: Text('File Resource'))
                 ],
                 onSaved: (v) {
                   setState(() {
@@ -103,13 +124,41 @@ class _resourceScreenState extends State<resourceScreen> {
                             fontSize: 18, fontWeight: FontWeight.bold)),
                   ),
                   boxInput(
+                      width: screenWidth / 4,
                       controller: _vulnTypeController,
                       content: "Vulnerability Type"),
-                  boxInput(controller: _typeController, content: "Type"),
+                  boxInput(
+                      width: screenWidth / 4,
+                      controller: _typeController,
+                      content: "Type"),
                   GradientButton(
-                      horizontalMargin: 40,
-                      onPressed: () {
-                        print(_vulnTypeController.text + _typeController.text);
+                      horizontalMargin: 50,
+                      onPressed: () async {
+                        String response = await getResourcesNormal(
+                            vulnType: _vulnTypeController.text,
+                            resType: _typeController.text);
+                        if (response == '[]') {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text('No result found'),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('OK'))
+                                  ],
+                                );
+                              });
+                        }
+                        List<dynamic> jsonD = jsonDecode(response);
+                        List<ResourceNormalTableData> newData = jsonD
+                            .map((json) =>
+                                ResourceNormalTableData.fromJson(json))
+                            .toList();
+                        updateTable(newData);
                       },
                       borderRadius: BorderRadius.circular(10),
                       child: const Text(
@@ -129,74 +178,20 @@ class _resourceScreenState extends State<resourceScreen> {
                           topLeft: Radius.circular(10),
                           topRight: Radius.circular(10)),
                       color: Colors.white24),
-                  child: DataTable2(columnSpacing: 10, columns: const [
-                    DataColumn2(
-                        label: Text('Vulnerability'), size: ColumnSize.S),
-                    DataColumn2(
-                        label: Text('Resource Type'), size: ColumnSize.S),
-                    DataColumn2(label: Text('Value'), size: ColumnSize.L),
-                    DataColumn2(
-                        label: Text('Created Date'), size: ColumnSize.S),
-                    DataColumn2(label: Text('Edited Date'), size: ColumnSize.S),
-                  ], rows: const [
-                    // test
-                    DataRow(cells: [
-                      DataCell(Text('SQL Injection')),
-                      DataCell(Text('File Resource')),
-                      DataCell(Text('"../../../../../etc/passwd"')),
-                      DataCell(Text('2021-10-10')),
-                      DataCell(Text('2021-10-10'))
-                    ]),
-                    DataRow(cells: [
-                      DataCell(Text('SQL Injection')),
-                      DataCell(Text('File Resource')),
-                      DataCell(Text('"../../../../../etc/passwd"')),
-                      DataCell(Text('2021-10-10')),
-                      DataCell(Text('2021-10-10'))
-                    ]),
-                    DataRow(cells: [
-                      DataCell(Text('SQL Injection')),
-                      DataCell(Text('File Resource')),
-                      DataCell(Text('"../../../../../etc/passwd"')),
-                      DataCell(Text('2021-10-10')),
-                      DataCell(Text('2021-10-10'))
-                    ]),
-                    DataRow(cells: [
-                      DataCell(Text('SQL Injection')),
-                      DataCell(Text('File Resource')),
-                      DataCell(Text('"../../../../../etc/passwd"')),
-                      DataCell(Text('2021-10-10')),
-                      DataCell(Text('2021-10-10'))
-                    ]),
-                    DataRow(cells: [
-                      DataCell(Text('SQL Injection')),
-                      DataCell(Text('File Resource')),
-                      DataCell(Text('"../../../../../etc/passwd"')),
-                      DataCell(Text('2021-10-10')),
-                      DataCell(Text('2021-10-10'))
-                    ]),
-                    DataRow(cells: [
-                      DataCell(Text('SQL Injection')),
-                      DataCell(Text('File Resource')),
-                      DataCell(Text('"../../../../../etc/passwd"')),
-                      DataCell(Text('2021-10-10')),
-                      DataCell(Text('2021-10-10'))
-                    ]),
-                    DataRow(cells: [
-                      DataCell(Text('SQL Injection')),
-                      DataCell(Text('File Resource')),
-                      DataCell(Text('"../../../../../etc/passwd"')),
-                      DataCell(Text('2021-10-10')),
-                      DataCell(Text('2021-10-10'))
-                    ]),
-                    DataRow(cells: [
-                      DataCell(Text('SQL Injection')),
-                      DataCell(Text('File Resource')),
-                      DataCell(Text('"../../../../../etc/passwd"')),
-                      DataCell(Text('2021-10-10')),
-                      DataCell(Text('2021-10-10'))
-                    ]),
-                  ])),
+                  child: DataTable2(
+                      columnSpacing: 10,
+                      columns: const [
+                        DataColumn2(
+                            label: Text('Vulnerability'), size: ColumnSize.S),
+                        DataColumn2(
+                            label: Text('Resource Type'), size: ColumnSize.S),
+                        DataColumn2(label: Text('Value'), size: ColumnSize.L),
+                        DataColumn2(
+                            label: Text('Created Date'), size: ColumnSize.S),
+                        DataColumn2(
+                            label: Text('Edited Date'), size: ColumnSize.S),
+                      ],
+                      rows: dataRowList)),
             ]),
           ),
 
@@ -208,12 +203,29 @@ class _resourceScreenState extends State<resourceScreen> {
   }
 
   Container boxInput(
+      {required TextEditingController controller,
+      required String content,
+      required double width}) {
+    return Container(
+      width: width,
+      height: 50,
+      margin:
+          const EdgeInsetsDirectional.symmetric(horizontal: 10, vertical: 20),
+      child: inputUser(
+        controller: controller,
+        hintName: content,
+        underIcon: const Icon(Icons.text_fields),
+      ),
+    );
+  }
+
+  Container boxInput1(
       {required TextEditingController controller, required String content}) {
     return Container(
       width: 400,
       height: 50,
       margin:
-          const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 20),
+          const EdgeInsetsDirectional.symmetric(horizontal: 10, vertical: 20),
       child: inputUser(
         controller: controller,
         hintName: content,
@@ -247,7 +259,7 @@ class _resourceScreenState extends State<resourceScreen> {
                     style: GoogleFonts.montserrat(
                         fontSize: 18, fontWeight: FontWeight.bold)),
               ),
-              boxInput(controller: actionController, content: "Type here...")
+              boxInput1(controller: actionController, content: "Type here...")
             ]),
             const Divider(
                 color: Colors.black, thickness: 0.2, indent: 40, endIndent: 40),
@@ -258,7 +270,7 @@ class _resourceScreenState extends State<resourceScreen> {
                     style: GoogleFonts.montserrat(
                         fontSize: 18, fontWeight: FontWeight.bold)),
               ),
-              boxInput(controller: actionController, content: "Type here...")
+              boxInput1(controller: actionController, content: "Type here...")
             ]),
             const Divider(
                 color: Colors.black, thickness: 0.2, indent: 40, endIndent: 40),
@@ -269,7 +281,7 @@ class _resourceScreenState extends State<resourceScreen> {
                     style: GoogleFonts.montserrat(
                         fontSize: 18, fontWeight: FontWeight.bold)),
               ),
-              boxInput(controller: actionController, content: "Type here...")
+              boxInput1(controller: actionController, content: "Type here...")
             ]),
             GradientButton(
                 onPressed: () {

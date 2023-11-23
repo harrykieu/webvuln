@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:syncfusion_flutter_gauges/gauges.dart';
-// import 'package:fl_chart/fl_chart.dart';
-// import 'package:pie_chart/pie_chart.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -17,12 +14,7 @@ class _lineChartState extends State<lineChart> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
 
-    List<LineChartData> dataLineChart =[
-      LineChartData(
-        maxX: 100,
-        minX: 10
-      )
-    ];
+    List<LineChartData> dataLineChart = [LineChartData(maxX: 100, minX: 10)];
     return Container(
       width: 500,
       height: 600,
@@ -43,17 +35,21 @@ class _lineChartState extends State<lineChart> {
             title: Row(
               children: [
                 Image(image: AssetImage('lib/assets/LineChart.png')),
-                Text('   Line Chart',style: GoogleFonts.montserrat(fontSize: 24,fontWeight: FontWeight.bold),)
+                Text(
+                  '   Line Chart',
+                  style: GoogleFonts.montserrat(
+                      fontSize: 24, fontWeight: FontWeight.bold),
+                )
               ],
             ),
           ),
           // MyLineChart()
-
         ],
       ),
     );
   }
 }
+
 class MyLineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -61,13 +57,8 @@ class MyLineChart extends StatelessWidget {
       LineChartData(
         gridData: FlGridData(show: false),
         titlesData: FlTitlesData(
-          leftTitles: AxisTitles(
-            drawBelowEverything: true
-          ),
-          bottomTitles: AxisTitles(
-            drawBelowEverything: true
-          )
-        ),
+            leftTitles: AxisTitles(drawBelowEverything: true),
+            bottomTitles: AxisTitles(drawBelowEverything: true)),
         borderData: FlBorderData(
           show: true,
           border: Border.all(
