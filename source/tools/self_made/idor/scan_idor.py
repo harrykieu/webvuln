@@ -14,6 +14,7 @@ class IDOR:
         }
         self.resources = resources
         self.idor_params = idor_params
+        self.result = False
 
     def scan_website(self, url):
         results = {
@@ -72,33 +73,38 @@ class IDOR:
         urls = self.extract_urls()
         
         for url in urls:
-            for param in self.idor_params:
+            for parameter in self.idor_params:
                 for payload in self.resources:
-                    if re.search(rf"{param}=(\d+)", url):
-                        original_id = re.search(rf"{param}=(\d+)", url).group(1)  
+                    if re.search(rf"{parameter["value"]}=(\d+)", url):
+                        original_id = re.search(rf"{parameter["value"]}=(\d+)", url).group(1)  
                         original_url = url 
                     
-                        test_url = re.sub(rf"{param}=\d+", f"{param}={payload}", url)
+                        test_url = re.sub(rf"{parameter["value"]}=\d+", f"{parameter["value"]}={payload["value"]}", url)
                         test_resp = self.session.get(test_url)
                         original_resp = self.session.get(original_url)
 
                         if self.compare_responses(original_resp, test_resp):
                             print("[!] IDOR detected on url:", test_url)
-                            return True
-                        utils.log(
+                            utils.log(
                             f"[IDOR] IDOR vulnerability detected, link: {test_url}",
                             "INFO",
                             "idor.txt",
                         )
+                            
                         
                         if self.check_unauthorized_access(test_resp):
                             print("[!] IDOR detected on url:", test_url)
-                            return True
-                        utils.log(
+                            utils.log(
                             f"[IDOR] IDOR vulnerability detected, link: {test_url}",
                             "INFO",
                             "idor.txt",
                         )
-
+                        return True
+                        
+        utils.log(
+            f"[IDOR] No IDOR vulnerability detected, link: {self.url}",
+            "INFO",
+            "idor.txt",
+        )
         return False
         

@@ -249,6 +249,7 @@ class WebVuln:
                             resultURL["vulnerabilities"].append(
                                 {
                                     "type": "IDOR",
+                                    "log": open(f"{ROOTPATH}/logs/idor.txt", "r").read(),
                                     "description": f"{url} is vulnerable to IDOR",
                                     "severity": "High",
                                 }
