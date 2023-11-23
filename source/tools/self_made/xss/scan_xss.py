@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 from urllib.parse import urlparse, urljoin
 import urllib.parse
+import source.core.utils as utils
 
 # 06/09/2023 : CODE Can cai thien them tinh nang check submit selection
 # maker : RBKING
@@ -15,6 +16,9 @@ class XSS:
     def __init__(self, url, xss_resources):
         self.url = url
         self.xss_resources = xss_resources
+        self.payloads = []
+        self.result = False
+
 # login_payload = {
 #     "username": "admin",
 #     "password": "password",
@@ -69,28 +73,41 @@ class XSS:
         details["action"] = action
         details["method"] = method
         details["inputs"] = inputs
-        return details
+        return 0
 
     # ---------------------------------------------------------------------
 
-    def check_xss(self, url):
+    def check_xss(self):
+
+        utils.log(
+            f"[XSS] Checking XSS for {self.url}",
+            "INFO",
+            "xss_log.txt",
+        )
 
         print("\n[+] Checking XSS")
 
         for payload in self.xss_resources:
             encoded_payload = urllib.parse.quote(payload)
-            new_url = f"{url}?q={encoded_payload}"
+            new_url = f"{self.url}?q={encoded_payload}"
 
             print("[!] Trying", new_url)
             res = s.get(new_url)
 
             if payload in res.text:
                 print("[+] XSS vulnerability detected, link:", new_url)
-                return True
+                utils.log(
+                            f"[XSS] XSS vulnerability detected, link: {new_url}",
+                            "INFO",
+                            "xss_log.txt",
+                        )
+                self.payloads.append(payload["value"])
+                self.result = True
+                break
 
-        forms = self.get_all_forms(url)
+        forms = self.get_all_forms(self.url)
         print(
-            f"[+] Detected {len(forms)} forms on {url}, form found: {forms}\n")
+            f"[+] Detected {len(forms)} forms on {self.url}, form found: {forms}\n")
 
         for form in forms:
             form_details = self.get_form_details(form)
@@ -107,16 +124,26 @@ class XSS:
                     elif input_tag["type"] != "submit":
                         data[input_tag["name"]] = payload
 
-                url = urljoin(url, form_details["action"])
+                self.url = urljoin(self.url, form_details["action"])
                 if form_details["method"] == "post":
-                    res = s.post(url, data=data)
+                    res = s.post(self.url, data=data)
                 elif form_details["method"] == "get":
-                    res = s.get(url, params=data)
+                    res = s.get(self.url, params=data)
 
                 if payload in res.text:
-                    print("[+] XSS vulnerability detected, link:", url)
-                    return True
+                    print("[+] XSS vulnerability detected, link:", self.url)
+                    utils.log(
+                            f"[XSS] XSS detected in form, link: {self.url}",
+                            "INFO",
+                            "xss_log.txt",
+                        )
+                    self.payloads.append(payload["value"])
+                    self.result = True
+                    break
 
         print("[+] Check XSS done")
+        utils.log(
+            "[XSS] Check XSS done", "INFO", "xss_log.txt"
+        )
 
         return False
