@@ -1,3 +1,5 @@
+// ignore_for_file: camel_case_types
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:webvuln/items/drawer_bar.dart';
@@ -11,7 +13,12 @@ import 'package:webvuln/views/settingScreen.dart';
 // import 'views/draft.dart';
 
 void main() async {
-  runApp(const mainScreen());
+  // Size size = await DesktopWindow.getWindowSize();
+  // await DesktopWindow.setMinWindowSize(Size(1920, 1080));
+  // await DesktopWindow.setMaxWindowSize(Size(1920, 1080));
+  runApp(mainScreen(
+      // changeScreen: 0,
+      ));
 }
 
 class mainScreen extends StatefulWidget {
@@ -30,7 +37,6 @@ class _mainScreenState extends State<mainScreen> {
     _selectedIndex = 0;
   }
 
-  @override
   final List _selectedItem = [
     const scan_screen(),
     const resultScreen(),
@@ -38,6 +44,19 @@ class _mainScreenState extends State<mainScreen> {
     const resourceScreen(),
     const settingScreen()
   ];
+
+  // void returnWidget() {
+  //   if (widget.changeScreen == 1) {
+  //     setState(() {
+  //       _selectedIndex = 1;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _selectedIndex = 0;
+  //     });
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -132,7 +151,8 @@ class _mainScreenState extends State<mainScreen> {
             foregroundColor: Colors.white),
         child: Column(
           children: [Image(image: AssetImage(icon)), Text(name)],
-        ));
+        )
+    );
   }
 
   Stream<int> get _selectedIndexStream =>
