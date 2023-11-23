@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
 import 'package:webvuln/service/api.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../items/submitButton.dart';
 import '../items/input.dart';
 import 'package:data_table_2/data_table_2.dart';
 
@@ -33,6 +32,23 @@ class _resourceScreenState extends State<resourceScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width *
         (1 - 0.13); // 0.13 is width of sidebar
+
+    Widget selectedWidget;
+    if (state == '/fileResource') {
+      selectedWidget = fileResource(
+        screenHeight: screenHeight,
+        screenWidth: screenWidth,
+        actionController: _actionController,
+      );
+    } else if (state == '/normalResource') {
+      selectedWidget = normalResource(
+          screenHeight: screenHeight,
+          screenWidth: screenWidth,
+          actionController: _actionController);
+    } else {
+      // Handle default case or provide an empty widget
+      selectedWidget = Container();
+    }
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -93,7 +109,7 @@ class _resourceScreenState extends State<resourceScreen> {
                   GradientButton(
                       horizontalMargin: 40,
                       onPressed: () {
-                        print("Pressed");
+                        print(_vulnTypeController.text + _typeController.text);
                       },
                       borderRadius: BorderRadius.circular(10),
                       child: const Text(
@@ -185,84 +201,7 @@ class _resourceScreenState extends State<resourceScreen> {
           ),
 
           // search box
-          Container(
-            width: screenWidth,
-            height: screenHeight / 2 - 100 - 50,
-            margin: const EdgeInsetsDirectional.symmetric(
-                horizontal: 40, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black38),
-              color: Colors.white12,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: const EdgeInsetsDirectional.only(start: 40),
-                          child: Text("Vulnerability type:",
-                              style: GoogleFonts.montserrat(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                        ),
-                        boxInput(
-                            controller: _actionController,
-                            content: "Type here...")
-                      ]),
-                  const Divider(
-                      color: Colors.black,
-                      thickness: 0.2,
-                      indent: 40,
-                      endIndent: 40),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: const EdgeInsetsDirectional.only(start: 40),
-                          child: Text("Resource type:",
-                              style: GoogleFonts.montserrat(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                        ),
-                        boxInput(
-                            controller: _actionController,
-                            content: "Type here...")
-                      ]),
-                  const Divider(
-                      color: Colors.black,
-                      thickness: 0.2,
-                      indent: 40,
-                      endIndent: 40),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: const EdgeInsetsDirectional.only(start: 40),
-                          child: Text("Value:",
-                              style: GoogleFonts.montserrat(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                        ),
-                        boxInput(
-                            controller: _actionController,
-                            content: "Type here...")
-                      ]),
-                  GradientButton(
-                      onPressed: () {
-                        print("Send");
-                      },
-                      horizontalMargin: 40,
-                      verticalMargin: 0,
-                      borderRadius: BorderRadius.circular(10),
-                      child: const Text(
-                        'Send',
-                        style: TextStyle(color: Colors.white),
-                      ))
-                ],
-              ),
-            ),
-          ),
+          selectedWidget,
         ],
       ),
     );
@@ -279,6 +218,193 @@ class _resourceScreenState extends State<resourceScreen> {
         controller: controller,
         hintName: content,
         underIcon: const Icon(Icons.text_fields),
+      ),
+    );
+  }
+
+  Container normalResource(
+      {required double screenHeight,
+      required double screenWidth,
+      required TextEditingController actionController}) {
+    return Container(
+      width: screenWidth,
+      height: screenHeight / 2 - 100 - 50,
+      margin:
+          const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.black38),
+        color: Colors.white12,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Container(
+                margin: const EdgeInsetsDirectional.only(start: 40),
+                child: Text("Vulnerability type:",
+                    style: GoogleFonts.montserrat(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              boxInput(controller: actionController, content: "Type here...")
+            ]),
+            const Divider(
+                color: Colors.black, thickness: 0.2, indent: 40, endIndent: 40),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Container(
+                margin: const EdgeInsetsDirectional.only(start: 40),
+                child: Text("Resource type:",
+                    style: GoogleFonts.montserrat(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              boxInput(controller: actionController, content: "Type here...")
+            ]),
+            const Divider(
+                color: Colors.black, thickness: 0.2, indent: 40, endIndent: 40),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Container(
+                margin: const EdgeInsetsDirectional.only(start: 40),
+                child: Text("Value:",
+                    style: GoogleFonts.montserrat(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              boxInput(controller: actionController, content: "Type here...")
+            ]),
+            GradientButton(
+                onPressed: () {
+                  print("Send");
+                },
+                horizontalMargin: 40,
+                verticalMargin: 0,
+                borderRadius: BorderRadius.circular(10),
+                child: const Text(
+                  'Send',
+                  style: TextStyle(color: Colors.white),
+                ))
+          ],
+        ),
+      ),
+    );
+  }
+
+  Container fileResource(
+      {required double screenHeight,
+      required double screenWidth,
+      required TextEditingController actionController}) {
+    String fileState = 'valid';
+    return Container(
+      width: screenWidth,
+      height: screenHeight / 2 - 100 - 50,
+      margin:
+          const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.black38),
+        color: Colors.white12,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Container(
+                margin: const EdgeInsetsDirectional.only(start: 40, top: 10),
+                child: Text("File type:",
+                    style: GoogleFonts.montserrat(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              Container(
+                width: 400,
+                margin: const EdgeInsetsDirectional.only(end: 40, top: 10),
+                child: DropdownButtonFormField<String>(
+                    focusColor: Colors.white,
+                    icon: const Icon(Icons.arrow_drop_down),
+                    dropdownColor: Colors.white,
+                    value: fileState,
+                    items: const [
+                      DropdownMenuItem(
+                          value: 'valid', child: Text('Valid File')),
+                      DropdownMenuItem(
+                          value: 'invalidbutvalidMH',
+                          child: Text('Invalid file but valid Magic Header')),
+                      DropdownMenuItem(
+                          value: 'invalidbutvalidExtension',
+                          child: Text('Invalid file but valid Extension'))
+                    ],
+                    onSaved: (v) {
+                      setState(() {
+                        fileState = v!;
+                      });
+                    },
+                    onChanged: (v) {
+                      setState(() {
+                        fileState = v!;
+                      });
+                      print(fileState);
+                    }),
+              ),
+            ]),
+            const Divider(
+                color: Colors.black, thickness: 0.2, indent: 40, endIndent: 40),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Container(
+                margin: const EdgeInsetsDirectional.only(start: 40, top: 10),
+                child: Text("Choose file:",
+                    style: GoogleFonts.montserrat(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              GradientButton(
+                  borderRadius: BorderRadius.circular(10),
+                  horizontalMargin: 40,
+                  verticalMargin: 10,
+                  onPressed: () {
+                    print("Browse");
+                  },
+                  child: Text("Browse",
+                      style: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: Colors.white)))
+            ]),
+            const Divider(
+                color: Colors.black, thickness: 0.2, indent: 40, endIndent: 40),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  width: screenWidth / 2 + 200,
+                  height: screenHeight / 4 - 100,
+                  margin: const EdgeInsetsDirectional.only(
+                      start: 40, top: 10, bottom: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.white24),
+                    color: const Color.fromARGB(255, 189, 149, 134),
+                  ),
+                  child: ListTile(
+                    title: Text("File Information:",
+                        style: GoogleFonts.montserrat(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    subtitle: const Text("This file is sus"),
+                  ),
+                ),
+                GradientButton(
+                    onPressed: () {
+                      print("Send");
+                    },
+                    horizontalMargin: 40,
+                    verticalMargin: 10,
+                    borderRadius: BorderRadius.circular(10),
+                    child: const Text(
+                      'Send',
+                      style: TextStyle(color: Colors.white),
+                    )),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
