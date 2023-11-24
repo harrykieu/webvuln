@@ -80,3 +80,66 @@ class ResourceNormalTableData {
     );
   }
 }
+
+class ResourceFile {
+  final String? fileName;
+  final String description;
+  final String? base64value;
+  final String? action;
+
+  const ResourceFile({
+    this.fileName,
+    required this.description,
+    this.base64value,
+    this.action,
+  });
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {
+      'description': description,
+    };
+
+    if (fileName != null) {
+      json['fileName'] = fileName;
+    }
+
+    if (base64value != null) {
+      json['base64value'] = base64value;
+    }
+
+    if (action != null) {
+      json['action'] = action;
+    }
+
+    return json;
+  }
+}
+
+class ResourceFileTableData {
+  final String id;
+  final String fileName;
+  final String description;
+  final String base64value;
+  final String createdDate;
+  final String editedDate;
+
+  ResourceFileTableData({
+    required this.id,
+    required this.fileName,
+    required this.description,
+    required this.base64value,
+    required this.createdDate,
+    required this.editedDate,
+  });
+
+  factory ResourceFileTableData.fromJson(Map<String, dynamic> json) {
+    return ResourceFileTableData(
+      id: json['_id'],
+      fileName: json['fileName'],
+      description: json['description'],
+      base64value: json['base64value'],
+      createdDate: json['createdDate'],
+      editedDate: json['editedDate'],
+    );
+  }
+}

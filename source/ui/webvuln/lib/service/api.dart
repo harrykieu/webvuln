@@ -101,3 +101,21 @@ Future<String> getResourcesNormal(
     return 'Error get resources';
   }
 }
+
+Future<String> getResourcesFile({required String description}) async {
+  final data = jsonEncode(ResourceFile(description: description));
+  final url = '$baseUrl/api/resourcesfile';
+  try {
+    final response = await dio.get(url, data: data, options: _options);
+    if (response.statusCode == 200) {
+      print('Get resources successfully');
+      return response.toString();
+    } else {
+      print('Failed to get resources');
+      return 'Failed to get resources';
+    }
+  } catch (e) {
+    print('Error get resources: $e');
+    return 'Error get resources';
+  }
+}
