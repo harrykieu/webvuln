@@ -7,7 +7,7 @@ with open(f'{__file__}\\..\\pathTraversalParameter.txt') as f:
     for line in path_traversal_parameter:
         data = {
             "vulnType": "pathTraversal",
-            "resType": "pathTraversalParameter",
+            "resType": "parameter",
             "value": line,
             "action": "add"
         }

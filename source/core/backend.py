@@ -240,7 +240,7 @@ class WebVuln:
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
                         pathTraversal_param = self.resourceHandler(
-                            'GET', {"vulnType": "pathTraversal", "resType": "pathTraversalParameter"})
+                            'GET', {"vulnType": "pathTraversal", "resType": "parameter"})
                         resources = self.resourceHandler(
                             "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
