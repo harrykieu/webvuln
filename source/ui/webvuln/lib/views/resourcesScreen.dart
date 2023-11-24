@@ -18,7 +18,8 @@ class resourceScreen extends StatefulWidget {
 
 class _resourceScreenState extends State<resourceScreen> {
   late String state;
-  late String fileState;
+  late String fileGetState;
+  late String fileSendState;
   List<ResourceNormalTableData> normalTableDataList = [];
   List<ResourceFileTableData> fileTableDataList = [];
   List<DataRow> dataRowList = [];
@@ -26,7 +27,8 @@ class _resourceScreenState extends State<resourceScreen> {
   @override
   void initState() {
     state = '/normalPost';
-    fileState = 'valid';
+    fileGetState = 'valid';
+    fileSendState = 'valid';
     super.initState();
   }
 
@@ -62,7 +64,7 @@ class _resourceScreenState extends State<resourceScreen> {
 
   void updateDropdownState(String newState) {
     setState(() {
-      fileState = newState;
+      fileGetState = newState;
     });
   }
 
@@ -88,7 +90,7 @@ class _resourceScreenState extends State<resourceScreen> {
       tableWidget = fileSearch(
           screenHeight: screenHeight,
           screenWidth: screenWidth,
-          fileState: fileState);
+          fileState: fileGetState);
       //tableWidget =
     } else if (state == '/normalPost') {
       inputWidget = normalPost(
