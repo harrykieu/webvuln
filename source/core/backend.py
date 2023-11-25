@@ -77,7 +77,7 @@ class WebVuln:
         :param jsonData: JSON object
         """
         if self.__debug:
-            print(f"{self.blue}{method} {route}: {jsonData.keys()}")
+            print(f"{self.blue}{method} {route}: {jsonData.keys()}{self.white}")
         if route == "/api/history":
             return self.getScanResult(method, jsonData)
         elif route == "/api/resourcesnormal":
@@ -85,11 +85,13 @@ class WebVuln:
         elif route == "/api/resourcesfile":
             return self.fileHandler(method, jsonData)
         elif route == "/api/scan":
-            return self.scanURL(jsonData["urls"],jsonData["modules"])
+            return self.scanURL(jsonData["urls"], jsonData["modules"])
         else:
             utils.log(f"[backend.py-recvFlask] Error: Invalid route {route}", "ERROR")
             if self.__debug:
-                print(f"{self.red}[backend.py-recvFlask] Error: Invalid route {route}")
+                print(
+                    f"{self.red}[backend.py-recvFlask] Error: Invalid route {route}{self.white}"
+                )
             raise ValueError(f"Invalid route {route}")
 
     def scanURL(self, urls, modules):
@@ -336,7 +338,7 @@ class WebVuln:
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
-                return listResult
+                return json.dumps(listResult, default=str)
             else:
                 utils.log("Error: Invalid JSON object", "ERROR")
                 return "Failed"
@@ -464,7 +466,7 @@ class WebVuln:
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
-                return listResult
+                return json.dumps(listResult, default=str)
             else:
                 if self.__debug:
                     print("[backend.py-fileHandler-GET] Error: Invalid JSON object")
@@ -592,7 +594,7 @@ class WebVuln:
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
-                return listResult
+                return json.dumps(listResult, default=str)
             else:
                 utils.log(
                     "[backend.py-getScanResult] Error: Invalid JSON object", "ERROR"
