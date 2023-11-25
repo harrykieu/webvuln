@@ -1,13 +1,17 @@
 // ignore_for_file: camel_case_types, avoid_print
 
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:data_table_2/data_table_2.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
 import 'package:webvuln/model/model.dart';
 import 'package:webvuln/service/api.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import '../items/input.dart';
-import 'package:data_table_2/data_table_2.dart';
 
 class resourceScreen extends StatefulWidget {
   const resourceScreen({super.key});
@@ -23,12 +27,14 @@ class _resourceScreenState extends State<resourceScreen> {
   List<ResourceNormalTableData> normalTableDataList = [];
   List<ResourceFileTableData> fileTableDataList = [];
   List<DataRow> dataRowList = [];
-
+  // For file information
+  late String fileName;
   @override
   void initState() {
     state = '/normalPost';
     fileGetState = 'valid';
     fileSendState = 'valid';
+    fileName = '';
     super.initState();
   }
 
@@ -68,6 +74,12 @@ class _resourceScreenState extends State<resourceScreen> {
     });
   }
 
+  void chooseFile(String filename) {
+    setState(() {
+      fileName = filename;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextEditingController vulnTypeController = TextEditingController();
@@ -83,10 +95,10 @@ class _resourceScreenState extends State<resourceScreen> {
     Widget tableWidget;
     if (state == '/filePost') {
       inputWidget = filePost(
-        screenHeight: screenHeight,
-        screenWidth: screenWidth,
-        actionController: actionController,
-      );
+          screenHeight: screenHeight,
+          screenWidth: screenWidth,
+          actionController: actionController,
+          fileName: fileName);
       tableWidget = fileSearch(
           screenHeight: screenHeight,
           screenWidth: screenWidth,
@@ -414,11 +426,14 @@ class _resourceScreenState extends State<resourceScreen> {
     );
   }
 
-  Container filePost(
-      {required double screenHeight,
-      required double screenWidth,
-      required TextEditingController actionController}) {
+  Container filePost({
+    required double screenHeight,
+    required double screenWidth,
+    required TextEditingController actionController,
+    required String fileName,
+  }) {
     String fileState = 'valid';
+    final TextEditingController fileContentController = TextEditingController();
     return Container(
       width: screenWidth,
       height: screenHeight / 2 - 100 - 50,
@@ -440,7 +455,6 @@ class _resourceScreenState extends State<resourceScreen> {
                     style: GoogleFonts.montserrat(
                         fontSize: 18, fontWeight: FontWeight.bold)),
               ),
-              // TODO: fix dropdown value
               Container(
                 width: 400,
                 margin: const EdgeInsetsDirectional.only(end: 40, top: 10),
@@ -468,7 +482,6 @@ class _resourceScreenState extends State<resourceScreen> {
                       setState(() {
                         fileState = v!;
                       });
-                      print(fileState);
                     }),
               ),
             ]),
@@ -485,8 +498,20 @@ class _resourceScreenState extends State<resourceScreen> {
                   borderRadius: BorderRadius.circular(10),
                   horizontalMargin: 40,
                   verticalMargin: 10,
-                  onPressed: () {
-                    print("Browse");
+                  onPressed: () async {
+                    FilePickerResult? result =
+                        await FilePicker.platform.pickFiles();
+                    if (result != null) {
+                      File file = File(result.files.single.path!);
+                      try {
+                        String content = await file.readAsString();
+                        chooseFile(content);
+                      } catch (e) {
+                        print("Error reading file: $e");
+                      }
+                    } else {
+                      print("No file selected");
+                    }
                   },
                   child: Text("Browse",
                       style: GoogleFonts.montserrat(
@@ -511,10 +536,20 @@ class _resourceScreenState extends State<resourceScreen> {
                     color: const Color.fromARGB(255, 189, 149, 134),
                   ),
                   child: ListTile(
-                    title: Text("File Information:",
-                        style: GoogleFonts.montserrat(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    subtitle: const Text("This file is sus"),
+                    title: Text(
+                      "File Information:",
+                      style: GoogleFonts.montserrat(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        fileName, // Use null-aware operator
+                        style: GoogleFonts.montserrat(fontSize: 15),
+                      ),
+                    ),
                   ),
                 ),
                 GradientButton(
