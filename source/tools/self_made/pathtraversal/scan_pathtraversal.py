@@ -28,7 +28,7 @@ class PathTraversal:
         )
 
         stopChecking = False
-        print(type(self.parameterList))
+        
         for paramInfo in self.parameterList:
             param = paramInfo["value"]
 
