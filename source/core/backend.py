@@ -256,6 +256,16 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
+                        if pathTraversalParam == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get parameter",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get parameter"
+                                )
+                            return "Failed"
                         PTResult, PTPayload = PathTraversal(
                             url, resources, pathTraversalParam
                         ).checkPathTraversal()
