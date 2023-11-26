@@ -535,19 +535,25 @@ class _resourceScreenState extends State<resourceScreen> {
                     border: Border.all(color: Colors.white24),
                     color: const Color.fromARGB(255, 189, 149, 134),
                   ),
-                  child: ListTile(
-                    title: Text(
-                      "File Information:",
-                      style: GoogleFonts.montserrat(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: ListTile(
+                      title: Text(
+                        "File Information:",
+                        style: GoogleFonts.montserrat(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    subtitle: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        fileName, // Use null-aware operator
-                        style: GoogleFonts.montserrat(fontSize: 15),
+                      subtitle: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        height: screenWidth / 4 - 100,
+                        child: Text(
+                          fileName,
+                          // Use null-aware operator
+                          overflow: TextOverflow.values[1],
+                          style: GoogleFonts.montserrat(fontSize: 15),
+                        ),
                       ),
                     ),
                   ),
