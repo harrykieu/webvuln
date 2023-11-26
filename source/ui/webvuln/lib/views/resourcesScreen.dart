@@ -10,7 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
 import 'package:webvuln/model/model.dart';
 import 'package:webvuln/service/api.dart';
-
+import 'package:path/path.dart';
 import '../items/input.dart';
 
 class resourceScreen extends StatefulWidget {
@@ -28,13 +28,13 @@ class _resourceScreenState extends State<resourceScreen> {
   List<ResourceFileTableData> fileTableDataList = [];
   List<DataRow> dataRowList = [];
   // For file information
-  late String fileName;
+  late String fileInfo;
   @override
   void initState() {
     state = '/normalPost';
     fileGetState = 'valid';
     fileSendState = 'valid';
-    fileName = '';
+    fileInfo = '';
     super.initState();
   }
 
@@ -74,9 +74,10 @@ class _resourceScreenState extends State<resourceScreen> {
     });
   }
 
-  void chooseFile(String filename) {
+  void chooseFile(String fileInfo, File file) {
     setState(() {
-      fileName = filename;
+      fileInfo = fileInfo;
+      file = file;
     });
   }
 
@@ -93,12 +94,13 @@ class _resourceScreenState extends State<resourceScreen> {
         (1 - 0.13); // 0.13 is width of sidebar
     Widget inputWidget;
     Widget tableWidget;
+    File file;
     if (state == '/filePost') {
       inputWidget = filePost(
           screenHeight: screenHeight,
           screenWidth: screenWidth,
           actionController: actionController,
-          fileName: fileName);
+          fileName: fileInfo);
       tableWidget = fileSearch(
           screenHeight: screenHeight,
           screenWidth: screenWidth,
@@ -199,7 +201,7 @@ class _resourceScreenState extends State<resourceScreen> {
                       resType: typeController.text);
                   if (response == '[]') {
                     showDialog(
-                        context: context,
+                        context: context as BuildContext,
                         builder: (context) {
                           return AlertDialog(
                             title: const Text('No result found'),
@@ -308,7 +310,7 @@ class _resourceScreenState extends State<resourceScreen> {
                       await getResourcesFile(description: fileState);
                   if (response == '[]') {
                     showDialog(
-                        context: context,
+                        context: context as BuildContext,
                         builder: (context) {
                           return AlertDialog(
                             title: const Text('No result found'),
@@ -433,7 +435,6 @@ class _resourceScreenState extends State<resourceScreen> {
     required String fileName,
   }) {
     String fileState = 'valid';
-    final TextEditingController fileContentController = TextEditingController();
     return Container(
       width: screenWidth,
       height: screenHeight / 2 - 100 - 50,
@@ -504,13 +505,19 @@ class _resourceScreenState extends State<resourceScreen> {
                     if (result != null) {
                       File file = File(result.files.single.path!);
                       try {
-                        String content = await file.readAsString();
-                        chooseFile(content);
+                        // TODO: add loading screen while analyzing file
+                        final filename = basename(result.files.single.path!);
+                        var filestat = file.statSync();
+                        print(filestat.size);
+                        print(filestat.type);
+                        final content =
+                            "Filename: $filename\nSize: ${filestat.size} bytes\nType: ${filestat.type}";
+                        chooseFile(content, file);
                       } catch (e) {
                         print("Error reading file: $e");
                       }
                     } else {
-                      print("No file selected");
+                      print("Something went wrong!");
                     }
                   },
                   child: Text("Browse",
@@ -545,15 +552,11 @@ class _resourceScreenState extends State<resourceScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Container(
-                        padding: const EdgeInsets.all(8.0),
-                        height: screenWidth / 4 - 100,
-                        child: Text(
-                          fileName,
-                          // Use null-aware operator
-                          overflow: TextOverflow.values[1],
-                          style: GoogleFonts.montserrat(fontSize: 15),
-                        ),
+                      subtitle: Text(
+                        fileName,
+                        // Use null-aware operator
+                        overflow: TextOverflow.values[1],
+                        style: GoogleFonts.montserrat(fontSize: 15),
                       ),
                     ),
                   ),
