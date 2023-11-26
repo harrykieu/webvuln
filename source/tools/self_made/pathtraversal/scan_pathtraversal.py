@@ -2,20 +2,22 @@ import requests
 import re
 import urllib.parse
 import source.core.utils as utils
+import json
+
 
 class PathTraversal:
-    def __init__(self, url, resources, parameter_list):
+    def __init__(self, url, resources, parameterList):
         self.url = url
-        self.resources = resources
+        self.resources = json.loads(resources)
         self.payloads = []
         self.result = False
-        self.parameter_list = parameter_list
+        self.parameterList = json.loads(parameterList)
 
-    def is_param_relevant(self, param):
-        test_url = f"{self.url}?{param}=test"
-        default_res = requests.get(self.url)
-        test_res = requests.get(test_url)
-        return default_res.content != test_res.content
+    def isParamRelevant(self, param):
+        testUrl = f"{self.url}?{param}=test"
+        defaultRes = requests.get(self.url)
+        testRes = requests.get(testUrl)
+        return defaultRes.content != testRes.content
 
     def checkPathTraversal(self):
         print("\n[+] Checking path traversal for", self.url)
@@ -25,35 +27,36 @@ class PathTraversal:
             "pathTraversal.txt",
         )
 
-        stop_checking = False 
+        stopChecking = False
+        print(type(self.parameterList))
+        for paramInfo in self.parameterList:
+            param = paramInfo["value"]
 
-        for param_info in self.parameter_list:
-            param = param_info['value']
+            if stopChecking is True:
+                break
 
-            if stop_checking is True:
-                break  
-
-            if not self.is_param_relevant(param):
+            if not self.isParamRelevant(param):
                 print(f"[!] Skipping irrelevant parameter: {param}")
                 continue
-            else:    
+            else:
                 for payload in self.resources:
-                    encoded_payload = urllib.parse.quote(payload["value"])
-                    new_url = f"{self.url}?{param}={encoded_payload}"
+                    encodedPayload = urllib.parse.quote(payload["value"])
+                    newUrl = f"{self.url}?{param}={encodedPayload}"
 
-                    print("[!] Trying", new_url)
-                    res = requests.get(new_url)
+                    print("[!] Trying", newUrl)
+                    res = requests.get(newUrl)
                     if re.search(rb"root:x:0:0", res.content):
-                        print("[+] Path Traversal vulnerability detected, link:", new_url)
+                        print(
+                            "[+] Path Traversal vulnerability detected, link:", newUrl)
                         utils.log(
-                            f"[PathTraversal] Path Traversal vulnerability detected, link: {new_url}",
+                            f"[PathTraversal] Path Traversal vulnerability detected, link: {newUrl}",
                             "INFO",
                             "pathTraversal.txt",
                         )
                         self.payloads.append(payload["value"])
                         self.result = True
-                        stop_checking = True  
-                        break  
+                        stopChecking = True
+                        break
 
         print("[+] Check path traversal done")
         utils.log(
