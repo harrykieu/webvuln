@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:webvuln/items/scrollable_widget.dart';
 import 'package:webvuln/model/url.dart';
 import 'package:webvuln/model/urls.dart';
 
@@ -26,11 +25,12 @@ class _SortableTableState extends State<SortableTable> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(child: buildDataTable());
   }
-  
-  Widget buildDataTable(){
-    final columns = ['No','Vulnerabilities','Description','Date&Time'];
-    return DataTable(columns:getColumns(columns) , rows: getRows(urlHistory));
+
+  Widget buildDataTable() {
+    final columns = ['No', 'Vulnerabilities', 'Description', 'Date&Time'];
+    return DataTable(columns: getColumns(columns), rows: getRows(urlHistory));
   }
+
   List<DataColumn> getColumns(List<String> columns) => columns
       .map((String column) => DataColumn(
             label: Text(column),
@@ -38,8 +38,13 @@ class _SortableTableState extends State<SortableTable> {
           ))
       .toList();
 
-  List<DataRow> getRows(List<urlScanned> urls) => urls.map((urlScanned url ) {
-        final cells = [url.no, url.description, url.vulnerabilities,url.scanTime];
+  List<DataRow> getRows(List<urlScanned> urls) => urls.map((urlScanned url) {
+        final cells = [
+          url.no,
+          url.description,
+          url.vulnerabilities,
+          url.scanTime
+        ];
 
         return DataRow(cells: getCells(cells));
       }).toList();
@@ -52,17 +57,18 @@ class _SortableTableState extends State<SortableTable> {
       urlHistory.sort((urlHistory1, urlHistory2) =>
           compareString(ascending, urlHistory1.no, urlHistory2.no));
     } else if (columnIndex == 1) {
-      urlHistory.sort((urlHistory1, urlHistory2) =>
-          compareString(ascending, urlHistory1.vulnerabilities, urlHistory2.vulnerabilities));
+      urlHistory.sort((urlHistory1, urlHistory2) => compareString(
+          ascending, urlHistory1.vulnerabilities, urlHistory2.vulnerabilities));
     } else if (columnIndex == 3) {
-      urlHistory.sort((urlHistory1, urlHistory2) =>
-          compareString(ascending, '${urlHistory1.scanTime}', '${urlHistory2.scanTime}'));
+      urlHistory.sort((urlHistory1, urlHistory2) => compareString(
+          ascending, '${urlHistory1.scanTime}', '${urlHistory2.scanTime}'));
     }
     setState(() {
       this.sortColumnIndex = columnIndex;
       this.isAscending = ascending;
     });
   }
+
   int compareString(bool ascending, String value1, String value2) =>
       ascending ? value1.compareTo(value2) : value2.compareTo(value1);
 }

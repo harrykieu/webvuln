@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:webvuln/views/scan_screen.dart';
 
 class drawer_bar extends StatefulWidget {
   drawer_bar({super.key, required this.number_screen});

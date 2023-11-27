@@ -64,6 +64,8 @@ dependencies:
   preload_page_view: ^0.2.0
   data_tables: ^1.4.0
   just_the_tooltip: ^0.0.12
+  google_fonts: ^6.1.0
+  file_picker: ^6.1.1
   # window_size:
   #     git:
   #       url: git://github.com/google/flutter-desktop-embedding.git
