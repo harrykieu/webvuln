@@ -104,7 +104,7 @@ class SQLi:
         details["action"] = action
         details["method"] = method
         details["inputs"] = inputs
-        return 0
+        return details
 
     # -------------------------------------------------------------
 
@@ -119,7 +119,8 @@ class SQLi:
         print("\n[+] Checking SQLi")
 
         for payload in self.sqli_resources:
-            encoded_payload = urllib.parse.quote(payload)
+            payload_str = payload["value"]
+            encoded_payload = urllib.parse.quote(payload_str.encode('utf-8'))
             new_url = f"{self.url}?id={encoded_payload}"
             print("[!] Trying", new_url)
 
