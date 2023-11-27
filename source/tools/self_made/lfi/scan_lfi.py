@@ -59,7 +59,7 @@ class LFI:
         details["action"] = action
         details["method"] = method
         details["inputs"] = inputs
-        return 0
+        return details
 
     # --------------------------------------------------
 
@@ -74,7 +74,8 @@ class LFI:
         print("\n[+] Checking LFI")
 
         for payload in self.lfi_resources:
-            encoded_payload = urllib.parse.quote(payload)
+            payload_str = payload["value"]
+            encoded_payload = urllib.parse.quote(payload_str.encode('utf-8'))
             new_url = f"{self.url}?page={encoded_payload}"
 
             print("[!] Trying", new_url)
