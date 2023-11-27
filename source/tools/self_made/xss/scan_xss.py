@@ -73,7 +73,7 @@ class XSS:
         details["action"] = action
         details["method"] = method
         details["inputs"] = inputs
-        return 0
+        return details
 
     # ---------------------------------------------------------------------
 
@@ -88,7 +88,8 @@ class XSS:
         print("\n[+] Checking XSS")
 
         for payload in self.xss_resources:
-            encoded_payload = urllib.parse.quote(payload)
+            payload_str = payload["value"]
+            encoded_payload = urllib.parse.quote(payload_str.encode('utf-8'))
             new_url = f"{self.url}?q={encoded_payload}"
 
             print("[!] Trying", new_url)
