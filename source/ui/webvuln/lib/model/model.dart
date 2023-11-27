@@ -33,10 +33,19 @@ class resource {
       required this.value});
   Map<String, dynamic> toJson() {
     return {
-      'vulnType':vulnType,
-      'action':action,
-      'resType':resType,
-      'value':value
+      'vulnType': vulnType,
+      'action': action,
+      'resType': resType,
+      'value': value
     };
   }
 }
+
+class ChartData {
+  final String x;
+  final num y;
+  final num y1;
+
+  ChartData(this.x, this.y, this.y1);
+}
+

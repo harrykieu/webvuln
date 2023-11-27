@@ -11,7 +11,7 @@ class loadingScreen extends StatelessWidget {
   Future<String> fetchData() async {
     // postURL(nameURL: nameURL, moduleNumber: moduleNumber)
     await Future.delayed(
-        const Duration(seconds: 2)); // Giả lập thời gian đợi API
+        const Duration(seconds: 2));
     return "Success";
   }
 
@@ -23,17 +23,16 @@ class loadingScreen extends StatelessWidget {
         future: fetchData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // Nếu đang đợi dữ liệu, hiển thị màn hình loading
             return Container(
               width: 200,
               height: 200,
               child: CircularProgressIndicator(),
             );
           } else if (snapshot.hasError) {
-            // Nếu có lỗi khi gọi API, hiển thị thông báo lỗi
+            
             return Text('Error: ${snapshot.error}');
           } else {
-            // Nếu thành công, hiển thị nội dung cần thiết
+
             return resultScreen();
           }
         },

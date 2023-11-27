@@ -1,102 +1,132 @@
 import 'package:flutter/material.dart';
-// import 'package:syncfusion_flutter_gauges/gauges.dart';
-// import 'package:fl_chart/fl_chart.dart';
-// import 'package:pie_chart/pie_chart.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:just_the_tooltip/just_the_tooltip.dart';
 
-class lineChart extends StatefulWidget {
-  const lineChart({super.key});
+class ChartData {
+  final String x;
+  final num y;
+  final num y1;
 
-  @override
-  State<lineChart> createState() => _lineChartState();
+  ChartData(this.x, this.y, this.y1);
 }
 
-class _lineChartState extends State<lineChart> {
+class lineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
+    double screenWidth = MediaQuery.of(context).size.width;
+    TextStyle text_style_title = GoogleFonts.montserrat(
+        fontSize: 24, color: Colors.black, fontWeight: FontWeight.w600);
+    TextStyle text_style_normal = GoogleFonts.montserrat(
+      fontSize: 20, color: Colors.black, fontWeight: FontWeight.normal);
 
-    List<LineChartData> dataLineChart =[
-      LineChartData(
-        maxX: 100,
-        minX: 10
-      )
+    final List<ChartData> chartData = [
+      ChartData('XSS', 48, 67),
+      ChartData('SQLi', 80, 34),
+      ChartData('LFI', 14, 23),
+      ChartData('RCE', 11, 18),
+      ChartData('XXE', 20, 12)
     ];
+
     return Container(
-      width: 500,
+      width: screenWidth / 3,
       height: 600,
-      margin: EdgeInsets.only(right: 10),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(24)),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black38,
-              offset: Offset(0, 4),
-              blurRadius: 10,
-            )
-          ]),
+      margin: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(24)),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black38,
+            offset: Offset(0, 4),
+            blurRadius: 10,
+          ),
+        ],
+      ),
       child: Column(
         children: [
+          // Title line chart
           ListTile(
             title: Row(
               children: [
-                Image(image: AssetImage('lib/assets/LineChart.png')),
-                Text('   Line Chart',style: GoogleFonts.montserrat(fontSize: 24,fontWeight: FontWeight.bold),)
+                const Image(image: AssetImage('lib/assets/LineChart.png')),
+                Row(
+                  children: [
+                    const Text(
+                      '   Line Chart',
+                      style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    ),
+                    tool_tip(content: 'Info about line chart')
+                  ],
+                )
               ],
             ),
           ),
-          // MyLineChart()
-
-        ],
-      ),
-    );
-  }
-}
-class MyLineChart extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return LineChart(
-      LineChartData(
-        gridData: FlGridData(show: false),
-        titlesData: FlTitlesData(
-          leftTitles: AxisTitles(
-            drawBelowEverything: true
-          ),
-          bottomTitles: AxisTitles(
-            drawBelowEverything: true
+          // Line chart
+          SfCartesianChart(
+              trackballBehavior: TrackballBehavior(enable: true),
+              legend: const Legend(isVisible: false),
+              tooltipBehavior: TooltipBehavior(enable: true),
+              plotAreaBorderWidth: 0,
+              primaryXAxis:
+                  CategoryAxis(), // Change to CategoryAxis since x values are strings
+              series: <ChartSeries>[
+                ColumnSeries<ChartData, String>(
+                    dataSource: chartData,
+                    xValueMapper: (ChartData data, _) => data.x,
+                    yValueMapper: (ChartData data, _) => data.y)
+              ]),
+          Container(
+            width: double.infinity,
+            height: 150,
+            margin: const EdgeInsets.all(10),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Text(chartData[0].x+" Percent of all:",style: text_style_title,),
+                    title: Text(chartData[0].y.toString()+"%",style: text_style_normal,),
+                  ),
+                  ListTile(
+                    leading: Text(chartData[1].x+" Percent of all:",style: text_style_title,),
+                    title: Text(chartData[1].y.toString()+"%",style: text_style_normal,),
+                  ),
+                  ListTile(
+                    leading: Text(chartData[2].x+" Percent of all:",style: text_style_title,),
+                    title: Text(chartData[2].y.toString()+"%",style: text_style_normal,),
+                  ),
+                  ListTile(
+                    leading: Text(chartData[3].x+" Percent of all:",style: text_style_title,),
+                    title: Text(chartData[3].y.toString()+"%",style: text_style_normal,),
+                  ),
+                  ListTile(
+                    leading: Text(chartData[4].x+" Percent of all:",style: text_style_title,),
+                    title: Text(chartData[4].y.toString()+"%",style: text_style_normal,),
+                  )
+              
+                ],
+              ),
+            ),
           )
-        ),
-        borderData: FlBorderData(
-          show: true,
-          border: Border.all(
-            color: const Color(0xff37434d),
-            width: 1,
-          ),
-        ),
-        minX: 0,
-        maxX: 7,
-        minY: 0,
-        maxY: 6,
-        lineBarsData: [
-          LineChartBarData(
-            spots: [
-              FlSpot(0, 3),
-              FlSpot(1, 1),
-              FlSpot(2, 4),
-              FlSpot(3, 2),
-              FlSpot(4, 5),
-              FlSpot(5, 1),
-              FlSpot(6, 4),
-            ],
-            isCurved: true,
-            // color: [Colors.blue,Colors.accents],
-            dotData: FlDotData(show: false),
-            belowBarData: BarAreaData(show: false),
-          ),
         ],
       ),
     );
   }
+  JustTheTooltip tool_tip({required String content}) {
+    return JustTheTooltip(
+      content: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          content,
+        ),
+      ),
+      child: const Icon(
+            Icons.info_outline_rounded,
+            color: Colors.black,
+            size: 16,
+          ),
+    );
+  }
 }
+

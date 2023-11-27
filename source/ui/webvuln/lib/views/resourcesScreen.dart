@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
 import 'package:webvuln/service/api.dart';
-import 'scanScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../items/submitButton.dart';
 import '../items/input.dart';
