@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 from urllib.parse import urlparse, urljoin
 import urllib.parse
+import source.core.utils as utils
 
 # 06/09/2023 : Code check sqli thi duoc nhung chua goi la hoan hao, dang nghien cuu de cai tien
 # maker : RBKING
@@ -16,6 +17,8 @@ class SQLi:
     def __init__(self, url, sqli_resources):
         self.url = url
         self.sqli_resources = sqli_resources
+        self.payloads = []
+        self.result = False
 
     # Uncomment the code below for DWVA
     # login_payload = {
@@ -105,21 +108,36 @@ class SQLi:
 
     # -------------------------------------------------------------
 
-    def check_sqli(self, url):
+    def check_sqli(self):
+
+        utils.log(
+            f"[SQLi] Checking SQLi for {self.url}",
+            "INFO",
+            "sqli_log.txt",
+        )        
+
         print("\n[+] Checking SQLi")
 
         for payload in self.sqli_resources:
-            encoded_payload = urllib.parse.quote(payload)
-            new_url = f"{url}?id={encoded_payload}"
+            payload_str = payload["value"]
+            encoded_payload = urllib.parse.quote(payload_str.encode('utf-8'))
+            new_url = f"{self.url}?id={encoded_payload}"
             print("[!] Trying", new_url)
 
             res = s.get(new_url)
             if self.is_vulnerable_sqli(res):
                 print("[+] SQL Injection vulnerability detected, link:", new_url)
-                return True
+                utils.log(
+                            f"[SQLi] SQL Injection vulnerability detected, link: {new_url}",
+                            "INFO",
+                            "sqli_log.txt",
+                        )
+                self.payloads.append(payload["value"])
+                self.result = True
+                break
 
-        forms = self.get_all_forms(url)
-        print(f"[+] Detected {len(forms)} forms on {url} and form found: {forms}")
+        forms = self.get_all_forms(self.url)
+        print(f"[+] Detected {len(forms)} forms on {self.url} and form found: {forms}")
 
         for form in forms:
             form_details = self.get_form_details(form)
@@ -135,13 +153,13 @@ class SQLi:
                     elif input_tag["type"] != "submit":
                         data[input_tag["name"]] = f"test{payload}"
 
-                url = urljoin(url, form_details["action"])
+                self.url = urljoin(self.url, form_details["action"])
                 if form_details["method"] == "post":
-                    res = s.post(url, data=data)
+                    res = s.post(self.url, data=data)
                 elif form_details["method"] == "get":
-                    res = s.get(url, params=data)
+                    res = s.get(self.url, params=data)
 
-                curr_url = url
+                curr_url = self.url
                 results = {"sqli": []}
 
                 if self.is_vulnerable_sqli(res):
@@ -149,7 +167,17 @@ class SQLi:
                         {"url": curr_url, "details": "[+] SQLi vulnerability detected"}
                     )
 
-                    return True
+                    utils.log(
+                            f"[SQL] SQL Injection detected in form, link: {self.url}",
+                            "INFO",
+                            "sqli_log.txt",
+                        )
+                    self.payloads.append(payload["value"])
+                    self.result = True
+                    break
 
         print("[+] Check SQLi done")
-        return False
+        utils.log(
+            "[SQLi] Check SQLi done", "INFO", "sqli_log.txt"
+        )
+        return self.result, self.payloads

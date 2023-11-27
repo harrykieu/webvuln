@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup as bs
 from urllib.parse import urljoin
 import re
 import urllib.parse
+import source.core.utils as utils
 
 # 06/09/2023 : CODE Can cai thien them mot so phuong dien de chen tim ra dia file (can cai tien tu dong 110 tro di)
 # maker : RBKING
@@ -17,6 +18,8 @@ class LFI:
     def __init__(self, url, lfi_resources):
         self.url = url
         self.lfi_resources = lfi_resources
+        self.payloads = []
+        self.result = False
 
     forms = []
 
@@ -60,25 +63,37 @@ class LFI:
 
     # --------------------------------------------------
 
-    def check_lfi(self, url):
-        with open("lfi_payloads.txt") as f:
-            lfi_payloads = f.read().splitlines()
+    def check_lfi(self):
+
+        utils.log(
+            f"[LFI] Checking LFI for {self.url}",
+            "INFO",
+            "lfi_log.txt",
+        )
 
         print("\n[+] Checking LFI")
 
-        for payload in lfi_payloads:
-            encoded_payload = urllib.parse.quote(payload)
-            new_url = f"{url}?page={encoded_payload}"
+        for payload in self.lfi_resources:
+            payload_str = payload["value"]
+            encoded_payload = urllib.parse.quote(payload_str.encode('utf-8'))
+            new_url = f"{self.url}?page={encoded_payload}"
 
             print("[!] Trying", new_url)
             res = s.get(new_url)
 
             if re.search(rb"root:x:0:0", res.content):
                 print("[+] LFI vulnerability detected, link:", new_url)
-                return True
+                utils.log(
+                            f"[LFI] Local File Injection vulnerability detected, link: {new_url}",
+                            "INFO",
+                            "lfi_log.txt",
+                        )
+                self.payloads.append(payload["value"])
+                self.result = True
+                break
 
-        forms = self.get_all_forms(url)
-        print(f"[+] Detected {len(forms)} forms on {url}.")
+        forms = self.get_all_forms(self.url)
+        print(f"[+] Detected {len(forms)} forms on {self.url}.")
 
         # -------------
 
@@ -98,16 +113,27 @@ class LFI:
                     elif input_tag["type"] != "submit":
                         data[input_tag["name"]] = payload
 
-                url = urljoin(url, form_details["action"])
+                self.url = urljoin(self.url, form_details["action"])
                 if form_details["method"] == "post":
-                    res = s.post(url, data=data)
+                    res = s.post(self.url, data=data)
                 elif form_details["method"] == "get":
-                    res = s.get(url, params=data)
+                    res = s.get(self.url, params=data)
 
                 if re.search(rb"root:x:0:0", res.content):
-                    print("[+] LFI vulnerability detected, link:", url)
-                    return True
+                    print("[+] Local File Injection detected, link:", self.url)
+                    utils.log(
+                            f"[LFI] Local File Injection detected in form, link: {self.url}",
+                            "INFO",
+                            "lfi_log.txt",
+                        )
+                    self.payloads.append(payload["value"])
+                    self.result = True
+                    break
+                    
 
         print("[+] Check LFI done")
+        utils.log(
+            "[LFI] Check LFI done", "INFO", "lfi_log.txt"
+        )
 
-        return False
+        return self.result, self.payloads
