@@ -331,14 +331,13 @@ class WebVuln:
                     utils.log(f"[backend.py-findDocument-GET] Error: {e}", "ERROR")
                     if self.__debug:
                         print(f"[backend.py-findDocument-GET] Error: {e}")
-                    raise e
                     return "Failed"
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
                 return json.dumps(listResult, default=str)
             else:
-                utils.log("Error: Invalid JSON object", "ERROR")
+                utils.log("[backend.py-findDocument-GET] Error: Invalid JSON object")
                 return "Failed"
         elif method == "POST":
             if (
@@ -430,7 +429,9 @@ class WebVuln:
                             )
                         return "Failed"
             else:
-                utils.log("Error: Invalid JSON object", "ERROR")
+                utils.log(
+                    "[backend.py-resourceHandler-POST] Error: Invalid JSON object"
+                )
                 return "Failed"
 
     def fileHandler(self, method, data) -> str | list:
