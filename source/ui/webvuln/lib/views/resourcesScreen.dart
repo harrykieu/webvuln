@@ -298,7 +298,7 @@ class _resourceScreenState extends State<resourceScreen> {
           children: [
             Container(
               margin: const EdgeInsetsDirectional.only(start: 40),
-              child: Text("Enter search criteria:",
+              child: Text("File type:",
                   style: GoogleFonts.montserrat(
                       fontSize: 18, fontWeight: FontWeight.bold)),
             ),
