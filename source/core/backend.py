@@ -249,7 +249,7 @@ class WebVuln:
                             resultURL["vulnerabilities"].append(
                                 {
                                     "type": "IDOR",
-                                    "log": open(f"{ROOTPATH}/logs/idor.txt", "r").read(),
+                                    "logs": open(f"{ROOTPATH}/logs/idor.txt", "r").read(),
                                     "payload": idor_payload,
                                     "severity": "High",
                                 }

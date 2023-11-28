@@ -85,10 +85,10 @@ class IDOR:
                         if self.check_unauthorized_access(test_resp):
                             print("[!] IDOR detected on url:", test_url)
                             utils.log(
-                            f"[IDOR] IDOR vulnerability detected, link: {test_url}",
-                            "INFO",
-                            "idor.txt",
-                        )
+                                f"[IDOR] IDOR vulnerability detected, link: {test_url}",
+                                "INFO",
+                                "idor.txt",
+                            )
                             self.result = True
                             self.payloads.append(payload["value"])
                             break
