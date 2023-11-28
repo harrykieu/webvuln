@@ -143,3 +143,12 @@ class ResourceFileTableData {
     );
   }
 }
+
+class ChartData {
+  final String x;
+  final num y;
+  final num y1;
+
+  ChartData(this.x, this.y, this.y1);
+}
+

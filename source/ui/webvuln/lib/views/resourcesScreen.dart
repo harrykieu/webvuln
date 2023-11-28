@@ -1,14 +1,22 @@
-// ignore_for_file: camel_case_types, avoid_print
+// ignore_for_file: camel_case_types, avoid_print, depend_on_referenced_packages
 
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:data_table_2/data_table_2.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:path/path.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
 import 'package:webvuln/model/model.dart';
 import 'package:webvuln/service/api.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../items/input.dart';
-import 'package:data_table_2/data_table_2.dart';
 
+import '../items/input.dart';
+
+// TODO: Add feature to edit and delete resource
+// TODO: Separate file and normal resource into different content table
+// TODO: Change post normal resource to use dropdown menu
 class resourceScreen extends StatefulWidget {
   const resourceScreen({super.key});
 
@@ -23,12 +31,18 @@ class _resourceScreenState extends State<resourceScreen> {
   List<ResourceNormalTableData> normalTableDataList = [];
   List<ResourceFileTableData> fileTableDataList = [];
   List<DataRow> dataRowList = [];
-
+  late ResourceFile resourceFile;
+  // For file information
+  late String fileInfo;
   @override
   void initState() {
     state = '/normalPost';
     fileGetState = 'valid';
     fileSendState = 'valid';
+    fileInfo = '';
+    // ignore: prefer_const_constructors
+    resourceFile = ResourceFile(
+        fileName: '', description: '', base64value: '', action: '');
     super.initState();
   }
 
@@ -54,7 +68,7 @@ class _resourceScreenState extends State<resourceScreen> {
           .map((tableData) => DataRow(cells: [
                 DataCell(Text(tableData.fileName)),
                 DataCell(Text(tableData.description)),
-                DataCell(Text(tableData.base64value ?? '')),
+                DataCell(Text(tableData.base64value)),
                 DataCell(Text(tableData.createdDate)),
                 DataCell(Text(tableData.editedDate)),
               ]))
@@ -68,14 +82,24 @@ class _resourceScreenState extends State<resourceScreen> {
     });
   }
 
+  void chooseFile(String newInfo, String filename, String description,
+      String base64value, String action) {
+    setState(() {
+      fileInfo = newInfo;
+      resourceFile = ResourceFile(
+          fileName: filename,
+          description: description,
+          base64value: base64value,
+          action: action);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextEditingController vulnTypeController = TextEditingController();
     final TextEditingController typeController = TextEditingController();
     final TextEditingController valueController = TextEditingController();
     final TextEditingController actionController = TextEditingController();
-    final TextEditingController vulnTypeSearchController =
-        TextEditingController();
     final double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width *
         (1 - 0.13); // 0.13 is width of sidebar
@@ -86,6 +110,8 @@ class _resourceScreenState extends State<resourceScreen> {
         screenHeight: screenHeight,
         screenWidth: screenWidth,
         actionController: actionController,
+        fileInfo: fileInfo,
+        resourceFile: resourceFile,
       );
       tableWidget = fileSearch(
           screenHeight: screenHeight,
@@ -94,9 +120,12 @@ class _resourceScreenState extends State<resourceScreen> {
       //tableWidget =
     } else if (state == '/normalPost') {
       inputWidget = normalPost(
-          screenHeight: screenHeight,
-          screenWidth: screenWidth,
-          actionController: actionController);
+        screenHeight: screenHeight,
+        screenWidth: screenWidth,
+        vulnTypeController: vulnTypeController,
+        typeController: typeController,
+        valueController: valueController,
+      );
       tableWidget = normalSearch(
           screenHeight: screenHeight,
           screenWidth: screenWidth,
@@ -108,6 +137,7 @@ class _resourceScreenState extends State<resourceScreen> {
       tableWidget = Container();
     }
     return Scaffold(
+      backgroundColor: const Color(0xFFF0F0F0),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -117,7 +147,7 @@ class _resourceScreenState extends State<resourceScreen> {
             width: 200,
             height: 50,
             child: DropdownButtonFormField<String>(
-                focusColor: Colors.white,
+                focusColor: const Color(0xFFF0F0F0),
                 icon: const Icon(Icons.arrow_drop_down),
                 dropdownColor: Colors.white,
                 value: state,
@@ -157,10 +187,15 @@ class _resourceScreenState extends State<resourceScreen> {
       height: screenHeight / 2,
       margin: const EdgeInsetsDirectional.only(start: 40, end: 40, top: 10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black38),
-        color: Colors.white12,
-      ),
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black38,
+              blurRadius: 15,
+              spreadRadius: -7,
+            )
+          ]),
       child: Column(children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -187,7 +222,7 @@ class _resourceScreenState extends State<resourceScreen> {
                       resType: typeController.text);
                   if (response == '[]') {
                     showDialog(
-                        context: context,
+                        context: context as BuildContext,
                         builder: (context) {
                           return AlertDialog(
                             title: const Text('No result found'),
@@ -248,17 +283,22 @@ class _resourceScreenState extends State<resourceScreen> {
       height: screenHeight / 2,
       margin: const EdgeInsetsDirectional.only(start: 40, end: 40, top: 10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black38),
-        color: Colors.white12,
-      ),
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black38,
+              blurRadius: 15,
+              spreadRadius: -7,
+            )
+          ]),
       child: Column(children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
               margin: const EdgeInsetsDirectional.only(start: 40),
-              child: Text("Enter search criteria:",
+              child: Text("File type:",
                   style: GoogleFonts.montserrat(
                       fontSize: 18, fontWeight: FontWeight.bold)),
             ),
@@ -294,22 +334,6 @@ class _resourceScreenState extends State<resourceScreen> {
                   print(fileState);
                   String response =
                       await getResourcesFile(description: fileState);
-                  if (response == '[]') {
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('No result found'),
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('OK'))
-                            ],
-                          );
-                        });
-                  }
                   List<dynamic> jsonD = jsonDecode(response);
                   List<ResourceFileTableData> newData = jsonD
                       .map((json) => ResourceFileTableData.fromJson(json))
@@ -351,17 +375,24 @@ class _resourceScreenState extends State<resourceScreen> {
   Container normalPost(
       {required double screenHeight,
       required double screenWidth,
-      required TextEditingController actionController}) {
+      required TextEditingController vulnTypeController,
+      required TextEditingController typeController,
+      required TextEditingController valueController}) {
     return Container(
       width: screenWidth,
       height: screenHeight / 2 - 100 - 50,
       margin:
           const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black38),
-        color: Colors.white12,
-      ),
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black38,
+              blurRadius: 15,
+              spreadRadius: -7,
+            )
+          ]),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -373,7 +404,7 @@ class _resourceScreenState extends State<resourceScreen> {
                     style: GoogleFonts.montserrat(
                         fontSize: 18, fontWeight: FontWeight.bold)),
               ),
-              boxInput1(controller: actionController, content: "Type here...")
+              boxInput1(controller: vulnTypeController, content: "Type here...")
             ]),
             const Divider(
                 color: Colors.black, thickness: 0.2, indent: 40, endIndent: 40),
@@ -384,7 +415,7 @@ class _resourceScreenState extends State<resourceScreen> {
                     style: GoogleFonts.montserrat(
                         fontSize: 18, fontWeight: FontWeight.bold)),
               ),
-              boxInput1(controller: actionController, content: "Type here...")
+              boxInput1(controller: typeController, content: "Type here...")
             ]),
             const Divider(
                 color: Colors.black, thickness: 0.2, indent: 40, endIndent: 40),
@@ -395,11 +426,21 @@ class _resourceScreenState extends State<resourceScreen> {
                     style: GoogleFonts.montserrat(
                         fontSize: 18, fontWeight: FontWeight.bold)),
               ),
-              boxInput1(controller: actionController, content: "Type here...")
+              boxInput1(controller: valueController, content: "Type here...")
             ]),
             GradientButton(
-                onPressed: () {
-                  print("Send");
+                onPressed: () async {
+                  String resp = await postResources(
+                      vulnType: vulnTypeController.text,
+                      resType: typeController.text,
+                      value: valueController.text,
+                      action: "add");
+                  if (resp == 'Failed to Post Resources' ||
+                      resp.contains('Error post resources')) {
+                    print("Failed to post file");
+                  } else {
+                    print("Posted file successfully");
+                  }
                 },
                 horizontalMargin: 40,
                 verticalMargin: 0,
@@ -414,10 +455,13 @@ class _resourceScreenState extends State<resourceScreen> {
     );
   }
 
-  Container filePost(
-      {required double screenHeight,
-      required double screenWidth,
-      required TextEditingController actionController}) {
+  Container filePost({
+    required double screenHeight,
+    required double screenWidth,
+    required TextEditingController actionController,
+    required String fileInfo,
+    required ResourceFile resourceFile,
+  }) {
     String fileState = 'valid';
     return Container(
       width: screenWidth,
@@ -425,10 +469,15 @@ class _resourceScreenState extends State<resourceScreen> {
       margin:
           const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black38),
-        color: Colors.white12,
-      ),
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black38,
+              blurRadius: 15,
+              spreadRadius: -7,
+            )
+          ]),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -440,7 +489,6 @@ class _resourceScreenState extends State<resourceScreen> {
                     style: GoogleFonts.montserrat(
                         fontSize: 18, fontWeight: FontWeight.bold)),
               ),
-              // TODO: fix dropdown value
               Container(
                 width: 400,
                 margin: const EdgeInsetsDirectional.only(end: 40, top: 10),
@@ -468,7 +516,6 @@ class _resourceScreenState extends State<resourceScreen> {
                       setState(() {
                         fileState = v!;
                       });
-                      print(fileState);
                     }),
               ),
             ]),
@@ -485,8 +532,27 @@ class _resourceScreenState extends State<resourceScreen> {
                   borderRadius: BorderRadius.circular(10),
                   horizontalMargin: 40,
                   verticalMargin: 10,
-                  onPressed: () {
-                    print("Browse");
+                  onPressed: () async {
+                    FilePickerResult? result =
+                        await FilePicker.platform.pickFiles();
+                    if (result != null) {
+                      File file = File(result.files.single.path!);
+                      try {
+                        // TODO: add loading screen while analyzing file
+                        final filename = basename(result.files.single.path!);
+                        var filestat = file.statSync();
+                        final fileInfoStr =
+                            "Filename: $filename\nSize: ${filestat.size} bytes\nType: ${filestat.type}";
+                        List<int> bytes = file.readAsBytesSync();
+                        String base64value = base64Encode(bytes);
+                        chooseFile(fileInfoStr, filename, fileState,
+                            base64value, "add");
+                      } catch (e) {
+                        print("Error reading file: $e");
+                      }
+                    } else {
+                      print("Something went wrong!");
+                    }
                   },
                   child: Text("Browse",
                       style: GoogleFonts.montserrat(
@@ -510,16 +576,38 @@ class _resourceScreenState extends State<resourceScreen> {
                     border: Border.all(color: Colors.white24),
                     color: const Color.fromARGB(255, 189, 149, 134),
                   ),
-                  child: ListTile(
-                    title: Text("File Information:",
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: ListTile(
+                      title: Text(
+                        "File Information:",
                         style: GoogleFonts.montserrat(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    subtitle: const Text("This file is sus"),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        fileInfo,
+                        // Use null-aware operator
+                        overflow: TextOverflow.values[1],
+                        style: GoogleFonts.montserrat(fontSize: 15),
+                      ),
+                    ),
                   ),
                 ),
                 GradientButton(
-                    onPressed: () {
-                      print("Send");
+                    onPressed: () async {
+                      String resp = await postResourcesFile(
+                          fileName: resourceFile.fileName!,
+                          description: resourceFile.description,
+                          base64value: resourceFile.base64value!,
+                          action: resourceFile.action!);
+                      if (resp == 'Failed to Post Resources' ||
+                          resp.contains('Error post resources')) {
+                        print("Failed to post file");
+                      } else {
+                        print("Posted file successfully");
+                      }
                     },
                     horizontalMargin: 40,
                     verticalMargin: 10,

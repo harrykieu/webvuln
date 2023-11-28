@@ -52,7 +52,7 @@ class _scan_screenState extends State<scan_screen> {
 
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
+    double screenWidth = MediaQuery.of(context).size.width-200;
     return Column(
       children: [
         SizedBox(
@@ -110,6 +110,7 @@ class _scan_screenState extends State<scan_screen> {
                       offset: Offset(5, 5))
                 ],
                 borderRadius: BorderRadius.all(Radius.circular(20)))),
+        SizedBox(height: 30,),
 
 //Button Scan URL
         submitButton(
@@ -213,9 +214,7 @@ class _scan_screenState extends State<scan_screen> {
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  visible_box(),
-                  Visibility(
-                      visible: _isVisibled1, child: method_description_module())
+                 visible_box()
                 ],
               ),
             ),
