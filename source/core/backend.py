@@ -777,6 +777,4 @@ class WebVuln:
 
         html += "</body></html>"
 
-        pdfkit.from_string(html, 'report.pdf')
-
-    
+        #pdfkit.from_string(html, 'report.pdf')
