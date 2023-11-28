@@ -252,24 +252,33 @@ class _resourceScreenState extends State<resourceScreen> {
         Container(
             // TODO: calculate height of table using other element's height
             // (need to find efficient way)
-            height: screenHeight / 2 - 50 - 20 - 20 - 10,
+            height: screenHeight / 2 - 50 - 20 - 20 - 10 - 10,
             width: screenWidth,
-            margin: const EdgeInsetsDirectional.symmetric(horizontal: 40),
+            margin: const EdgeInsetsDirectional.only(
+                start: 40, end: 40, bottom: 10),
             decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(10),
                     topRight: Radius.circular(10)),
                 color: Colors.white24),
-            child: DataTable2(
-                columnSpacing: 10,
-                columns: const [
-                  DataColumn2(label: Text('Vulnerability'), size: ColumnSize.S),
-                  DataColumn2(label: Text('Resource Type'), size: ColumnSize.S),
-                  DataColumn2(label: Text('Value'), size: ColumnSize.L),
-                  DataColumn2(label: Text('Created Date'), size: ColumnSize.S),
-                  DataColumn2(label: Text('Edited Date'), size: ColumnSize.S),
-                ],
-                rows: dataRowList)),
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  color: Colors.blue.shade100),
+              child: DataTable2(
+                  columnSpacing: 10,
+                  columns: const [
+                    DataColumn2(
+                        label: Text('Vulnerability'), size: ColumnSize.S),
+                    DataColumn2(
+                        label: Text('Resource Type'), size: ColumnSize.S),
+                    DataColumn2(label: Text('Value'), size: ColumnSize.L),
+                    DataColumn2(
+                        label: Text('Created Date'), size: ColumnSize.S),
+                    DataColumn2(label: Text('Edited Date'), size: ColumnSize.S),
+                  ],
+                  rows: dataRowList),
+            )),
       ]),
     );
   }
@@ -358,16 +367,23 @@ class _resourceScreenState extends State<resourceScreen> {
                     topLeft: Radius.circular(10),
                     topRight: Radius.circular(10)),
                 color: Colors.white24),
-            child: DataTable2(
-                columnSpacing: 10,
-                columns: const [
-                  DataColumn2(label: Text('File name'), size: ColumnSize.S),
-                  DataColumn2(label: Text('Description'), size: ColumnSize.S),
-                  DataColumn2(label: Text('Base64 Value'), size: ColumnSize.L),
-                  DataColumn2(label: Text('Created Date'), size: ColumnSize.S),
-                  DataColumn2(label: Text('Edited Date'), size: ColumnSize.S),
-                ],
-                rows: dataRowList)),
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  color: Colors.brown.shade100),
+              child: DataTable2(
+                  columnSpacing: 10,
+                  columns: const [
+                    DataColumn2(label: Text('File name'), size: ColumnSize.S),
+                    DataColumn2(label: Text('Description'), size: ColumnSize.S),
+                    DataColumn2(
+                        label: Text('Base64 Value'), size: ColumnSize.L),
+                    DataColumn2(
+                        label: Text('Created Date'), size: ColumnSize.S),
+                    DataColumn2(label: Text('Edited Date'), size: ColumnSize.S),
+                  ],
+                  rows: dataRowList),
+            )),
       ]),
     );
   }
@@ -471,9 +487,9 @@ class _resourceScreenState extends State<resourceScreen> {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: Colors.white,
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Colors.black38,
+              color: Colors.brown.shade100,
               blurRadius: 15,
               spreadRadius: -7,
             )
@@ -574,7 +590,7 @@ class _resourceScreenState extends State<resourceScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.white24),
-                    color: const Color.fromARGB(255, 189, 149, 134),
+                    color: Colors.brown.shade100,
                   ),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
