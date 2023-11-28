@@ -34,6 +34,10 @@ A website vulnerability scanner for coders without any knowledge of web security
 [Here](https://docs.google.com/document/d/1q2712vtjwxAC53eEqRq5TR32uh3Rn8zE73PcZUIBzOs/edit?usp=sharing)
 ## Figma
 [Here](https://www.figma.com/file/GaYOiOhGOmMFxXdlmdPTDr/Project-Scanner-website?type=design&node-id=0-1&mode=design)
+
+## Install for pdfkit-generate report as PDF
+https://wkhtmltopdf.org/downloads.html
+
 ## How to run
 - Install Docker
 - Run `docker-compose up` at the `source\\core\\database` directory
