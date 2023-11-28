@@ -6,14 +6,14 @@ from urllib.parse import urljoin
 
 
 class IDOR:
-    def __init__(self, url, resources, idor_params):
+    def __init__(self, url, resources, idorParams):
         self.url = url
         self.session = requests.Session()
         self.session.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.5938.92"
         }
         self.resources = resources
-        self.idor_params = idor_params
+        self.idorParams = idorParams
         self.result = False
         self.payloads = []
     
@@ -61,7 +61,7 @@ class IDOR:
         urls = self.extract_urls()
         
         for url in urls:
-            for parameter in self.idor_params:
+            for parameter in self.idorParams:
                 for payload in self.resources:
                     if re.search(rf"{parameter["value"]}=(\d+)", url):
                         original_id = re.search(rf"{parameter["value"]}=(\d+)", url).group(1)  
