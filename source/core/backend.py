@@ -77,7 +77,7 @@ class WebVuln:
         :param jsonData: JSON object
         """
         if self.__debug:
-            print(f"{self.blue}{method} {route}: {jsonData.keys()}")
+            print(f"{self.blue}{method} {route}: {jsonData.keys()}{self.white}")
         if route == "/api/history":
             return self.getScanResult(method, jsonData)
         elif route == "/api/resourcesnormal":
@@ -85,11 +85,13 @@ class WebVuln:
         elif route == "/api/resourcesfile":
             return self.fileHandler(method, jsonData)
         elif route == "/api/scan":
-            return self.scanURL(jsonData["urls"],jsonData["modules"])
+            return self.scanURL(jsonData["urls"], jsonData["modules"])
         else:
             utils.log(f"[backend.py-recvFlask] Error: Invalid route {route}", "ERROR")
             if self.__debug:
-                print(f"{self.red}[backend.py-recvFlask] Error: Invalid route {route}")
+                print(
+                    f"{self.red}[backend.py-recvFlask] Error: Invalid route {route}{self.white}"
+                )
             raise ValueError(f"Invalid route {route}")
 
     def scanURL(self, urls, modules):
@@ -187,14 +189,95 @@ class WebVuln:
             for url in dirURL[key]:
                 for module in modules:
                     if module == "lfi":
-                        print("[+] Checking LFI vulnerability...")
-                        pass
+                        print("[+] Checking LFI vulnerability...")                        
+                        lfi_resources = self.resourceHandler(
+                            "GET", {"vulnType": "lfi", "resType": "payload"}
+                        )
+                        if lfi_resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        LFIResult, LFIPayload = LFI(
+                            url, lfi_resources
+                        ).check_lfi()
+                        if LFIResult is True:
+                            resultURL["numVuln"] += 1
+                            resultURL["vulnerabilities"].append(
+                                {
+                                    "type": "LFI",
+                                    "logs": open(
+                                        f"{ROOTPATH}/logs/lfi_log.txt", "r"
+                                    ).read(),
+                                    "payload": LFIPayload,
+                                    "severity": "High",
+                                }
+                            )
                     elif module == "sqli":
                         print("[+] Checking SQLi vulnerability...")
-                        pass
+                        sqli_resources = self.resourceHandler(
+                            "GET", {"vulnType": "sqli", "resType": "payload"}
+                        )
+                        if sqli_resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        SQLiResult, SQLiPayload = LFI(
+                            url, sqli_resources
+                        ).check_sqli()
+                        if SQLiResult is True:
+                            resultURL["numVuln"] += 1
+                            resultURL["vulnerabilities"].append(
+                                {
+                                    "type": "SQLi",
+                                    "logs": open(
+                                        f"{ROOTPATH}/logs/sqli_log.txt", "r"
+                                    ).read(),
+                                    "payload": SQLiPayload,
+                                    "severity": "High",
+                                }
+                            )
                     elif module == "xss":
                         print("[+] Checking XSS vulnerability...")
-                        pass
+                        xss_resources = self.resourceHandler(
+                            "GET", {"vulnType": "sqli", "resType": "payload"}
+                        )
+                        if xss_resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        XSSResult, XSSPayload = LFI(
+                            url, xss_resources
+                        ).check_xss()
+                        if XSSResult is True:
+                            resultURL["numVuln"] += 1
+                            resultURL["vulnerabilities"].append(
+                                {
+                                    "type": "SQLi",
+                                    "logs": open(
+                                        f"{ROOTPATH}/logs/xss_log.txt", "r"
+                                    ).read(),
+                                    "payload": XSSPayload,
+                                    "severity": "High",
+                                }
+                            )
                     elif module == "fileupload":
                         print("[+] Checking file upload vulnerability...")
                         resources = self.fileHandler("GET", {"description": ""})
@@ -256,6 +339,8 @@ class WebVuln:
                             )
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
+                        pathTraversalParam = self.resourceHandler(
+                            'GET', {"vulnType": "pathTraversal", "resType": "parameter"})
                         resources = self.resourceHandler(
                             "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
@@ -269,8 +354,18 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
+                        if pathTraversalParam == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get parameter",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get parameter"
+                                )
+                            return "Failed"
                         PTResult, PTPayload = PathTraversal(
-                            url, resources
+                            url, resources, pathTraversalParam
                         ).checkPathTraversal()
                         if PTResult is True:
                             resultURL["numVuln"] += 1
@@ -351,7 +446,7 @@ class WebVuln:
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
-                return listResult
+                return json.dumps(listResult, default=str)
             else:
                 utils.log("Error: Invalid JSON object", "ERROR")
                 return "Failed"
@@ -479,7 +574,7 @@ class WebVuln:
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
-                return listResult
+                return json.dumps(listResult, default=str)
             else:
                 if self.__debug:
                     print("[backend.py-fileHandler-GET] Error: Invalid JSON object")
@@ -607,7 +702,7 @@ class WebVuln:
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
-                return listResult
+                return json.dumps(listResult, default=str)
             else:
                 utils.log(
                     "[backend.py-getScanResult] Error: Invalid JSON object", "ERROR"
@@ -615,60 +710,73 @@ class WebVuln:
                 if self.__debug:
                     print("[backend.py-getScanResult] Error: Invalid JSON object")
                 return "Failed"
+            
+    # Generate JSON report
+    def generate_json_report(results):
+
+        json_str = json.dumps(results, indent=4) 
+        json_str = json_str.replace(', ', ',\n')
+        json_str = json_str.replace('{', '{\n')
+        json_str = json_str.replace('}', '\n}')
+
+        with open("report.json", "w") as f:
+            f.write(json_str)
 
     def generateXMLReport(self, results):
         """Generate XML report from the JSON result.
 
         :param results: JSON result
         """
-        root = ET.Element("scan_results")
+        with open('report.json') as f:
+            data = json.load(f)
 
-        for result in results:
-            domain = ET.SubElement(root, "domain")
-            domain.text = result["domain"]
-            scan_date = ET.SubElement(root, "scan_date")
-            scan_date.text = result["scanDate"]
+        root = ET.Element('report')
 
-            vulns = ET.SubElement(root, "vulnerabilities")
-            for vuln in result["vulnerabilities"]:
-                vuln_node = ET.SubElement(vulns, "vulnerability")
-                ET.SubElement(vuln_node, "type").text = vuln["type"]
-                ET.SubElement(vuln_node, "severity").text = vuln["severity"]
+        for item in data:
+            domain = ET.SubElement(root, 'domain')
+            domain.text = item['domain']
 
-        xml_report = ET.tostring(root)
-        with open("report.xml", "wb") as f:
-            f.write(xml_report)
+            scan_date = ET.SubElement(root, 'scan_date')
+            scan_date.text = item['scanDate']
+
+            vulns = ET.SubElement(root, 'vulnerabilities')
+            for vuln in item['vulnerabilities']:
+                vuln_node = ET.SubElement(vulns, 'vulnerability')
+                ET.SubElement(vuln_node, 'type').text = vuln['type']
+                ET.SubElement(vuln_node, 'severity').text = vuln['severity']
+
+        tree = ET.ElementTree(root)
+        tree.write('report.xml')
 
     def generatePDFReport(self, results):
         """Generate PDF report from the JSON result.
 
         :param results: JSON result
         """
-        html = "<h1>Report</h1>"
+        with open('report.json') as f:
+            data = json.load(f)
 
-        for item in results:
-            html += f"<h3>{item['domain']}</h3>"
+        html = '''
+        <html>
+        <head>
+        <title>Report</title>
+        </head>
+        <body>
+        <h1>Vulnerability Report</h1>
+        '''
+
+        for item in data:
+            html += f"<h2>{item['domain']}</h2>"
             html += f"<p>Scan Date: {item['scanDate']}</p>"
 
+            html += "<h3>Vulnerabilities:</h3>"
             html += "<ul>"
-            for vuln in item["vulnerabilities"]:
+            for vuln in item['vulnerabilities']:
                 html += f"<li>{vuln['type']} - {vuln['severity']}</li>"
-                html += "<li>Log:<br><div><p>"
-                for line in vuln["logs"].split("\n"):
-                    html += f"{line}<br>"
             html += "</ul>"
-        with open("test.html", "w") as f:
-            f.writelines(html)
-        f.close()
-        # BUG
-        # pdfkit.from_string(html, "scan_results.pdf")
 
-    # Generate JSON report
-    def generateJSONReport(self, results):
-        """Generate JSON report from the JSON result.
+        html += "</body></html>"
 
-        :param results: JSON result
-        """
-        json_report = json.dumps(results)
-        with open("report.json", "w") as f:
-            f.write(json_report)
+        pdfkit.from_string(html, 'report.pdf')
+
+    

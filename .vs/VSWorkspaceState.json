@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\source",
+    "\\source\\ui",
+    "\\source\\ui\\webvuln",
+    "\\source\\ui\\webvuln\\lib",
+    "\\source\\ui\\webvuln\\lib\\views"
+  ],
+  "SelectedNode": "\\source\\ui\\webvuln\\lib\\views\\resultScreen.dart",
+  "PreviewInSolutionExplorer": false
+}
