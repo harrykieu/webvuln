@@ -95,7 +95,7 @@ class XSS:
             print("[!] Trying", new_url)
             res = s.get(new_url)
 
-            if payload in res.text:
+            if payload["value"] in res.text:
                 print("[+] XSS vulnerability detected, link:", new_url)
                 utils.log(
                             f"[XSS] XSS vulnerability detected, link: {new_url}",
