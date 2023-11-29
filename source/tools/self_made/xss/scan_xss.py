@@ -147,4 +147,4 @@ class XSS:
             "[XSS] Check XSS done", "INFO", "xss_log.txt"
         )
 
-        return False
+        return self.result, self.payloads
