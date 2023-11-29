@@ -316,26 +316,6 @@ class WebVuln:
                         resources = self.resourceHandler(
                             "GET", {"vulnType": "idor", "resType": "payload"}
                         )
-                        if idorParams == "Failed":
-                            utils.log(
-                                "[backend.py-scanURL] Error: Failed to get parameter",
-                                "ERROR",
-                            )
-                            if self.__debug:
-                                print(
-                                    "[backend.py-scanURL] Error: Failed to get parameter"
-                                )
-                            return "Failed"
-                        if resources == "Failed":
-                            utils.log(
-                                "[backend.py-scanURL] Error: Failed to get resources",
-                                "ERROR",
-                            )
-                            if self.__debug:
-                                print(
-                                    "[backend.py-scanURL] Error: Failed to get resources"
-                                )
-                            return "Failed"
                         idorResult, idorPayload = IDOR(url, resources, idorParams).check_idor(url)
                         if idorResult is True:
                             resultURL["numVuln"] += 1

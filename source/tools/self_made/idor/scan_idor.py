@@ -13,8 +13,8 @@ class IDOR:
         self.session.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.5938.92"
         }
-        self.resources = resources
-        self.idorParams = idorParams
+        self.resources = json.loads(resources)
+        self.idorParams = json.loads(idorParams)
         self.result = False
         self.payloads = []
     
@@ -64,6 +64,7 @@ class IDOR:
         for url in urls:
             for parameter in self.idorParams:
                 for payload in self.resources:
+                    print(f'Type of parameter["value"]: {type(parameter["value"])}')
                     if re.search(rf"{parameter["value"]}=(\d+)", url):
                         originalId = re.search(rf"{parameter["value"]}=(\d+)", url).group(1)  
                         originalUrl = url 
