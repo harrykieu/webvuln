@@ -131,7 +131,7 @@ class XSS:
                 elif form_details["method"] == "get":
                     res = s.get(self.url, params=data)
 
-                if payload in res.text:
+                if payload["value"] in res.text:
                     print("[+] XSS vulnerability detected, link:", self.url)
                     utils.log(
                             f"[XSS] XSS detected in form, link: {self.url}",
