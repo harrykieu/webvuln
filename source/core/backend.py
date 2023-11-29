@@ -251,7 +251,7 @@ class WebVuln:
                     elif module == "xss":
                         print("[+] Checking XSS vulnerability...")
                         xss_resources = self.resourceHandler(
-                            "GET", {"vulnType": "sqli", "resType": "payload"}
+                            "GET", {"vulnType": "xss", "resType": "payload"}
                         )
                         if xss_resources == "Failed":
                             utils.log(
