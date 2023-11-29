@@ -270,7 +270,7 @@ class WebVuln:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
                                 {
-                                    "type": "SQLi",
+                                    "type": "XSS",
                                     "logs": open(
                                         f"{ROOTPATH}/logs/xss_log.txt", "r"
                                     ).read(),
