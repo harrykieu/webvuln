@@ -64,7 +64,7 @@ class IDOR:
         for url in urls:
             for parameter in self.idorParams:
                 for payload in self.resources:
-                    print(f'Type of parameter["value"]: {type(parameter["value"])}')
+                    
                     if re.search(rf"{parameter["value"]}=(\d+)", url):
                         originalId = re.search(rf"{parameter["value"]}=(\d+)", url).group(1)  
                         originalUrl = url 
