@@ -16,7 +16,7 @@ from source.tools.self_made.idor.scan_idor import IDOR
 from source.core.calSeverity import calculateWebsiteSafetyRate
 
 import xml.etree.ElementTree as ET
-# import pdfkit
+#import pdfkit
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [
@@ -233,7 +233,7 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        SQLiResult, SQLiPayload = LFI(
+                        SQLiResult, SQLiPayload = SQLi(
                             url, sqli_resources
                         ).check_sqli()
                         if SQLiResult is True:
@@ -263,7 +263,7 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        XSSResult, XSSPayload = LFI(
+                        XSSResult, XSSPayload = XSS(
                             url, xss_resources
                         ).check_xss()
                         if XSSResult is True:
@@ -322,6 +322,8 @@ class WebVuln:
                             )
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
+                        pathTraversalParam = self.resourceHandler(
+                            'GET', {"vulnType": "pathTraversal", "resType": "parameter"})
                         resources = self.resourceHandler(
                             "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
@@ -335,8 +337,18 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
+                        if pathTraversalParam == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get parameter",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get parameter"
+                                )
+                            return "Failed"
                         PTResult, PTPayload = PathTraversal(
-                            url, resources
+                            url, resources, pathTraversalParam
                         ).checkPathTraversal()
                         if PTResult is True:
                             resultURL["numVuln"] += 1
