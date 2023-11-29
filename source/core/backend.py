@@ -310,12 +310,22 @@ class WebVuln:
                             )
                     elif module == "idor":
                         print("[+] Checking IDOR vulnerability...")
-                        idor_params = self.resourceHandler(
+                        idorParams = self.resourceHandler(
                             "GET", {"vulnType": "idor", "resType": "parameter"}
                         )
                         resources = self.resourceHandler(
                             "GET", {"vulnType": "idor", "resType": "payload"}
                         )
+                        if idorParams == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get parameter",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get parameter"
+                                )
+                            return "Failed"
                         if resources == "Failed":
                             utils.log(
                                 "[backend.py-scanURL] Error: Failed to get resources",
@@ -326,14 +336,14 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        idor_result, idor_payload = IDOR(url, resources, idor_params).check_idor(url)
-                        if idor_result is True:
+                        idorResult, idorPayload = IDOR(url, resources, idorParams).check_idor(url)
+                        if idorResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
                                 {
                                     "type": "IDOR",
                                     "logs": open(f"{ROOTPATH}/logs/idor.txt", "r").read(),
-                                    "payload": idor_payload,
+                                    "payload": idorPayload,
                                     "severity": "High",
                                 }
                             )

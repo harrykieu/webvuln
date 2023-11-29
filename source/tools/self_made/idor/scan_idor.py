@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import re
 import source.core.utils as utils
 from urllib.parse import urljoin
+import json
 
 
 class IDOR:
@@ -64,17 +65,17 @@ class IDOR:
             for parameter in self.idorParams:
                 for payload in self.resources:
                     if re.search(rf"{parameter["value"]}=(\d+)", url):
-                        original_id = re.search(rf"{parameter["value"]}=(\d+)", url).group(1)  
-                        original_url = url 
+                        originalId = re.search(rf"{parameter["value"]}=(\d+)", url).group(1)  
+                        originalUrl = url 
                     
-                        test_url = re.sub(rf"{parameter["value"]}=\d+", f"{parameter["value"]}={payload["value"]}", url)
-                        test_resp = self.session.get(test_url)
-                        original_resp = self.session.get(original_url)
+                        testUrl = re.sub(rf"{parameter["value"]}=\d+", f"{parameter["value"]}={payload["value"]}", url)
+                        testResp = self.session.get(testUrl)
+                        originalResp = self.session.get(originalUrl)
 
-                        if self.compare_responses(original_resp, test_resp):
-                            print("[!] IDOR detected on url:", test_url)
+                        if self.compare_responses(originalResp, testResp):
+                            print("[!] IDOR detected on url:", testUrl)
                             utils.log(
-                            f"[IDOR] IDOR vulnerability detected, link: {test_url}",
+                            f"[IDOR] IDOR vulnerability detected, link: {testUrl}",
                             "INFO",
                             "idor.txt",
                         )
@@ -82,10 +83,10 @@ class IDOR:
                             self.payloads.append(payload["value"])
                             break
                         
-                        if self.check_unauthorized_access(test_resp):
-                            print("[!] IDOR detected on url:", test_url)
+                        if self.check_unauthorized_access(testResp):
+                            print("[!] IDOR detected on url:", testUrl)
                             utils.log(
-                                f"[IDOR] IDOR vulnerability detected, link: {test_url}",
+                                f"[IDOR] IDOR vulnerability detected, link: {testUrl}",
                                 "INFO",
                                 "idor.txt",
                             )
