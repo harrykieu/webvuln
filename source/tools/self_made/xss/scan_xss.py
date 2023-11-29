@@ -86,6 +86,16 @@ class XSS:
 
         print("\n[+] Checking XSS")
 
+        if not self.xss_resources:
+            print(f"\n[-] Resources not found!")
+            utils.log(
+                "[XSS] Resources not found!",
+                "ERROR",
+                "xss_log.txt",
+            )
+            return self.result
+            sys.exit(1)
+
         for payload in self.xss_resources:
             payload_str = payload["value"]
             encoded_payload = urllib.parse.quote(payload_str.encode('utf-8'))
@@ -147,4 +157,3 @@ class XSS:
         )
 
         return self.result, self.payloads
-
