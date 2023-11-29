@@ -118,6 +118,16 @@ class SQLi:
 
         print("\n[+] Checking SQLi")
 
+        if not self.sqli_resources:
+            print(f"\n[-] Resources not found!")
+            utils.log(
+                "[SQLi] Resources not found!",
+                "ERROR",
+                "sqli_log.txt",
+            )
+            return self.result
+            sys.exit(1)
+
         for payload in self.sqli_resources:
             payload_str = payload["value"]
             encoded_payload = urllib.parse.quote(payload_str.encode('utf-8'))
@@ -168,7 +178,7 @@ class SQLi:
                     )
 
                     utils.log(
-                            f"[SQL] SQL Injection detected in form, link: {self.url}",
+                            f"[SQLi] SQL Injection detected in form, link: {self.url}",
                             "INFO",
                             "sqli_log.txt",
                         )
