@@ -2,21 +2,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:webvuln/items/drawer_bar.dart';
 import 'package:webvuln/views/historyScreen.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
 import 'package:webvuln/views/resultScreen.dart';
-import 'package:webvuln/views/scan_screen.dart';
+import 'package:webvuln/views/scanScreen.dart';
 import 'package:webvuln/views/settingScreen.dart';
-import 'dart:io';
 
 // import '../views/scanScreen2.dart';
 // import 'views/draft.dart';
 
 void main() async {
-  // Size size = await DesktopWindow.getWindowSize();
-  // await DesktopWindow.setMinWindowSize(Size(1920, 1080));
-  // await DesktopWindow.setMaxWindowSize(Size(1920, 1080));
   runApp(const mainScreen());
 }
 
@@ -29,23 +24,16 @@ class mainScreen extends StatefulWidget {
 
 class _mainScreenState extends State<mainScreen> {
   int _selectedIndex = 0;
+  String scanResult = '';
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _selectedIndex = 0;
-    // TODO: move this to scanScreen
-    ServerSocket.bind("0.0.0.0", 5001).then((serverSocket) {
-      serverSocket.listen((socket) {
-        socket.listen((data) {
-          print(String.fromCharCodes(data).trim());
-        });
-      });
-    });
   }
 
   final List _selectedItem = [
-    const scan_screen(),
+    const scanScreen(),
     const resultScreen(),
     const historyScreen(),
     const resourceScreen(),

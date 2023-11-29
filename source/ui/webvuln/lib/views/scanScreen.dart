@@ -1,20 +1,25 @@
+// ignore_for_file: file_names, camel_case_types
+
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/loadingScreen.dart';
 import 'package:webvuln/views/variable.dart';
-import '../items/submitButton.dart';
-import '../items/input.dart';
 
-class scan_screen extends StatefulWidget {
-  const scan_screen({super.key});
+import '../items/input.dart';
+import '../items/submitButton.dart';
+
+class scanScreen extends StatefulWidget {
+  const scanScreen({super.key});
 
   @override
-  State<scan_screen> createState() => _scan_screenState();
+  State<scanScreen> createState() => _scanScreenState();
 }
 
-class _scan_screenState extends State<scan_screen> {
+class _scanScreenState extends State<scanScreen> {
   @override
   void initState() {
     setState(() {
@@ -30,10 +35,10 @@ class _scan_screenState extends State<scan_screen> {
     style: GoogleFonts.montserrat(
         color: Colors.white, fontWeight: FontWeight.normal),
   );
-  bool _isVisibled1 = false;
   bool _isVisibled = false;
   int _numberModule = 0;
-  void check_number_selected() {
+  String dataReceive = '';
+  void checkNumberSelected() {
     switch (Constants.valueSelected.length) {
       case 0:
         break;
@@ -44,27 +49,27 @@ class _scan_screenState extends State<scan_screen> {
       case 2:
         setState(() {
           _isVisibled = true;
-          _isVisibled1 = true;
         });
       default:
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width-200;
+    double screenWidth = MediaQuery.of(context).size.width - 200;
     return Column(
       children: [
-        SizedBox(
+        const SizedBox(
           height: 100,
         ),
 
-//Textbox SCAN URL
-        container(
+        //Textbox SCAN URL
+        Container(
             margin: const EdgeInsets.only(left: 200, right: 200),
-            Width: double.infinity,
-            Height: 200,
-            decoration: BoxDecoration(color: Colors.transparent),
+            width: double.infinity,
+            height: 200,
+            decoration: const BoxDecoration(color: Colors.transparent),
             child: ListTile(
               title: Text(
                 'SCAN URL',
@@ -75,12 +80,12 @@ class _scan_screenState extends State<scan_screen> {
               ),
             )),
 
-// TextField Input url
-        container(
+        // TextField Input url
+        Container(
             margin: const EdgeInsets.only(left: 200, right: 200),
-            Width: double.infinity,
-            Height: 100,
-            decoration: BoxDecoration(color: Colors.transparent),
+            width: double.infinity,
+            height: 100,
+            decoration: const BoxDecoration(color: Colors.transparent),
             child:
                 // Constants.buildInputUser(
                 //   controller: urlController,
@@ -95,12 +100,11 @@ class _scan_screenState extends State<scan_screen> {
                   child: Image(image: AssetImage('lib/assets/suffixIcon.png'))),
             )),
 
-//Box Module scan
-        container(
+        //Box Module scan
+        Container(
             margin: const EdgeInsets.only(left: 50, right: 50),
-            Width: double.infinity,
-            child: boxModule(screenWidth, screenHeight),
-            Height: screenHeight - 600,
+            width: double.infinity,
+            height: screenHeight - 600,
             decoration: const BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -109,14 +113,17 @@ class _scan_screenState extends State<scan_screen> {
                       blurRadius: 10,
                       offset: Offset(5, 5))
                 ],
-                borderRadius: BorderRadius.all(Radius.circular(20)))),
-        SizedBox(height: 30,),
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            child: boxModule(screenWidth, screenHeight)),
+        const SizedBox(
+          height: 30,
+        ),
 
-//Button Scan URL
+        //Button Scan URL
         submitButton(
           onPressed: () {
             // String result = postURL(nameURL: urlController.text, moduleNumber: Constants.valueSelected) as String;
-            Get.to(loadingScreen());
+            Get.to(const loadingScreen());
             if (postURL(
                             nameURL: urlController.text,
                             moduleNumber: Constants.valueSelected)
@@ -134,7 +141,7 @@ class _scan_screenState extends State<scan_screen> {
                 );
               });
             } else {
-              Get.to(loadingScreen());
+              Get.to(const loadingScreen());
             }
           },
           childButton: contentChild,
@@ -146,12 +153,11 @@ class _scan_screenState extends State<scan_screen> {
   Row boxModule(double screenWidth, double screenHeight) {
     return Row(
       children: [
-// group checkbox module button
-
+        // group checkbox module button
         Container(
             width: screenWidth / 8,
             height: double.infinity,
-            margin: EdgeInsets.all(20),
+            margin: const EdgeInsets.all(20),
             decoration: const BoxDecoration(
                 color: Colors.transparent,
                 borderRadius: BorderRadius.all(Radius.circular(20))),
@@ -165,7 +171,6 @@ class _scan_screenState extends State<scan_screen> {
                         Checkbox(
                           value: Constants.valueCheckbox[index],
                           onChanged: (value) {
-                            
                             setState(() {
                               Constants.valueCheckbox[index] = value!;
                               _numberModule = index;
@@ -177,7 +182,7 @@ class _scan_screenState extends State<scan_screen> {
                                 Constants.valueSelected
                                     .remove(Constants.nameModule[index]);
                               }
-                              check_number_selected();
+                              checkNumberSelected();
                               print(Constants.valueSelected);
                             });
                           },
@@ -189,22 +194,25 @@ class _scan_screenState extends State<scan_screen> {
                 ),
               ),
             )),
-// divide line between the button and description
+        // divide line between the button and description
         const VerticalDivider(
           indent: 40,
           endIndent: 40,
           color: Color(0xFF021361),
           thickness: 2,
         ),
-// description
-        container(
+        // description
+        Container(
             margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-            Width: screenWidth - (screenWidth / 2),
+            width: screenWidth - (screenWidth / 2),
+            height: screenHeight / 2.7,
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.transparent, width: 1)),
             child: SingleChildScrollView(
               child: Column(
                 children: [
                   ListTile(
-                    leading: Icon(
+                    leading: const Icon(
                       Icons.document_scanner_rounded,
                       color: Color(0xFF1A35C3),
                     ),
@@ -214,18 +222,15 @@ class _scan_screenState extends State<scan_screen> {
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
-                 visible_box()
+                  visibleBox()
                 ],
               ),
-            ),
-            Height: screenHeight / 2.7,
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.transparent, width: 1)))
+            ))
       ],
     );
   }
 
-  Visibility visible_box() => Visibility(
+  Visibility visibleBox() => Visibility(
         visible: _isVisibled,
         child: method_description_module(),
       );
@@ -235,21 +240,7 @@ class _scan_screenState extends State<scan_screen> {
       title: Text(Constants.content[_numberModule]),
     );
   }
-
-  Container container(
-      {required Widget child,
-      required double Height,
-      required BoxDecoration decoration,
-      required double Width,
-      required EdgeInsets margin}) {
-    return Container(
-        width: Width,
-        height: Height,
-        decoration: decoration,
-        margin: margin,
-        child: child);
-  }
 }
 // viet them ham nhan data tu backend de setState cho widget trong contentChild
 
-// viết hàm truyền giá trị của 1 biến từ màn scan_screen sang màn main để màn main nhận định được _selectedIndex của nó chuyển thành 1
+// viết hàm truyền giá trị của 1 biến từ màn scanScreen sang màn main để màn main nhận định được _selectedIndex của nó chuyển thành 1
