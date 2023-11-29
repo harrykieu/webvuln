@@ -78,7 +78,6 @@ class XSS:
     # ---------------------------------------------------------------------
 
     def check_xss(self):
-
         utils.log(
             f"[XSS] Checking XSS for {self.url}",
             "INFO",
@@ -98,10 +97,10 @@ class XSS:
             if payload["value"] in res.text:
                 print("[+] XSS vulnerability detected, link:", new_url)
                 utils.log(
-                            f"[XSS] XSS vulnerability detected, link: {new_url}",
-                            "INFO",
-                            "xss_log.txt",
-                        )
+                    f"[XSS] XSS vulnerability detected, link: {new_url}",
+                    "INFO",
+                    "xss_log.txt",
+                )
                 self.payloads.append(payload["value"])
                 self.result = True
                 break
@@ -119,25 +118,25 @@ class XSS:
                 for input_tag in form_details["inputs"]:
                     if input_tag["value"] or input_tag["type"] == "hidden":
                         try:
-                            data[input_tag["name"]] = input_tag["value"] + payload
+                            data[input_tag["name"]] = input_tag["value"] + payload["value"]
                         except:
                             pass
                     elif input_tag["type"] != "submit":
-                        data[input_tag["name"]] = payload
+                        data[input_tag["name"]] = payload["value"]
 
-                self.url = urljoin(self.url, form_details["action"])
+                form_action_url = urljoin(self.url, form_details["action"])
                 if form_details["method"] == "post":
-                    res = s.post(self.url, data=data)
+                    res = s.post(form_action_url, data=data)
                 elif form_details["method"] == "get":
-                    res = s.get(self.url, params=data)
+                    res = s.get(form_action_url, params=data)
 
                 if payload["value"] in res.text:
-                    print("[+] XSS vulnerability detected, link:", self.url)
+                    print("[+] XSS vulnerability detected in form, link:", form_action_url)
                     utils.log(
-                            f"[XSS] XSS detected in form, link: {self.url}",
-                            "INFO",
-                            "xss_log.txt",
-                        )
+                        f"[XSS] XSS detected in form, link: {form_action_url}",
+                        "INFO",
+                        "xss_log.txt",
+                    )
                     self.payloads.append(payload["value"])
                     self.result = True
                     break
@@ -148,3 +147,4 @@ class XSS:
         )
 
         return self.result, self.payloads
+
