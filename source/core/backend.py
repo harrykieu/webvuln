@@ -16,7 +16,7 @@ from source.tools.self_made.idor.scan_idor import IDOR
 from source.core.calSeverity import calculateWebsiteSafetyRate
 
 import xml.etree.ElementTree as ET
-import pdfkit
+#import pdfkit
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [
