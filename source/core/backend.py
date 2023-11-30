@@ -16,7 +16,7 @@ from source.tools.self_made.idor.scan_idor import IDOR
 from source.core.calSeverity import calculateWebsiteSafetyRate
 
 import xml.etree.ElementTree as ET
-#import pdfkit
+import pdfkit
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [
@@ -189,23 +189,11 @@ class WebVuln:
             for url in dirURL[key]:
                 for module in modules:
                     if module == "lfi":
-                        print("[+] Checking LFI vulnerability...")                        
+                        print("[+] Checking LFI vulnerability...")
                         lfi_resources = self.resourceHandler(
                             "GET", {"vulnType": "lfi", "resType": "payload"}
                         )
-                        if lfi_resources == "Failed":
-                            utils.log(
-                                "[backend.py-scanURL] Error: Failed to get resources",
-                                "ERROR",
-                            )
-                            if self.__debug:
-                                print(
-                                    "[backend.py-scanURL] Error: Failed to get resources"
-                                )
-                            return "Failed"
-                        LFIResult, LFIPayload = LFI(
-                            url, lfi_resources
-                        ).check_lfi()
+                        LFIResult, LFIPayload = LFI(url, lfi_resources).check_lfi()
                         if LFIResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
@@ -223,19 +211,7 @@ class WebVuln:
                         sqli_resources = self.resourceHandler(
                             "GET", {"vulnType": "sqli", "resType": "payload"}
                         )
-                        if sqli_resources == "Failed":
-                            utils.log(
-                                "[backend.py-scanURL] Error: Failed to get resources",
-                                "ERROR",
-                            )
-                            if self.__debug:
-                                print(
-                                    "[backend.py-scanURL] Error: Failed to get resources"
-                                )
-                            return "Failed"
-                        SQLiResult, SQLiPayload = LFI(
-                            url, sqli_resources
-                        ).check_sqli()
+                        SQLiResult, SQLiPayload = LFI(url, sqli_resources).check_sqli()
                         if SQLiResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
@@ -253,19 +229,7 @@ class WebVuln:
                         xss_resources = self.resourceHandler(
                             "GET", {"vulnType": "sqli", "resType": "payload"}
                         )
-                        if xss_resources == "Failed":
-                            utils.log(
-                                "[backend.py-scanURL] Error: Failed to get resources",
-                                "ERROR",
-                            )
-                            if self.__debug:
-                                print(
-                                    "[backend.py-scanURL] Error: Failed to get resources"
-                                )
-                            return "Failed"
-                        XSSResult, XSSPayload = LFI(
-                            url, xss_resources
-                        ).check_xss()
+                        XSSResult, XSSPayload = LFI(url, xss_resources).check_xss()
                         if XSSResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
@@ -281,16 +245,6 @@ class WebVuln:
                     elif module == "fileupload":
                         print("[+] Checking file upload vulnerability...")
                         resources = self.fileHandler("GET", {"description": ""})
-                        if resources == "Failed":
-                            utils.log(
-                                "[backend.py-scanURL] Error: Failed to get resources",
-                                "ERROR",
-                            )
-                            if self.__debug:
-                                print(
-                                    "[backend.py-scanURL] Error: Failed to get resources"
-                                )
-                            return "Failed"
                         if "dvwa" in url:
                             a = FileUpload(url, resources, isDVWA=True)
                         else:
@@ -323,30 +277,11 @@ class WebVuln:
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
                         pathTraversalParam = self.resourceHandler(
-                            'GET', {"vulnType": "pathTraversal", "resType": "parameter"})
+                            "GET", {"vulnType": "pathTraversal", "resType": "parameter"}
+                        )
                         resources = self.resourceHandler(
                             "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
-                        if resources == "Failed":
-                            utils.log(
-                                "[backend.py-scanURL] Error: Failed to get resources",
-                                "ERROR",
-                            )
-                            if self.__debug:
-                                print(
-                                    "[backend.py-scanURL] Error: Failed to get resources"
-                                )
-                            return "Failed"
-                        if pathTraversalParam == "Failed":
-                            utils.log(
-                                "[backend.py-scanURL] Error: Failed to get parameter",
-                                "ERROR",
-                            )
-                            if self.__debug:
-                                print(
-                                    "[backend.py-scanURL] Error: Failed to get parameter"
-                                )
-                            return "Failed"
                         PTResult, PTPayload = PathTraversal(
                             url, resources, pathTraversalParam
                         ).checkPathTraversal()
@@ -425,7 +360,6 @@ class WebVuln:
                     if self.__debug:
                         print(f"[backend.py-findDocument-GET] Error: {e}")
                     raise e
-                    return "Failed"
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
@@ -693,14 +627,13 @@ class WebVuln:
                 if self.__debug:
                     print("[backend.py-getScanResult] Error: Invalid JSON object")
                 return "Failed"
-            
+
     # Generate JSON report
     def generate_json_report(results):
-
-        json_str = json.dumps(results, indent=4) 
-        json_str = json_str.replace(', ', ',\n')
-        json_str = json_str.replace('{', '{\n')
-        json_str = json_str.replace('}', '\n}')
+        json_str = json.dumps(results, indent=4)
+        json_str = json_str.replace(", ", ",\n")
+        json_str = json_str.replace("{", "{\n")
+        json_str = json_str.replace("}", "\n}")
 
         with open("report.json", "w") as f:
             f.write(json_str)
@@ -710,43 +643,43 @@ class WebVuln:
 
         :param results: JSON result
         """
-        with open('report.json') as f:
+        with open("report.json") as f:
             data = json.load(f)
 
-        root = ET.Element('report')
+        root = ET.Element("report")
 
         for item in data:
-            domain = ET.SubElement(root, 'domain')
-            domain.text = item['domain']
+            domain = ET.SubElement(root, "domain")
+            domain.text = item["domain"]
 
-            scan_date = ET.SubElement(root, 'scan_date')
-            scan_date.text = item['scanDate']
+            scan_date = ET.SubElement(root, "scan_date")
+            scan_date.text = item["scanDate"]
 
-            vulns = ET.SubElement(root, 'vulnerabilities')
-            for vuln in item['vulnerabilities']:
-                vuln_node = ET.SubElement(vulns, 'vulnerability')
-                ET.SubElement(vuln_node, 'type').text = vuln['type']
-                ET.SubElement(vuln_node, 'severity').text = vuln['severity']
+            vulns = ET.SubElement(root, "vulnerabilities")
+            for vuln in item["vulnerabilities"]:
+                vuln_node = ET.SubElement(vulns, "vulnerability")
+                ET.SubElement(vuln_node, "type").text = vuln["type"]
+                ET.SubElement(vuln_node, "severity").text = vuln["severity"]
 
         tree = ET.ElementTree(root)
-        tree.write('report.xml')
+        tree.write("report.xml")
 
     def generatePDFReport(self, results):
         """Generate PDF report from the JSON result.
 
         :param results: JSON result
         """
-        with open('report.json') as f:
+        with open("report.json") as f:
             data = json.load(f)
 
-        html = '''
+        html = """
         <html>
         <head>
         <title>Report</title>
         </head>
         <body>
         <h1>Vulnerability Report</h1>
-        '''
+        """
 
         for item in data:
             html += f"<h2>{item['domain']}</h2>"
@@ -754,12 +687,10 @@ class WebVuln:
 
             html += "<h3>Vulnerabilities:</h3>"
             html += "<ul>"
-            for vuln in item['vulnerabilities']:
+            for vuln in item["vulnerabilities"]:
                 html += f"<li>{vuln['type']} - {vuln['severity']}</li>"
             html += "</ul>"
 
         html += "</body></html>"
 
-        pdfkit.from_string(html, 'report.pdf')
-
-    
+        pdfkit.from_string(html, "report.pdf")
