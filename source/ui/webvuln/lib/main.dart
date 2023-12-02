@@ -2,23 +2,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:webvuln/items/drawer_bar.dart';
 import 'package:webvuln/views/historyScreen.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
 import 'package:webvuln/views/resultScreen.dart';
-import 'package:webvuln/views/scan_screen.dart';
+import 'package:webvuln/views/scanScreen.dart';
 import 'package:webvuln/views/settingScreen.dart';
 
 // import '../views/scanScreen2.dart';
 // import 'views/draft.dart';
 
 void main() async {
-  // Size size = await DesktopWindow.getWindowSize();
-  // await DesktopWindow.setMinWindowSize(Size(1920, 1080));
-  // await DesktopWindow.setMaxWindowSize(Size(1920, 1080));
-  runApp(mainScreen(
-      // changeScreen: 0,
-      ));
+  runApp(const mainScreen());
 }
 
 class mainScreen extends StatefulWidget {
@@ -30,6 +24,7 @@ class mainScreen extends StatefulWidget {
 
 class _mainScreenState extends State<mainScreen> {
   int _selectedIndex = 0;
+  String scanResult = '';
   @override
   void initState() {
     // TODO: implement initState
@@ -38,24 +33,12 @@ class _mainScreenState extends State<mainScreen> {
   }
 
   final List _selectedItem = [
-    const scan_screen(),
+    const scanScreen(),
     const resultScreen(),
     const historyScreen(),
     const resourceScreen(),
     const settingScreen()
   ];
-
-  // void returnWidget() {
-  //   if (widget.changeScreen == 1) {
-  //     setState(() {
-  //       _selectedIndex = 1;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       _selectedIndex = 0;
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +60,8 @@ class _mainScreenState extends State<mainScreen> {
                       width: double.infinity,
                       height: 200,
                       margin: const EdgeInsets.symmetric(vertical: 30),
-                      child: const Image(image: AssetImage('lib/assets/logo.png')),
+                      child:
+                          const Image(image: AssetImage('lib/assets/logo.png')),
                     ),
                     button(
                         onPressed: () {
@@ -85,9 +69,11 @@ class _mainScreenState extends State<mainScreen> {
                             _selectedIndex = 0;
                           });
                         },
-                        icon:'lib/assets/scanner.png',
+                        icon: 'lib/assets/scanner.png',
                         name: 'Scan'),
-                    const SizedBox(height: 20,),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     button(
                         onPressed: () {
                           setState(() {
@@ -96,7 +82,9 @@ class _mainScreenState extends State<mainScreen> {
                         },
                         icon: 'lib/assets/result.png',
                         name: 'Result'),
-                    const SizedBox(height: 20,),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     button(
                         onPressed: () {
                           setState(() {
@@ -105,18 +93,28 @@ class _mainScreenState extends State<mainScreen> {
                         },
                         icon: 'lib/assets/history.png',
                         name: 'History'),
-                    const SizedBox(height: 20,),
-                    button(onPressed: (){
-                      setState(() {
-                        _selectedIndex = 3;
-                      });
-                    }, icon: 'lib/assets/resources.png', name: 'Resources'),
-                    const SizedBox(height: 20,),
-                    button(onPressed: (){
-                      setState(() {
-                        _selectedIndex = 4;
-                      });
-                    }, icon: 'lib/assets/settings.png', name: 'Settings')
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    button(
+                        onPressed: () {
+                          setState(() {
+                            _selectedIndex = 3;
+                          });
+                        },
+                        icon: 'lib/assets/resources.png',
+                        name: 'Resources'),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    button(
+                        onPressed: () {
+                          setState(() {
+                            _selectedIndex = 4;
+                          });
+                        },
+                        icon: 'lib/assets/settings.png',
+                        name: 'Settings')
                   ],
                 )),
             // Gradient background
@@ -151,8 +149,7 @@ class _mainScreenState extends State<mainScreen> {
             foregroundColor: Colors.white),
         child: Column(
           children: [Image(image: AssetImage(icon)), Text(name)],
-        )
-    );
+        ));
   }
 
   Stream<int> get _selectedIndexStream =>

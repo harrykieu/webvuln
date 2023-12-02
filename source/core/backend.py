@@ -193,6 +193,16 @@ class WebVuln:
                         lfi_resources = self.resourceHandler(
                             "GET", {"vulnType": "lfi", "resType": "payload"}
                         )
+                        if lfi_resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
                         LFIResult, LFIPayload = LFI(url, lfi_resources).check_lfi()
                         if LFIResult is True:
                             resultURL["numVuln"] += 1
@@ -211,6 +221,16 @@ class WebVuln:
                         sqli_resources = self.resourceHandler(
                             "GET", {"vulnType": "sqli", "resType": "payload"}
                         )
+                        if sqli_resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
                         SQLiResult, SQLiPayload = LFI(url, sqli_resources).check_sqli()
                         if SQLiResult is True:
                             resultURL["numVuln"] += 1
@@ -229,6 +249,16 @@ class WebVuln:
                         xss_resources = self.resourceHandler(
                             "GET", {"vulnType": "sqli", "resType": "payload"}
                         )
+                        if xss_resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
                         XSSResult, XSSPayload = LFI(url, xss_resources).check_xss()
                         if XSSResult is True:
                             resultURL["numVuln"] += 1
@@ -365,7 +395,7 @@ class WebVuln:
                     listResult.append(item)
                 return json.dumps(listResult, default=str)
             else:
-                utils.log("Error: Invalid JSON object", "ERROR")
+                utils.log("[backend.py-findDocument-GET] Error: Invalid JSON object")
                 return "Failed"
         elif method == "POST":
             if (
@@ -456,8 +486,18 @@ class WebVuln:
                                 f"[backend.py-resourceHandler-updateDocument] Error: {e}"
                             )
                         return "Failed"
+                else:
+                    utils.log(
+                        "[backend.py-resourceHandler-POST] Error: Invalid action",
+                        "ERROR",
+                    )
+                    if self.__debug:
+                        print("[backend.py-resourceHandler-POST] Error: Invalid action")
+                    return "Failed"
             else:
-                utils.log("Error: Invalid JSON object", "ERROR")
+                utils.log(
+                    "[backend.py-resourceHandler-POST] Error: Invalid JSON object"
+                )
                 return "Failed"
 
     def fileHandler(self, method, data) -> str | list:
