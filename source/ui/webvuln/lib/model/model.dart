@@ -24,7 +24,7 @@ class historyURL {
 class ResourceNormal {
   final String vulnType;
   final String resType;
-  final String? value;
+  final dynamic value;
   final String? action;
 
   const ResourceNormal({
@@ -84,7 +84,7 @@ class ResourceNormalTableData {
 class ResourceFile {
   final String? fileName;
   final String description;
-  final String? base64value;
+  final dynamic base64value;
   final String? action;
 
   const ResourceFile({
@@ -142,4 +142,12 @@ class ResourceFileTableData {
       editedDate: json['editedDate'],
     );
   }
+}
+
+class ChartData {
+  final String x;
+  final num y;
+  final num y1;
+
+  ChartData(this.x, this.y, this.y1);
 }
