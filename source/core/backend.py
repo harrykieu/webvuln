@@ -231,7 +231,10 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        SQLiResult, SQLiPayload = LFI(url, sqli_resources).check_sqli()
+                        SQLiResult, SQLiPayload = SQLi(
+                            url, sqli_resources
+                        ).check_sqli()
+
                         if SQLiResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
@@ -247,7 +250,7 @@ class WebVuln:
                     elif module == "xss":
                         print("[+] Checking XSS vulnerability...")
                         xss_resources = self.resourceHandler(
-                            "GET", {"vulnType": "sqli", "resType": "payload"}
+                            "GET", {"vulnType": "xss", "resType": "payload"}
                         )
                         if xss_resources == "Failed":
                             utils.log(
@@ -259,12 +262,15 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        XSSResult, XSSPayload = LFI(url, xss_resources).check_xss()
+                        XSSResult, XSSPayload = XSS(
+                            url, xss_resources
+                        ).check_xss()
+
                         if XSSResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
                                 {
-                                    "type": "SQLi",
+                                    "type": "XSS",
                                     "logs": open(
                                         f"{ROOTPATH}/logs/xss_log.txt", "r"
                                     ).read(),
@@ -307,11 +313,30 @@ class WebVuln:
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
                         pathTraversalParam = self.resourceHandler(
-                            "GET", {"vulnType": "pathTraversal", "resType": "parameter"}
-                        )
+                            'GET', {"vulnType": "pathTraversal", "resType": "parameter"})
                         resources = self.resourceHandler(
                             "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
+                        if resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        if pathTraversalParam == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get parameter",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get parameter"
+                                )
+                            return "Failed"
                         PTResult, PTPayload = PathTraversal(
                             url, resources, pathTraversalParam
                         ).checkPathTraversal()
@@ -733,4 +758,4 @@ class WebVuln:
 
         html += "</body></html>"
 
-        pdfkit.from_string(html, "report.pdf")
+        pdfkit.from_string(html, 'report.pdf')
