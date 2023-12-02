@@ -177,14 +177,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  file_picker:
-    dependency: "direct main"
-    description:
-      name: file_picker
-      sha256: "4e42aacde3b993c5947467ab640882c56947d9d27342a5b6f2895b23956954a6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.1.1"
   fl_chart:
     dependency: "direct main"
     description:
@@ -246,14 +238,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
-  flutter_plugin_android_lifecycle:
-    dependency: transitive
-    description:
-      name: flutter_plugin_android_lifecycle
-      sha256: b068ffc46f82a55844acfa4fdbb61fad72fa2aef0905548419d97f0f95c456da
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.17"
   flutter_resizable_container:
     dependency: "direct main"
     description:
@@ -288,11 +272,6 @@ packages:
     version: "2.0.9"
   flutter_test:
     dependency: "direct dev"
-    description: flutter
-    source: sdk
-    version: "0.0.0"
-  flutter_web_plugins:
-    dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.0"
@@ -368,14 +347,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.2"
-  just_the_tooltip:
-    dependency: "direct main"
-    description:
-      name: just_the_tooltip
-      sha256: "7a081133d57285bfb41b331f411006d57b433d7b35772e6155745f6a7a09cb82"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.12"
   line_icons:
     dependency: "direct main"
     description:

@@ -73,14 +73,13 @@ class LFI:
         print("\n[+] Checking LFI")
 
         if not self.lfi_resources:
-            print(f"\n[-] Resources not found!")
+            print("\n[-] Resources not found!")
             utils.log(
                 "[LFI] Resources not found!",
                 "ERROR",
                 "lfi_log.txt",
             )
             return self.result
-            sys.exit(1)
 
         for payload in self.lfi_resources:
             payload_str = payload["value"]

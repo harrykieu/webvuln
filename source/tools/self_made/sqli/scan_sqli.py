@@ -1,7 +1,9 @@
+import urllib.parse
+from urllib.parse import urljoin
+
 import requests
 from bs4 import BeautifulSoup as bs
-from urllib.parse import urlparse, urljoin
-import urllib.parse
+
 import source.core.utils as utils
 
 # 06/09/2023 : Code check sqli thi duoc nhung chua goi la hoan hao, dang nghien cuu de cai tien
@@ -109,28 +111,26 @@ class SQLi:
     # -------------------------------------------------------------
 
     def check_sqli(self):
-
         utils.log(
             f"[SQLi] Checking SQLi for {self.url}",
             "INFO",
             "sqli_log.txt",
-        )        
+        )
 
         print("\n[+] Checking SQLi")
 
         if not self.sqli_resources:
-            print(f"\n[-] Resources not found!")
+            print("\n[-] Resources not found!")
             utils.log(
                 "[SQLi] Resources not found!",
                 "ERROR",
                 "sqli_log.txt",
             )
             return self.result
-            sys.exit(1)
 
         for payload in self.sqli_resources:
             payload_str = payload["value"]
-            encoded_payload = urllib.parse.quote(payload_str.encode('utf-8'))
+            encoded_payload = urllib.parse.quote(payload_str.encode("utf-8"))
             new_url = f"{self.url}?id={encoded_payload}"
             print("[!] Trying", new_url)
 
@@ -138,10 +138,10 @@ class SQLi:
             if self.is_vulnerable_sqli(res):
                 print("[+] SQL Injection vulnerability detected, link:", new_url)
                 utils.log(
-                            f"[SQLi] SQL Injection vulnerability detected, link: {new_url}",
-                            "INFO",
-                            "sqli_log.txt",
-                        )
+                    f"[SQLi] SQL Injection vulnerability detected, link: {new_url}",
+                    "INFO",
+                    "sqli_log.txt",
+                )
                 self.payloads.append(payload["value"])
                 self.result = True
                 break
@@ -178,16 +178,14 @@ class SQLi:
                     )
 
                     utils.log(
-                            f"[SQLi] SQL Injection detected in form, link: {self.url}",
-                            "INFO",
-                            "sqli_log.txt",
-                        )
+                        f"[SQLi] SQL Injection detected in form, link: {self.url}",
+                        "INFO",
+                        "sqli_log.txt",
+                    )
                     self.payloads.append(payload["value"])
                     self.result = True
                     break
 
         print("[+] Check SQLi done")
-        utils.log(
-            "[SQLi] Check SQLi done", "INFO", "sqli_log.txt"
-        )
+        utils.log("[SQLi] Check SQLi done", "INFO", "sqli_log.txt")
         return self.result, self.payloads
