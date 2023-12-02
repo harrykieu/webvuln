@@ -275,16 +275,6 @@ class WebVuln:
                     elif module == "fileupload":
                         print("[+] Checking file upload vulnerability...")
                         resources = self.fileHandler("GET", {"description": ""})
-                        if resources == "Failed":
-                            utils.log(
-                                "[backend.py-scanURL] Error: Failed to get resources",
-                                "ERROR",
-                            )
-                            if self.__debug:
-                                print(
-                                    "[backend.py-scanURL] Error: Failed to get resources"
-                                )
-                            return "Failed"
                         if "dvwa" in url:
                             a = FileUpload(url, resources, isDVWA=True)
                         else:
@@ -322,26 +312,6 @@ class WebVuln:
                         resources = self.resourceHandler(
                             "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
-                        if resources == "Failed":
-                            utils.log(
-                                "[backend.py-scanURL] Error: Failed to get resources",
-                                "ERROR",
-                            )
-                            if self.__debug:
-                                print(
-                                    "[backend.py-scanURL] Error: Failed to get resources"
-                                )
-                            return "Failed"
-                        if pathTraversalParam == "Failed":
-                            utils.log(
-                                "[backend.py-scanURL] Error: Failed to get parameter",
-                                "ERROR",
-                            )
-                            if self.__debug:
-                                print(
-                                    "[backend.py-scanURL] Error: Failed to get parameter"
-                                )
-                            return "Failed"
                         PTResult, PTPayload = PathTraversal(
                             url, resources, pathTraversalParam
                         ).checkPathTraversal()
@@ -419,7 +389,7 @@ class WebVuln:
                     utils.log(f"[backend.py-findDocument-GET] Error: {e}", "ERROR")
                     if self.__debug:
                         print(f"[backend.py-findDocument-GET] Error: {e}")
-                    return "Failed"
+                    raise e
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
@@ -516,6 +486,14 @@ class WebVuln:
                                 f"[backend.py-resourceHandler-updateDocument] Error: {e}"
                             )
                         return "Failed"
+                else:
+                    utils.log(
+                        "[backend.py-resourceHandler-POST] Error: Invalid action",
+                        "ERROR",
+                    )
+                    if self.__debug:
+                        print("[backend.py-resourceHandler-POST] Error: Invalid action")
+                    return "Failed"
             else:
                 utils.log(
                     "[backend.py-resourceHandler-POST] Error: Invalid JSON object"

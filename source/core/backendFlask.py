@@ -132,7 +132,10 @@ def postResources():
             utils.log(
                 f"/api/resourcesnormal: Successfully received data: {data}", "DEBUG"
             )
-        backend.recvFlask("/api/resourcesnormal", "POST", data)
+        value = backend.recvFlask("/api/resourcesnormal", "POST", data)
+        if value == "Failed":
+            utils.log("/api/resourcesnormal: Failed to create resource", "ERROR")
+            return "Failed", 400
         return "Success", 200
     else:
         if app.debug:

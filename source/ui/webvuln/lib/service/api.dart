@@ -65,7 +65,7 @@ Future<String> postResources(
     {required String vulnType,
     required String action,
     required String resType,
-    required String value}) async {
+    required dynamic value}) async {
   final data = jsonEncode(ResourceNormal(
       vulnType: vulnType, action: action, resType: resType, value: value));
   final url = '$baseUrl/api/resourcesnormal';
@@ -86,7 +86,7 @@ Future<String> postResources(
 Future<String> postResourcesFile({
   required String fileName,
   required String description,
-  required String? base64value,
+  required dynamic base64value,
   required String? action,
 }) async {
   final data = jsonEncode(ResourceFile(
