@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class URL {
   final String url;
   final List<String> modules;
@@ -11,13 +13,85 @@ class URL {
   }
 }
 
-class historyURL {
-  final String domain;
-  final String scanDate;
-  const historyURL({required this.domain, required this.scanDate});
+class History {
+  final String? domain;
+  final String? scanDate;
+  const History({
+    this.domain,
+    this.scanDate,
+  });
 
   Map<String, dynamic> toJson() {
-    return {'domain': domain, 'scanDate': scanDate};
+    Map<String, dynamic> json = {
+      'domain': domain,
+      'scanDate': scanDate,
+    };
+
+    if (domain != null) {
+      json['domain'] = domain;
+    }
+
+    if (scanDate != null) {
+      json['scanDate'] = scanDate;
+    }
+
+    return json;
+  }
+}
+
+class Vulnerability {
+  final String type;
+  final String log;
+  final List<String> payload;
+  final String severity;
+
+  Vulnerability({
+    required this.type,
+    required this.log,
+    required this.payload,
+    required this.severity,
+  });
+}
+
+class HistoryTableData {
+  final String id;
+  final String domain;
+  final int numVuln;
+  final List<Vulnerability> vuln;
+  final String resultSeverity;
+  final double resultPoint;
+  final String scanDate;
+
+  HistoryTableData({
+    required this.id,
+    required this.domain,
+    required this.numVuln,
+    required this.vuln,
+    required this.resultSeverity,
+    required this.resultPoint,
+    required this.scanDate,
+  });
+
+  factory HistoryTableData.fromJson(Map<String, dynamic> json) {
+    List<dynamic> vulnListJson = json['vulnerabilities'];
+    List<Vulnerability> vulnList = vulnListJson.map((vulnJson) {
+      List<String> payloadList = List<String>.from(vulnJson['payload']);
+      return Vulnerability(
+        type: vulnJson['type'],
+        log: vulnJson['logs'],
+        payload: payloadList,
+        severity: vulnJson['severity'],
+      );
+    }).toList();
+    return HistoryTableData(
+      id: json['_id'],
+      domain: json['domain'],
+      numVuln: json['numVuln'],
+      vuln: vulnList,
+      resultSeverity: json['resultSeverity'],
+      resultPoint: json['resultPoint'],
+      scanDate: json['scanDate'],
+    );
   }
 }
 

@@ -164,21 +164,21 @@ class _listVulnerabilitiesState extends State<listVulnerabilities> {
         style: text_style_bold,
       ),
       Container(
-          width: 100,
-          height: 50,
-          margin: EdgeInsetsDirectional.only(start: width - 800),
-          child: DropDown(
-            items: error,
-            initialValue: _selectedModule,
-            dropDownType: DropDownType.Button,
-            onChanged: (val) {
-              setState(() {
-                _selectedModule = val as String;
-              });
-              print(_selectedModule);
-            },
-          ),
+        width: 100,
+        height: 50,
+        margin: EdgeInsetsDirectional.only(start: width - 800),
+        child: DropDown(
+          items: error,
+          initialValue: _selectedModule,
+          dropDownType: DropDownType.Button,
+          onChanged: (val) {
+            setState(() {
+              _selectedModule = val as String;
+            });
+            print(_selectedModule);
+          },
         ),
+      ),
       Container(
         color: Colors.transparent,
       )
@@ -235,8 +235,6 @@ class _listVulnerabilitiesState extends State<listVulnerabilities> {
       ),
     );
   }
-
-  
 
   JustTheTooltip tool_tip({required String content}) {
     return JustTheTooltip(

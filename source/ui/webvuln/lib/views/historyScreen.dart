@@ -1,11 +1,13 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, camel_case_types, use_build_context_synchronously
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:webvuln/items/table_history.dart';
+import 'package:webvuln/items/newSubmitButton.dart';
+import 'package:webvuln/model/model.dart';
 import 'package:webvuln/service/api.dart';
-
+import 'package:data_table_2/data_table_2.dart';
 import '../items/input.dart';
-import '../items/submitButton.dart';
 
 class historyScreen extends StatefulWidget {
   const historyScreen({super.key});
@@ -15,72 +17,203 @@ class historyScreen extends StatefulWidget {
 }
 
 class _historyScreenState extends State<historyScreen> {
-  @override
   final TextEditingController _historyURLController = TextEditingController();
   final TextEditingController _dateScanController = TextEditingController();
-  final List<Map<String, String>> data = [
-    {
-      "no": "1",
-      "Vuln": "XSS error",
-      "Des": "https://www.google.com.vn/intl/vi/about.html",
-      "date/time": "11-11-23/12:52:34 AM"
-    },
-    {
-      "no": "1",
-      "Vuln": "XSS error",
-      "Des": "https://www.google.com.vn/intl/vi/about.html",
-      "date/time": "11-11-23/12:52:34 AM"
-    }
-  ];
+  List<HistoryTableData> historyTableData = [];
+  List<DataRow> dataRowList = [];
+  String value = "";
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
+  void updateTable(List<HistoryTableData> newData, BuildContext context) {
+    setState(() {
+      historyTableData = newData;
+      dataRowList = historyTableData
+          .map((tableData) => DataRow(cells: [
+                DataCell(Text(tableData.domain)),
+                DataCell(Text(tableData.scanDate)),
+                DataCell(Text(tableData.numVuln.toString())),
+                DataCell(Text(tableData.resultSeverity)),
+                DataCell(Text(tableData.resultPoint.toString())),
+              ]))
+          .toList();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    Widget inputData_datetime = Container(
-      width: 400,
-      height: 55,
-      padding: const EdgeInsets.all(5),
-      decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(30)),
-          gradient: LinearGradient(colors: [
-            Color(0xFF2400FF),
-            Color(0xFF0075FF),
-            Color(0xFF710883)
-          ])),
-      child: inputUser(
-        controller: _dateScanController,
-        hintName: 'Date & Time',
-        underIcon: const Icon(Icons.search_rounded),
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width * (1 - 0.13);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF0F0F0),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsetsDirectional.only(start: 40, top: 10),
+            child: Text(
+              "HISTORY",
+              style: GoogleFonts.montserrat(
+                  fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.start,
+            ),
+          ),
+          const Divider(
+            color: Colors.black,
+            thickness: 0.2,
+            indent: 40,
+            endIndent: 40,
+          ),
+          // search bar
+          Container(
+            width: screenWidth,
+            height: 75,
+            margin: const EdgeInsets.symmetric(horizontal: 40),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black38,
+                    blurRadius: 15,
+                    spreadRadius: -7,
+                  )
+                ]),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                  child: Text("Search criteria: ",
+                      style: GoogleFonts.montserrat(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black)),
+                ),
+                getBoxInput(
+                    controller: _historyURLController,
+                    content: "URL",
+                    width: 300,
+                    height: 40),
+                getBoxInput(
+                    controller: _dateScanController,
+                    content: "Date/Time",
+                    width: 300,
+                    height: 40),
+                GradientButton(
+                  height: 40,
+                  verticalMargin: 10,
+                  borderRadius: BorderRadius.circular(10),
+                  onPressed: () async {
+                    String resp = await getHistory(
+                      nameURL: _historyURLController.text,
+                      datetime: _dateScanController.text,
+                    );
+                    if (resp == '[]') {
+                      await showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: Row(
+                                  children: [
+                                    const Icon(Icons.error),
+                                    const SizedBox(width: 5),
+                                    Text('Error',
+                                        style: GoogleFonts.montserrat(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold))
+                                  ],
+                                ),
+                                content: Text(
+                                    'No resource found with given criteria!',
+                                    style: GoogleFonts.montserrat(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal)),
+                                alignment: Alignment.center,
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('OK'))
+                                ],
+                              ));
+                    }
+                    List<dynamic> jsonD = jsonDecode(resp);
+                    List<HistoryTableData> newData = jsonD
+                        .map((json) => HistoryTableData.fromJson(json))
+                        .toList();
+                    updateTable(newData, context);
+                  },
+                  child: const Icon(
+                    Icons.search_sharp,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // history table
+          Container(
+              width: screenWidth,
+              height: screenHeight - 200,
+              margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black38,
+                      blurRadius: 15,
+                      spreadRadius: -7,
+                    )
+                  ]),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                child: DataTable2(columns: const [
+                  DataColumn2(label: Text('Domain'), size: ColumnSize.M),
+                  DataColumn2(label: Text('Scan Date'), size: ColumnSize.M),
+                  DataColumn2(
+                      label: Text('Number of Vulnerabilities'),
+                      size: ColumnSize.M),
+                  DataColumn2(label: Text('Severity'), size: ColumnSize.S),
+                  DataColumn2(label: Text('Safety Rating'), size: ColumnSize.S),
+                ], rows: dataRowList),
+              ))
+        ],
       ),
     );
-    Widget inputData_url = Container(
-      width: 400,
-      height: 55,
-      padding: const EdgeInsets.all(5),
-      decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(30)),
-          gradient: LinearGradient(colors: [
-            Color(0xFF2400FF),
-            Color(0xFF0075FF),
-            Color(0xFF710883)
-          ])),
+  }
+
+  Container getBoxInput(
+      {required TextEditingController controller,
+      required String content,
+      required double width,
+      required double height}) {
+    return Container(
+      width: width,
+      height: height,
+      margin: const EdgeInsetsDirectional.symmetric(
+        horizontal: 10,
+      ),
       child: inputUser(
-        controller: _historyURLController,
-        hintName: 'Paste URL here ',
-        underIcon: const Icon(Icons.search_rounded),
+        controller: controller,
+        hintName: content,
+        underIcon: const Icon(Icons.text_fields),
       ),
     );
-    List<Widget> historyTable = [
+  }
+}
+
+/*     List<Widget> historyTable = [
       Stack(
         children: [
           Container(
-            width: double.infinity,
-            height: height - 150,
-            padding: const EdgeInsets.all(10),
+            width: width,
+            height: height,
             margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             decoration: const BoxDecoration(
                 color: Colors.transparent,
@@ -111,7 +244,7 @@ class _historyScreenState extends State<historyScreen> {
             ),
           ),
           Positioned(
-              top: height - 210,
+              top: height - 410,
               right: 20,
               child: Container(
                 width: 150,
@@ -149,101 +282,4 @@ class _historyScreenState extends State<historyScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         color: Colors.black,
       )
-    ];
-
-    return Scaffold(
-      drawer: null,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text(
-            "History",
-            style: GoogleFonts.montserrat(
-                fontSize: 30, fontWeight: FontWeight.bold),
-          ),
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(horizontal: 30),
-            padding: const EdgeInsets.all(10),
-            decoration: const BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    offset: Offset(0, 3),
-                    blurRadius: 10,
-                  )
-                ],
-                borderRadius: BorderRadius.all(Radius.circular(20))),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                inputData_datetime,
-                inputData_url,
-                Container(
-                  width: 200,
-                  height: 50,
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      showDialog(
-                          barrierDismissible: false,
-                          barrierColor: Colors.transparent,
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              shadowColor: Colors.black38,
-                              title: const Text('Sort by'),
-                              content: Container(
-                                width: 100,
-                                height: 100,
-                                color: Colors.transparent,
-                                child: Column(
-                                  children: [
-                                    TextButton(
-                                        onPressed: () {},
-                                        child: const Text('Number')),
-                                    TextButton(
-                                        onPressed: () {},
-                                        child: const Text('Vulnerabilities')),
-                                    TextButton(
-                                        onPressed: () {},
-                                        child: const Text('Date/Time')),
-                                  ],
-                                ),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(); // Đóng popup
-                                  },
-                                  child: const Text('Close'),
-                                ),
-                              ],
-                            );
-                          });
-                    },
-                    child: const Text('Sort by'),
-                  ),
-                ),
-                submitButton(
-                  onPressed: () {
-                    postHistory(
-                      nameURL: _historyURLController.text,
-                      datetime: _dateScanController.text,
-                    );
-                  },
-                  childButton: const Icon(
-                    Icons.search_sharp,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          historyTable[0]
-        ],
-      ),
-    );
-  }
-}
+    ]; */

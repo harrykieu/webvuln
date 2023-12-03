@@ -38,25 +38,22 @@ Future<String> postURL(
   }
 }
 
-//POST api/history
-Future<void> postHistory(
+//GET api/history
+Future<String> getHistory(
     {required String nameURL, required String datetime}) async {
-  final data = jsonEncode(historyURL(domain: nameURL, scanDate: datetime));
+  final data = jsonEncode(History(domain: nameURL, scanDate: datetime));
   final url = '$baseUrl/api/history';
   try {
     final response = await dio.get(url, data: data, options: _options);
 
     if (response.statusCode == 200) {
       print('Get data successfully');
-      print(response);
+      return response.toString();
     } else {
-      print('Failed to get data');
+      return 'Failed to get data';
     }
   } catch (e) {
-    print('Error: $e');
-    print(ContentType.json);
-    print(nameURL);
-    print(data);
+    return 'Error: $e';
   }
 }
 

@@ -468,8 +468,9 @@ class _resourceScreenState extends State<resourceScreen> {
                 color: Colors.white24),
             child: Container(
               decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  color: Colors.brown.shade100),
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                color: Colors.brown.shade100,
+              ),
               child: DataTable2(
                   columnSpacing: 20,
                   columns: const [
