@@ -85,7 +85,7 @@ class LFI:
         for payload in self.lfi_resources:
             payload_str = payload["value"]
             encoded_payload = urllib.parse.quote(payload_str.encode("utf-8"))
-            new_url = f"{self.url}?page={encoded_payload}"
+            new_url = re.sub(r'=.*?(&|$)', '=' + encoded_payload + '\\1', self.url)
 
             print("[!] Trying", new_url)
             res = s.get(new_url)
