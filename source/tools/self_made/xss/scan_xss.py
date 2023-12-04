@@ -3,9 +3,7 @@ from bs4 import BeautifulSoup as bs
 from urllib.parse import urlparse, urljoin
 import urllib.parse
 import source.core.utils as utils
-
-# 06/09/2023 : CODE Can cai thien them tinh nang check submit selection
-# maker : RBKING
+import json
 
 s = requests.Session()
 s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.5938.92"
@@ -15,7 +13,7 @@ class XSS:
 
     def __init__(self, url, xss_resources):
         self.url = url
-        self.xss_resources = xss_resources
+        self.xss_resources = json.loads(xss_resources)
         self.payloads = []
         self.result = False
 
