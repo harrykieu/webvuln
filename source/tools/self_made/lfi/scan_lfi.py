@@ -4,9 +4,7 @@ from urllib.parse import urljoin
 import re
 import urllib.parse
 import source.core.utils as utils
-
-# 06/09/2023 : CODE Can cai thien them mot so phuong dien de chen tim ra dia file (can cai tien tu dong 110 tro di)
-# maker : RBKING
+import json
 
 s = requests.Session()
 s.headers[
@@ -17,7 +15,7 @@ s.headers[
 class LFI:
     def __init__(self, url, lfi_resources):
         self.url = url
-        self.lfi_resources = lfi_resources
+        self.lfi_resources = json.loads(lfi_resources)
         self.payloads = []
         self.result = False
 
