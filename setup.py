@@ -13,17 +13,23 @@ def main():
     db = DatabaseUtils()
     for folder in Path(ROOTPATH).iterdir():
         if folder.is_dir():
-            print(f"[+] Adding {folder.name} resources to database...")
             # Normal resource
+            print(f"[+] Adding {folder.name} resources to database...")
             if folder.name != "fileUpload":
                 for file in folder.iterdir():
+                    if file.name.__contains__("Parameter"):
+                        typeJSON = "parameter"
+                    elif file.name.__contains__("Payload"):
+                        typeJSON = "payload"
+                    else:
+                        raise Exception("Invalid resource type!")
                     with open(file, "r") as f:
                         data = f.read()
                     f.close()
                     for line in data.splitlines():
                         newDocument = {
                             "vulnType": folder.name,
-                            "type": "payload",
+                            "type": f"{typeJSON}",
                             "value": line,
                             "createdDate": datetime.now(),
                             "editedDate": datetime.now(),
