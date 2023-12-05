@@ -75,7 +75,7 @@ class _tableXSSState extends State<tableXSS> {
                     size: 30,
                   )),
                   DataCell(Text(
-                    "XSS error",
+                    "XSS",
                     style: text_style_normal,
                   )),
                   DataCell(Text(

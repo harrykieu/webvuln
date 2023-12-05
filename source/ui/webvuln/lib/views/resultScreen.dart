@@ -24,6 +24,9 @@ class _resultScreenState extends State<resultScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
     double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
+    bool isVisibled = true;
+    List<String> error = ['XSS', 'SQLi', 'LFI', 'RCE'];
+    String _selectedModule = 'XSS';
     return Scaffold(
       appBar: AppBar(
         leading: GradientButton(
@@ -42,12 +45,29 @@ class _resultScreenState extends State<resultScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              DropDown(
+                items: error, // Ensure unique values
+                initialValue: _selectedModule,
+                dropDownType: DropDownType.Button,
+                onChanged: (val) {
+                  setState(() {
+                    _selectedModule = val as String;
+                    // if (val == 'XSS') {
+                    //   setState(() {});
+                    // }
+                  });
+                  print(_selectedModule);
+                },
+              ),
               // Table list errors
-              const listVulnerabilities(),
+              const list_vulnerabilities(),
               // Graph line and pie chart
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [const containerPieChart(), lineChart()],
+              Visibility(
+                visible: isVisibled,
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [containerPieChart(), lineChart()],
+                ),
               ),
               // Description
               Container(
@@ -118,31 +138,24 @@ class _resultScreenState extends State<resultScreen> {
   }
 }
 
-class listVulnerabilities extends StatefulWidget {
-  const listVulnerabilities({super.key});
+class list_vulnerabilities extends StatefulWidget {
+  const list_vulnerabilities({super.key});
 
   @override
-  State<listVulnerabilities> createState() => _listVulnerabilitiesState();
+  State<list_vulnerabilities> createState() => _list_vulnerabilitiesState();
 }
 
-class _listVulnerabilitiesState extends State<listVulnerabilities> {
+class _list_vulnerabilitiesState extends State<list_vulnerabilities> {
   @override
   void initState() {
     // TODO: implement initState
     _selectedModule = 'XSS';
     super.initState();
   }
-
-  List<String> error = ['XSS', 'SQLi', 'LFI', 'RCE'];
-  List<String> headersTable = ['Severity', 'Type', 'Vulnerabilities'];
-  List<String> rowsTableXSS = ['yellow', 'XSS error', 'google.com'];
-  List<String> rowsTableSQL = ['SQL injection', 'google.com'];
-  List<String> rowsTableLFI = ['LFI error', 'google.com'];
-  List<String> rowsTableRCE = ['RCE', 'google.com'];
   String _selectedModule = 'XSS';
 
   //important!! number_error is recognized as the number of error get api from backend
-  int number_error = 2;
+  int number_error = 1;
   // ignore: non_constant_identifier_names
   TextStyle text_style_title = GoogleFonts.montserrat(
       fontSize: 24, color: Colors.black, fontWeight: FontWeight.bold);
@@ -157,53 +170,11 @@ class _listVulnerabilitiesState extends State<listVulnerabilities> {
 
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    List<Widget> listVulnerabilities = [
-      tableXSS(),
-      Text(
-        '404 Not found!!',
-        style: text_style_bold,
-      ),
-      Container(
-          width: 100,
-          height: 50,
-          margin: EdgeInsetsDirectional.only(start: width - 800),
-          child: DropDown(
-            items: error,
-            initialValue: _selectedModule,
-            dropDownType: DropDownType.Button,
-            onChanged: (val) {
-              setState(() {
-                _selectedModule = val as String;
-              });
-              print(_selectedModule);
-            },
-          ),
-        ),
-      Container(
-        color: Colors.transparent,
-      )
-    ];
-    @override
-    Widget checkNumberErrors(numberError) {
-      if (numberError == 0) {
-        return listVulnerabilities[1];
-      } else {
-        return listVulnerabilities[0];
-      }
-    }
-
-    Widget visibleDropdown(numberError) {
-      if (numberError == 0) {
-        return listVulnerabilities[3];
-      } else {
-        return listVulnerabilities[2];
-      }
-    }
 
     //table chinh
     return Container(
       width: width - 100,
-      height: 500,
+      height: 600,
       margin: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
       decoration: const BoxDecoration(
           color: Colors.white,
@@ -226,17 +197,14 @@ class _listVulnerabilitiesState extends State<listVulnerabilities> {
                   '   List vulnerabilities',
                   style: text_style_title,
                 ),
-                visibleDropdown(number_error)
               ],
             ),
           ),
-          checkNumberErrors(number_error)
+          const tableXSS()
         ],
       ),
     );
   }
-
-  
 
   JustTheTooltip tool_tip({required String content}) {
     return JustTheTooltip(
