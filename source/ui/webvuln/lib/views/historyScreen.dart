@@ -20,7 +20,7 @@ class _historyScreenState extends State<historyScreen> {
   final TextEditingController _historyURLController = TextEditingController();
   final TextEditingController _dateScanController = TextEditingController();
   List<HistoryTableData> historyTableData = [];
-  List<DataRow> dataRowList = [];
+  List<DataRow2> dataRowList = [];
   String value = "";
   @override
   void initState() {
@@ -31,13 +31,87 @@ class _historyScreenState extends State<historyScreen> {
     setState(() {
       historyTableData = newData;
       dataRowList = historyTableData
-          .map((tableData) => DataRow(cells: [
-                DataCell(Text(tableData.domain)),
-                DataCell(Text(tableData.scanDate)),
-                DataCell(Text(tableData.numVuln.toString())),
-                DataCell(Text(tableData.resultSeverity)),
-                DataCell(Text(tableData.resultPoint.toString())),
-              ]))
+          .map((tableData) => DataRow2(
+                cells: [
+                  DataCell(Text(tableData.domain)),
+                  DataCell(Text(tableData.scanDate)),
+                  DataCell(Text(tableData.numVuln.toString())),
+                  DataCell(Text(tableData.resultSeverity)),
+                  DataCell(Text(tableData.resultPoint.toString())),
+                ],
+                onTap: () async {
+                  String resp = await getHistory(
+                    nameURL: tableData.domain,
+                    // for compatibility with backend
+                    datetime: '${tableData.scanDate.replaceAll(' ', 'T')}Z',
+                  );
+                  List<dynamic> jsonD = jsonDecode(resp);
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: Row(
+                              children: [
+                                const Icon(Icons.history),
+                                const SizedBox(width: 5),
+                                Text('History',
+                                    style: GoogleFonts.montserrat(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold))
+                              ],
+                            ),
+                            content: SizedBox(
+                              width: 500,
+                              height: 500,
+                              child: ListView.builder(
+                                itemCount: jsonD.length,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Scan date: ${jsonD[index]['scanDate']}',
+                                          style: GoogleFonts.montserrat(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          'Number of vulnerabilities: ${jsonD[index]['numVuln']}',
+                                          style: GoogleFonts.montserrat(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          'Result severity: ${jsonD[index]['resultSeverity']}',
+                                          style: GoogleFonts.montserrat(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          'Result point: ${jsonD[index]['resultPoint']}',
+                                          style: GoogleFonts.montserrat(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('OK'))
+                            ],
+                          ));
+                },
+              ))
           .toList();
     });
   }
@@ -127,7 +201,7 @@ class _historyScreenState extends State<historyScreen> {
                                   ],
                                 ),
                                 content: Text(
-                                    'No resource found with given criteria!',
+                                    'No history found with given criteria!',
                                     style: GoogleFonts.montserrat(
                                         fontSize: 16,
                                         fontWeight: FontWeight.normal)),
@@ -207,79 +281,3 @@ class _historyScreenState extends State<historyScreen> {
     );
   }
 }
-
-/*     List<Widget> historyTable = [
-      Stack(
-        children: [
-          Container(
-            width: width,
-            height: height,
-            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            decoration: const BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.all(Radius.circular(20))),
-            child: Column(
-              children: [
-                Stack(
-                  children: [
-                    Container(
-                        width: double.infinity,
-                        height: height - 300,
-                        padding: const EdgeInsets.all(10),
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black, width: 2),
-                          gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [Color(0xFFDEEDFF), Colors.white]),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(20)),
-                        ),
-                        child: SortableTable()),
-                  ],
-                )
-              ],
-            ),
-          ),
-          Positioned(
-              top: height - 410,
-              right: 20,
-              child: Container(
-                width: 150,
-                child: FloatingActionButton(
-                  onPressed: () {},
-                  backgroundColor: Colors.white,
-                  child: Row(
-                    children: [
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      const Icon(
-                        Icons.picture_as_pdf,
-                        color: Colors.grey,
-                        size: 30,
-                      ),
-                      Text(
-                        'PDF',
-                        style: GoogleFonts.montserrat(
-                            fontSize: 20, fontWeight: FontWeight.normal),
-                      ),
-                      const SizedBox(
-                        width: 30,
-                      ),
-                      const Icon(Icons.download)
-                    ],
-                  ),
-                ),
-              ))
-        ],
-      ),
-      Container(
-        width: double.infinity,
-        height: height - 150,
-        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        color: Colors.black,
-      )
-    ]; */

@@ -11,7 +11,6 @@ def main():
     else:
         ROOTPATH = f"{Path(__file__).parent}/setupAssets"
     db = DatabaseUtils()
-
     for folder in Path(ROOTPATH).iterdir():
         if folder.is_dir():
             print(f"[+] Adding {folder.name} resources to database...")
