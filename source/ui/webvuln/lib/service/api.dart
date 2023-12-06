@@ -38,25 +38,22 @@ Future<String> postURL(
   }
 }
 
-//POST api/history
-Future<void> postHistory(
+//GET api/history
+Future<String> getHistory(
     {required String nameURL, required String datetime}) async {
-  final data = jsonEncode(historyURL(domain: nameURL, scanDate: datetime));
+  final data = jsonEncode(History(domain: nameURL, scanDate: datetime));
   final url = '$baseUrl/api/history';
   try {
     final response = await dio.get(url, data: data, options: _options);
 
     if (response.statusCode == 200) {
       print('Get data successfully');
-      print(response);
+      return response.toString();
     } else {
-      print('Failed to get data');
+      return 'Failed to get data';
     }
   } catch (e) {
-    print('Error: $e');
-    print(ContentType.json);
-    print(nameURL);
-    print(data);
+    return 'Error: $e';
   }
 }
 
@@ -65,7 +62,7 @@ Future<String> postResources(
     {required String vulnType,
     required String action,
     required String resType,
-    required String value}) async {
+    required dynamic value}) async {
   final data = jsonEncode(ResourceNormal(
       vulnType: vulnType, action: action, resType: resType, value: value));
   final url = '$baseUrl/api/resourcesnormal';
@@ -86,7 +83,7 @@ Future<String> postResources(
 Future<String> postResourcesFile({
   required String fileName,
   required String description,
-  required String? base64value,
+  required dynamic base64value,
   required String? action,
 }) async {
   final data = jsonEncode(ResourceFile(
