@@ -64,7 +64,6 @@ class LFI:
     # --------------------------------------------------
 
     def check_lfi(self):
-
         utils.log(
             f"[LFI] Checking LFI for {self.url}",
             "INFO",
@@ -73,9 +72,18 @@ class LFI:
 
         print("\n[+] Checking LFI")
 
+        if not self.lfi_resources:
+            print("\n[-] Resources not found!")
+            utils.log(
+                "[LFI] Resources not found!",
+                "ERROR",
+                "lfi_log.txt",
+            )
+            return self.result
+
         for payload in self.lfi_resources:
             payload_str = payload["value"]
-            encoded_payload = urllib.parse.quote(payload_str.encode('utf-8'))
+            encoded_payload = urllib.parse.quote(payload_str.encode("utf-8"))
             new_url = f"{self.url}?page={encoded_payload}"
 
             print("[!] Trying", new_url)
@@ -84,10 +92,10 @@ class LFI:
             if re.search(rb"root:x:0:0", res.content):
                 print("[+] LFI vulnerability detected, link:", new_url)
                 utils.log(
-                            f"[LFI] Local File Injection vulnerability detected, link: {new_url}",
-                            "INFO",
-                            "lfi_log.txt",
-                        )
+                    f"[LFI] Local File Injection vulnerability detected, link: {new_url}",
+                    "INFO",
+                    "lfi_log.txt",
+                )
                 self.payloads.append(payload["value"])
                 self.result = True
                 break
@@ -122,18 +130,15 @@ class LFI:
                 if re.search(rb"root:x:0:0", res.content):
                     print("[+] Local File Injection detected, link:", self.url)
                     utils.log(
-                            f"[LFI] Local File Injection detected in form, link: {self.url}",
-                            "INFO",
-                            "lfi_log.txt",
-                        )
+                        f"[LFI] Local File Injection detected in form, link: {self.url}",
+                        "INFO",
+                        "lfi_log.txt",
+                    )
                     self.payloads.append(payload["value"])
                     self.result = True
                     break
-                    
 
         print("[+] Check LFI done")
-        utils.log(
-            "[LFI] Check LFI done", "INFO", "lfi_log.txt"
-        )
+        utils.log("[LFI] Check LFI done", "INFO", "lfi_log.txt")
 
         return self.result, self.payloads

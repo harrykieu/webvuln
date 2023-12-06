@@ -2,10 +2,10 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'package:webvuln/model/url.dart';
+
+import 'package:dio/dio.dart';
 
 import '../model/model.dart';
-import 'package:dio/dio.dart';
 
 Dio dio = Dio();
 String baseUrl = 'http://127.0.0.1:5000';
@@ -61,25 +61,50 @@ Future<void> postHistory(
 }
 
 //POST api/resources
-Future<void> postResources(
+Future<String> postResources(
     {required String vulnType,
     required String action,
     required String resType,
-    required String value}) async {
+    required dynamic value}) async {
   final data = jsonEncode(ResourceNormal(
       vulnType: vulnType, action: action, resType: resType, value: value));
-  final url = '$baseUrl/api/resources';
+  final url = '$baseUrl/api/resourcesnormal';
 
   try {
     final response = await dio.post(url, data: data, options: _options);
     if (response.statusCode == 200) {
-      print('Posted resources successfully');
+      return ('Posted resources successfully');
     } else {
-      print('Failed to Post Resources');
+      return ('Failed to Post Resources');
       // print('Status code:');
     }
   } catch (e) {
-    print('Error post resources: $e');
+    return ('Error post resources: $e');
+  }
+}
+
+Future<String> postResourcesFile({
+  required String fileName,
+  required String description,
+  required dynamic base64value,
+  required String? action,
+}) async {
+  final data = jsonEncode(ResourceFile(
+      fileName: fileName,
+      description: description,
+      base64value: base64value,
+      action: action));
+  final url = '$baseUrl/api/resourcesfile';
+  try {
+    final response = await dio.post(url, data: data, options: _options);
+    if (response.statusCode == 200 && response.data == 'Success') {
+      return ('Posted file successfully');
+    } else {
+      return ('Failed to Post Resources');
+      // print('Status code:');
+    }
+  } catch (e) {
+    return ('Error post resources: $e');
   }
 }
 
@@ -89,7 +114,7 @@ Future<String> getResourcesNormal(
   final url = '$baseUrl/api/resourcesnormal';
   try {
     final response = await dio.get(url, data: data, options: _options);
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 && response.data != {}) {
       print('Get resources successfully');
       return response.toString();
     } else {
@@ -107,7 +132,7 @@ Future<String> getResourcesFile({required String description}) async {
   final url = '$baseUrl/api/resourcesfile';
   try {
     final response = await dio.get(url, data: data, options: _options);
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 && response.data != {}) {
       print('Get resources successfully');
       return response.toString();
     } else {

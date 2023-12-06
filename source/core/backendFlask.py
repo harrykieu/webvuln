@@ -132,7 +132,10 @@ def postResources():
             utils.log(
                 f"/api/resourcesnormal: Successfully received data: {data}", "DEBUG"
             )
-        backend.recvFlask("/api/resourcesnormal", "POST", data)
+        value = backend.recvFlask("/api/resourcesnormal", "POST", data)
+        if value == "Failed":
+            utils.log("/api/resourcesnormal: Failed to create resource", "ERROR")
+            return "Failed", 400
         return "Success", 200
     else:
         if app.debug:
@@ -250,19 +253,19 @@ def postResourcesFile():
     orgHeader = request.headers.get("Origin")
     if orgHeader != "frontend":
         if app.debug:
-            utils.log("/api/resourcesnormal: Missing or invalid Origin header", "DEBUG")
+            utils.log("/api/resourcesfile: Missing or invalid Origin header", "DEBUG")
         return "Forbidden", 403
     contHeader = request.headers.get("Content-Type")
     if contHeader != "application/json":
         if app.debug:
             utils.log(
-                "/api/resourcesnormal: Missing or invalid Content-Type header", "DEBUG"
+                "/api/resourcesfile: Missing or invalid Content-Type header", "DEBUG"
             )
         return "Bad request", 400
     data = request.get_json()
     if not data:
         if app.debug:
-            utils.log("/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
+            utils.log("/api/resourcesfile: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
     if (
@@ -274,13 +277,13 @@ def postResourcesFile():
     ):
         if app.debug:
             utils.log(
-                f"/api/resourcesnormal: Successfully received data: {data}", "DEBUG"
+                f"/api/resourcesfile: Successfully received data: {data}", "DEBUG"
             )
-        backend.recvFlask("/api/resourcesnormal", "POST", data)
+        backend.recvFlask("/api/resourcesfile", "POST", data)
         return "Success", 200
     else:
         if app.debug:
-            utils.log("/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
+            utils.log("/api/resourcesfile: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
 
 
