@@ -60,7 +60,6 @@ class IDOR:
         )
 
         urls = self.extract_urls()
-        
         for url in urls:
             for parameter in self.idorParams:
                 for payload in self.resources:
@@ -70,6 +69,7 @@ class IDOR:
                         originalUrl = url 
                     
                         testUrl = re.sub(rf"{parameter["value"]}=\d+", f"{parameter["value"]}={payload["value"]}", url)
+                        print("[+] Testing IDOR on URL:", testUrl)
                         testResp = self.session.get(testUrl)
                         originalResp = self.session.get(originalUrl)
 

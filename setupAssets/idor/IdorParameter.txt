@@ -8,6 +8,8 @@ IdUse
 UserId
 user_name
 name_user
+username
+cat
 id
 ID
 Id
