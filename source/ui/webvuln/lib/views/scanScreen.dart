@@ -86,15 +86,9 @@ class _scanScreenState extends State<scanScreen> {
             width: double.infinity,
             height: 100,
             decoration: const BoxDecoration(color: Colors.transparent),
-            child:
-                // Constants.buildInputUser(
-                //   controller: urlController,
-                //    hintName: 'Paste URL here',
-                //    underIcon:const Padding(padding: EdgeInsets.all(10),child: Image(image: AssetImage('lib/assets/suffixIcon.png')),),
-                // )
-                inputUser(
+            child: inputUser(
               controller: urlController,
-              hintName: 'Paste URL here',
+              hintName: 'Paste URL here...',
               underIcon: const Padding(
                   padding: EdgeInsets.all(10),
                   child: Image(image: AssetImage('lib/assets/suffixIcon.png'))),
@@ -122,16 +116,13 @@ class _scanScreenState extends State<scanScreen> {
         //Button Scan URL
         submitButton(
           onPressed: () {
-            // String result = postURL(nameURL: urlController.text, moduleNumber: Constants.valueSelected) as String;
             Get.to(const loadingScreen());
-            if (postURL(
-                            nameURL: urlController.text,
-                            moduleNumber: Constants.valueSelected)
+            List<String> listURL = [];
+            listURL.add(urlController.text);
+            if (postURL(nameURL: listURL, moduleNumber: Constants.valueSelected)
                         .toString() ==
                     "Failed post data" ||
-                postURL(
-                            nameURL: urlController.text,
-                            moduleNumber: Constants.valueSelected)
+                postURL(nameURL: listURL, moduleNumber: Constants.valueSelected)
                         .toString() ==
                     "Error") {
               setState(() {

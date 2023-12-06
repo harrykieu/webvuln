@@ -1,4 +1,5 @@
 from base64 import b64decode
+import json
 import re
 import requests
 from bs4 import BeautifulSoup
@@ -13,7 +14,7 @@ class FileUpload:
         self.cookies = None
         self.csrfExist = False
         self.isDVWA = isDVWA
-        self.resources = resources
+        self.resources = json.loads(resources)
         self.isVuln = False
         self.filePayload = []
         # Color codes for text output

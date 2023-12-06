@@ -62,6 +62,7 @@ class WebVuln:
                     data=data,
                     headers={"Content-Type": "application/json", "Origin": "backend"},
                 )
+                requests.post(url="http://localhost:5001", data=data)
             except Exception as e:
                 if self.__debug:
                     print(f"{self.red}[backend.py-sendResultFlask] Error: {e}")
@@ -231,9 +232,7 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        SQLiResult, SQLiPayload = SQLi(
-                            url, sqli_resources
-                        ).check_sqli()
+                        SQLiResult, SQLiPayload = SQLi(url, sqli_resources).check_sqli()
 
                         if SQLiResult is True:
                             resultURL["numVuln"] += 1
@@ -262,9 +261,7 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        XSSResult, XSSPayload = XSS(
-                            url, xss_resources
-                        ).check_xss()
+                        XSSResult, XSSPayload = XSS(url, xss_resources).check_xss()
 
                         if XSSResult is True:
                             resultURL["numVuln"] += 1
@@ -313,7 +310,8 @@ class WebVuln:
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
                         pathTraversalParam = self.resourceHandler(
-                            'GET', {"vulnType": "pathTraversal", "resType": "parameter"})
+                            "GET", {"vulnType": "pathTraversal", "resType": "parameter"}
+                        )
                         resources = self.resourceHandler(
                             "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
@@ -758,4 +756,4 @@ class WebVuln:
 
         html += "</body></html>"
 
-        pdfkit.from_string(html, 'report.pdf')
+        pdfkit.from_string(html, "report.pdf")

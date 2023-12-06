@@ -34,7 +34,6 @@ class _mainScreenState extends State<mainScreen> {
 
   final List _selectedItem = [
     const scanScreen(),
-    const resultScreen(),
     const historyScreen(),
     const resourceScreen(),
     const settingScreen()

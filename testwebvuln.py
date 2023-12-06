@@ -97,9 +97,10 @@ for item in data:
 dateFind = datetime.strptime(
     '2023-09-23T09:31:41.274Z', "%Y-%m-%dT%H:%M:%S.%fZ") """
 # Get scan result
-data = {"domain": "", "scanDate": ""}
+""" data = {"domain": "", "scanDate": ""}
 jsondata = dumps(data)
 b = loads(jsondata)
 result = a.getScanResult("GET", b)
 with open(f"{ROOTPATH}/data_scanResult.json", "w") as f:
     f.write(dumps(result, default=str))
+ """

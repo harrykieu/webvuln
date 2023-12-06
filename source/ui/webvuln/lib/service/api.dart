@@ -15,7 +15,7 @@ Options _options = Options(
 //POST api/scan
 //Post url and number module to scan in screen scan
 Future<String> postURL(
-    {required String nameURL, required List<String> moduleNumber}) async {
+    {required List<String> nameURL, required List<String> moduleNumber}) async {
   final data = jsonEncode(URL(url: nameURL, modules: moduleNumber).toJson());
   final url = '$baseUrl/api/scan';
   print(url);

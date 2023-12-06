@@ -12,10 +12,12 @@ import 'package:webvuln/views/detail_screen.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 
 class resultScreen extends StatefulWidget {
-  const resultScreen({super.key});
+  final String data;
+  const resultScreen({super.key, required this.data});
 
   @override
   State<resultScreen> createState() => _resultScreenState();
+  String get resultData => data;
 }
 
 class _resultScreenState extends State<resultScreen> {
@@ -24,6 +26,8 @@ class _resultScreenState extends State<resultScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
     double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
+    String data = widget.data;
+    print(data);
     return Scaffold(
       appBar: AppBar(
         leading: GradientButton(
