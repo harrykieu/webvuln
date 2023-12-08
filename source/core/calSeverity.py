@@ -1,5 +1,5 @@
 def calculateWebsiteSafetyRate(websiteVulns):
-    """Calculate the website's safety rate and severity 
+    """Calculate the website's safety rate and severity
     :param websiteVulns: A list of vulnerabilities defined in the list vulnerabilities.
     :return: A tuple containing the website safety rate and its severity.
     """
@@ -10,7 +10,7 @@ def calculateWebsiteSafetyRate(websiteVulns):
         "lfi": 8.6,
         "pathtraversal": 5.8,
         "idor": 7.5,
-        "fileupload": 3.3
+        "fileupload": 3.3,
     }
 
     totalScore = 0
@@ -25,7 +25,6 @@ def calculateWebsiteSafetyRate(websiteVulns):
 
     # Define the conversion table for severity
     safetyPercent = {
-        (0, 39): "Critical",
         (40, 69): "High",
         (70, 89): "Medium",
         (90, 99): "Low",

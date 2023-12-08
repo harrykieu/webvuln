@@ -1,8 +1,7 @@
-from flask import Flask
-from flask import request
-from source.core.backend import WebVuln
-import source.core.utils as utils
+from flask import Flask, request
 
+import source.core.utils as utils
+from source.core.backend import WebVuln
 
 app = Flask(__name__)
 backend = WebVuln()

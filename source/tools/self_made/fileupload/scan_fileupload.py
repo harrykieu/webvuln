@@ -1,10 +1,12 @@
-from base64 import b64decode
 import json
+import os
 import re
+from base64 import b64decode
+
 import requests
 from bs4 import BeautifulSoup
+
 import source.core.utils as utils
-import os
 
 
 class FileUpload:

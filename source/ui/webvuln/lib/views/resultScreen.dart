@@ -1,15 +1,14 @@
 // ignore_for_file: unused_element
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dropdown/flutter_dropdown.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:webvuln/items/lineChart.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
 import 'package:webvuln/items/pieGraph.dart';
-import 'package:flutter_dropdown/flutter_dropdown.dart';
 import 'package:webvuln/items/tables.dart';
-import 'package:webvuln/views/detail_screen.dart';
-import 'package:just_the_tooltip/just_the_tooltip.dart';
 
 class resultScreen extends StatefulWidget {
   final String data;

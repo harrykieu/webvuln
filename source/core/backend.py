@@ -1,22 +1,22 @@
 import json
 import os
+import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
-import pymongo
 
+import pdfkit
+import pymongo
 import requests
-from source.core.database.dbutils import DatabaseUtils
+
 import source.core.utils as utils
+from source.core.calSeverity import calculateWebsiteSafetyRate
+from source.core.database.dbutils import DatabaseUtils
 from source.tools.self_made.fileupload.scan_fileupload import FileUpload
-from source.tools.self_made.pathtraversal.scan_pathtraversal import PathTraversal
+from source.tools.self_made.idor.scan_idor import IDOR
 from source.tools.self_made.lfi.scan_lfi import LFI
+from source.tools.self_made.pathtraversal.scan_pathtraversal import PathTraversal
 from source.tools.self_made.sqli.scan_sqli import SQLi
 from source.tools.self_made.xss.scan_xss import XSS
-from source.tools.self_made.idor.scan_idor import IDOR
-from source.core.calSeverity import calculateWebsiteSafetyRate
-
-import xml.etree.ElementTree as ET
-import pdfkit
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [
@@ -373,7 +373,6 @@ class WebVuln:
             utils.log(f"[backend.py-scanURL] Error: {e}", "ERROR")
             raise e
         return json.dumps(result, default=str)
-        # return "Success"
 
     def resourceHandler(self, method, data) -> str | list:
         """Handle the resources.

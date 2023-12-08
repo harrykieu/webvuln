@@ -1,13 +1,10 @@
+// ignore_for_file: file_names
+
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
-import 'package:preload_page_view/preload_page_view.dart';
-import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/resultScreen.dart';
-import 'package:webvuln/views/scanScreen.dart';
-import 'dart:io';
 
 class loadingScreen extends StatefulWidget {
   const loadingScreen({Key? key}) : super(key: key);
