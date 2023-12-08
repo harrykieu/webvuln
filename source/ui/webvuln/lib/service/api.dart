@@ -1,16 +1,54 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-
+import 'dart:io';
 import '../model/model.dart';
 
 Dio dio = Dio();
 String baseUrl = 'http://127.0.0.1:5000';
 Options _options = Options(
     headers: {'Content-Type': 'application/json', 'Origin': 'frontend'});
+
+Future<String> listen() async {
+  Completer<String> completer = Completer<String>();
+
+  await ServerSocket.bind("0.0.0.0", 5001, shared: true)
+      .then((ServerSocket server) {
+    print('Server listening on ${server.address}:${server.port}');
+    server.listen((Socket socket) {
+      socket.listen((data) async {
+        String response = String.fromCharCodes(data);
+        socket.close();
+        print(response);
+
+        if (!completer.isCompleted) {
+          completer.complete(response);
+        }
+      });
+    }, onError: (error) {
+      print(error);
+      if (!completer.isCompleted) {
+        completer.completeError('Error');
+      }
+    }, onDone: () {
+      print('done');
+    });
+  });
+
+  return completer.future;
+}
+
+Future<String> checkData() async {
+  if (listen().toString().isEmpty) {
+    return 'No error';
+  } else {
+    return 'Error';
+  }
+}
 
 //POST api/scan
 //Post url and number module to scan in screen scan

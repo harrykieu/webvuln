@@ -1,9 +1,9 @@
 // ignore_for_file: file_names
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/resultScreen.dart';
 
 class loadingScreen extends StatefulWidget {
@@ -25,33 +25,6 @@ class _loadingScreenState extends State<loadingScreen> {
   Future<String> fetchData() async {
     await Future.delayed(const Duration(seconds: 2));
     return "Success";
-  }
-
-  Future<String> listen() async {
-    Completer<String> completer = Completer<String>();
-
-    await ServerSocket.bind("0.0.0.0", 5001).then((ServerSocket server) {
-      print('Server listening on ${server.address}:${server.port}');
-      server.listen((Socket server) {
-        server.listen((data) async {
-          String response = String.fromCharCodes(data);
-          server.close();
-
-          if (!completer.isCompleted) {
-            completer.complete(response);
-          }
-        });
-      }, onError: (error) {
-        print(error);
-        if (!completer.isCompleted) {
-          completer.completeError('Error');
-        }
-      }, onDone: () {
-        print('done');
-      });
-    });
-
-    return completer.future;
   }
 
   @override

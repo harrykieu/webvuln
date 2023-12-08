@@ -105,15 +105,7 @@ class _mainScreenState extends State<mainScreen> {
                         name: 'Resources'),
                     const SizedBox(
                       height: 20,
-                    ),
-                    button(
-                        onPressed: () {
-                          setState(() {
-                            _selectedIndex = 4;
-                          });
-                        },
-                        icon: 'lib/assets/settings.png',
-                        name: 'Settings')
+                    )
                   ],
                 )),
             // Gradient background
