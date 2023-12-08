@@ -204,6 +204,7 @@ class WebVuln:
                                 )
                             return "Failed"
                         LFIResult, LFIPayload = LFI(url, lfi_resources).check_lfi()
+                        # TODO: Fix severity to match formula on Google Docs
                         if LFIResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
@@ -231,9 +232,7 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        SQLiResult, SQLiPayload = SQLi(
-                            url, sqli_resources
-                        ).check_sqli()
+                        SQLiResult, SQLiPayload = SQLi(url, sqli_resources).check_sqli()
 
                         if SQLiResult is True:
                             resultURL["numVuln"] += 1
@@ -262,9 +261,7 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        XSSResult, XSSPayload = XSS(
-                            url, xss_resources
-                        ).check_xss()
+                        XSSResult, XSSPayload = XSS(url, xss_resources).check_xss()
 
                         if XSSResult is True:
                             resultURL["numVuln"] += 1
@@ -313,7 +310,8 @@ class WebVuln:
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
                         pathTraversalParam = self.resourceHandler(
-                            'GET', {"vulnType": "pathTraversal", "resType": "parameter"})
+                            "GET", {"vulnType": "pathTraversal", "resType": "parameter"}
+                        )
                         resources = self.resourceHandler(
                             "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
@@ -694,6 +692,7 @@ class WebVuln:
                 return "Failed"
 
     # Generate JSON report
+    # TODO: Fix function name to match camelCase
     def generate_json_report(results):
         json_str = json.dumps(results, indent=4)
         json_str = json_str.replace(", ", ",\n")
@@ -703,7 +702,8 @@ class WebVuln:
         with open("report.json", "w") as f:
             f.write(json_str)
 
-    def generateXMLReport(self, results):
+    # TODO: retrieve path from GUI, save at that location, return "Success" or "Failed"
+    def generateXMLReport(self, path):
         """Generate XML report from the JSON result.
 
         :param results: JSON result
@@ -729,7 +729,7 @@ class WebVuln:
         tree = ET.ElementTree(root)
         tree.write("report.xml")
 
-    def generatePDFReport(self, results):
+    def generatePDFReport(self):
         """Generate PDF report from the JSON result.
 
         :param results: JSON result
@@ -758,4 +758,4 @@ class WebVuln:
 
         html += "</body></html>"
 
-        pdfkit.from_string(html, 'report.pdf')
+        pdfkit.from_string(html, "report.pdf")
