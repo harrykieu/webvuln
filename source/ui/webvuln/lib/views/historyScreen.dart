@@ -46,6 +46,7 @@ class _historyScreenState extends State<historyScreen> {
                     datetime: '${tableData.scanDate.replaceAll(' ', 'T')}Z',
                   );
                   List<dynamic> jsonD = jsonDecode(resp);
+                  // TODO: show result screen with jsonD
                   showDialog(
                       context: context,
                       builder: (context) => AlertDialog(

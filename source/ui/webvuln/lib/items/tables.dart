@@ -99,6 +99,35 @@ class CustomDataTable extends StatelessWidget {
     );
   }
 }
+class TableAll extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    List<DataRow> duplicatedRows = List.generate(10, (index) {
+      return DataRow(cells: [
+        const DataCell(Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
+        DataCell(Text("XSS", style: text_style_normal)),
+        DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"', style: text_style_code)),
+      ]);
+    });
+
+    return CustomDataTable(
+      rows: duplicatedRows,
+    );
+  }
+
+  TextStyle get text_style_normal => GoogleFonts.montserrat(
+        fontSize: 20,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      );
+
+  TextStyle get text_style_code => GoogleFonts.ubuntu(
+        fontSize: 20,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      );
+}
+
 
 class TableXSS extends StatelessWidget {
   @override
@@ -134,7 +163,61 @@ class TableSQli extends StatelessWidget {
       rows: [
         DataRow(cells: [
           const DataCell(Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
-          DataCell(Text("XSS", style: text_style_normal)),
+          DataCell(Text("SQLi", style: text_style_normal)),
+          DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"', style: text_style_code)),
+        ]),
+        // Add more rows as neededlo
+      ],
+    );
+  }
+
+  TextStyle get text_style_normal => GoogleFonts.montserrat(
+        fontSize: 20,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      );
+
+  TextStyle get text_style_code => GoogleFonts.ubuntu(
+        fontSize: 20,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      );
+}
+class TableLFI extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CustomDataTable(
+      rows: [
+        DataRow(cells: [
+          const DataCell(Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
+          DataCell(Text("LFI", style: text_style_normal)),
+          DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"', style: text_style_code)),
+        ]),
+        // Add more rows as neededlo
+      ],
+    );
+  }
+
+  TextStyle get text_style_normal => GoogleFonts.montserrat(
+        fontSize: 20,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      );
+
+  TextStyle get text_style_code => GoogleFonts.ubuntu(
+        fontSize: 20,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      );
+}
+class TableRCE extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CustomDataTable(
+      rows: [
+        DataRow(cells: [
+          const DataCell(Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
+          DataCell(Text("RCE", style: text_style_normal)),
           DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"', style: text_style_code)),
         ]),
         // Add more rows as neededlo

@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
 class URL {
-  final String url;
+  final List<String> url;
   final List<String> modules;
   const URL({required this.url, required this.modules});
 

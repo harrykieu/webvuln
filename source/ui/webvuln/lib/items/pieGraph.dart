@@ -28,7 +28,7 @@ class _containerPieChartState extends State<containerPieChart> {
           color: Colors.white,
           boxShadow: const [
             BoxShadow(
-                color: Colors.cyan, offset: const Offset(0, 4), blurRadius: 10)
+                color: Colors.black38, offset: const Offset(0, 4), blurRadius: 10)
           ]),
       child: Column(
         children: [

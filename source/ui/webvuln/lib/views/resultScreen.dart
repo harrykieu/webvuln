@@ -10,26 +10,47 @@ import 'package:webvuln/items/pieGraph.dart';
 import 'package:flutter_dropdown/flutter_dropdown.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:webvuln/items/tables.dart';
+import 'package:webvuln/views/variable.dart';
 
 class resultScreen extends StatefulWidget {
-  const resultScreen({super.key});
+  final String data;
+  const resultScreen({super.key, required this.data});
 
   @override
   State<resultScreen> createState() => _resultScreenState();
+  String get resultData => data;
 }
 
 class _resultScreenState extends State<resultScreen> {
   @override
+  bool isVisibled = true;
+  bool isAppeared = true;
+  int number_module = 0;
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    isVisibled = true;
+    number_module = 0;
+    isAppeared = true;
+  }
+
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
-    List<Widget> table_errors = [
-      TableXSS(),TableSQli()
+    List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
+    List<Widget> tables = [
+      TableAll(),
+      TableXSS(),
+      TableSQli(),
+      TableRCE(),
+      TableLFI()
     ];
-    bool isVisibled = true;
-    List<String> error = ['All', 'XSS', 'SQLi', 'LFI', 'RCE'];
-    String _selectedModule = 'All';
+    String selectedModule = "All";
+    String data = widget.data;
+
+    print(data);
+
     return Scaffold(
       appBar: AppBar(
         leading: GradientButton(
@@ -45,78 +66,97 @@ class _resultScreenState extends State<resultScreen> {
       ),
       body: ClipRRect(
         borderRadius: BorderRadius.circular(borderRadiusValue),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              CustomDropdownButton(
-                  selectedItem: _selectedModule,
-                  items: error,
-                  onItemSelected: (item) {
-                    if (item == 'All') {
+        child: Visibility(
+          visible: isAppeared,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                CustomDropdownButton(
+                    selectedItem: selectedModule,
+                    items: error,
+                    onItemSelected: (item) {
+                      print(item);
                       setState(() {
-                        isVisibled = true;
-                        _selectedModule = item;
+                        isVisibled = item == 'All';
+                        print(isVisibled);
                       });
-                    } else {
-                      setState(() {
-                        isVisibled = false;
-                        _selectedModule = item;
-                      });
-                    }
-                  }),
-              /* Table list errors*/
-              container(screenWidth,
+                      switch (item) {
+                        case 'All':
+                          setState(() {
+                            number_module = 0;
+                          });
+                          break;
+                        case 'XSS':
+                          setState(() {
+                            number_module = 1;
+                          });
+                          break;
+                        case 'SQLi':
+                          setState(() {
+                            number_module = 2;
+                          });
+                          break;
+                        case 'RCE':
+                          setState(() {
+                            number_module = 3;
+                          });
+                          break;
+                        case 'LFI':
+                          setState(() {
+                            number_module = 4;
+                          });
+                          break;
+                        default:
+                      }
+                    }),
+                /* Table list errors*/
+                container(screenWidth,
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: const Image(
+                              image: AssetImage('lib/assets/list.png')),
+                          title: Text('List Vulnerabilities',
+                              style: GoogleFonts.montserrat(
+                                  fontSize: 24, fontWeight: FontWeight.bold)),
+                        ),
+                        tables[number_module]
+                      ],
+                    )),
+                // Graph line and pie chart
+                Visibility(
+                  visible: isVisibled,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [containerPieChart(), lineChart()],
+                  ),
+                ),
+                // Description
+                container(
+                  screenWidth,
                   child: Column(
                     children: [
                       ListTile(
-                        leading: const Image(
-                            image: AssetImage('lib/assets/list.png')),
-                        title: Text('List Vulnerabilities',
-                            style: GoogleFonts.montserrat(
-                                fontSize: 24, fontWeight: FontWeight.bold)),
+                        title: Row(
+                          children: [
+                            const Image(
+                                image:
+                                    AssetImage('lib/assets/Folders_light.png')),
+                            Text(
+                              '  Description',
+                              style: GoogleFonts.montserrat(
+                                  fontSize: 24, fontWeight: FontWeight.bold),
+                            ),
+                            tool_tip(content: 'Info about description')
+                          ],
+                        ),
                       ),
-                      table_errors[0]
+                      Constants.content_vulnerabilities[number_module]
                     ],
-                  )),
-              // Graph line and pie chart
-              Visibility(
-                visible: isVisibled,
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [containerPieChart(), lineChart()],
-                ),
-              ),
-              // Description
-              container(
-                screenWidth,
-                child: Column(
-                  children: [
-                    ListTile(
-                      title: Row(
-                        children: [
-                          const Image(
-                              image:
-                                  AssetImage('lib/assets/Folders_light.png')),
-                          Text(
-                            '  Description',
-                            style: GoogleFonts.montserrat(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                          tool_tip(content: 'Info about description')
-                        ],
-                      ),
-                    ),
-                    ListTile(
-                      title: Text(
-                        'SQL injection, also known as SQLI, is a common attack vector that uses malicious SQL code for backend database manipulation to access information that was not intended to be displayed',
-                        style: GoogleFonts.montserrat(
-                            fontSize: 20, fontWeight: FontWeight.normal),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -125,7 +165,7 @@ class _resultScreenState extends State<resultScreen> {
 
   Container container(double screenWidth, {required Widget child}) {
     return Container(
-        width: screenWidth - (0.13 * screenWidth),
+        width: screenWidth,
         height: 550,
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
         padding: EdgeInsets.all(20),

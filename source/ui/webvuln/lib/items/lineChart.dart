@@ -18,7 +18,7 @@ class lineChart extends StatelessWidget {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.cyan,
+              color: Colors.black38,
               blurRadius: 15,
             )
           ],
