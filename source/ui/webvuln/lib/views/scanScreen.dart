@@ -98,27 +98,32 @@ class _scanScreenState extends State<scanScreen> {
 
         //Button Scan URL
         GradientButton(
-          onPressed: () {
-            Get.to(const loadingScreen());
-            List<String> listURL = [];
-            listURL.add(urlController.text);
-            if (postURL(nameURL: listURL, moduleNumber: Constants.valueSelected)
-                        .toString() ==
-                    "Failed post data"
-                // postURL(nameURL: listURL, moduleNumber: Constants.valueSelected)
-                //         .toString() ==
-                //     "Error"
-                    ) {
-              setState(() {
-                Constants.contentChild =
-                    const CircularProgressIndicator.adaptive(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                );
-              });
-            } else {
+            onPressed: () {
               Get.to(const loadingScreen());
-            }
-          }, child: Text('Scan',style:GoogleFonts.montserrat(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.white) ,))
+              List<String> listURL = [];
+              listURL.add(urlController.text);
+              if (postURL(
+                          nameURL: listURL,
+                          moduleNumber: Constants.valueSelected)
+                      .toString() ==
+                  "Failed post data") {
+                setState(() {
+                  Constants.contentChild =
+                      const CircularProgressIndicator.adaptive(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  );
+                });
+              } else {
+                Get.to(const loadingScreen());
+              }
+            },
+            child: Text(
+              'Scan',
+              style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ))
       ],
     );
   }
@@ -157,7 +162,7 @@ class _scanScreenState extends State<scanScreen> {
                               }
                               if (Constants.valueSelected.length == 0) {
                                 _isVisibled = false;
-                              }else{
+                              } else {
                                 _isVisibled = true;
                               }
                               print(_numberModule);
