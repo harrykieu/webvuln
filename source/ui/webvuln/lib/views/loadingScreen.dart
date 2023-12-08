@@ -44,6 +44,7 @@ class _loadingScreenState extends State<loadingScreen> {
               return Text('Error: ${snapshot.error}');
             } else if (snapshot.connectionState == ConnectionState.done) {
               String snapData = snapshot.data!;
+              // FIXME: ERROR!
               return resultScreen(data: snapData);
             } else {
               return const Text('Error');

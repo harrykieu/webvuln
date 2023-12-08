@@ -163,7 +163,7 @@ class _resourceScreenState extends State<resourceScreen> {
         vulnTypePostController: vulnTypePostController,
         typePostController: typePostController,
         valueController: valueController,
-      ); 
+      );
       tableWidget = normalSearch(
         screenHeight: screenHeight,
         screenWidth: screenWidth,
