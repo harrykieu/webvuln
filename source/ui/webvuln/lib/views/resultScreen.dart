@@ -11,6 +11,7 @@ import 'package:webvuln/items/pieGraph.dart';
 import 'package:webvuln/items/tables.dart';
 import 'package:webvuln/views/variable.dart';
 
+// TODO: parse data from loading screen to display on result screen
 class resultScreen extends StatefulWidget {
   final String data;
   const resultScreen({super.key, required this.data});
@@ -48,7 +49,7 @@ class _resultScreenState extends State<resultScreen> {
     String selectedModule = "All";
     String data = widget.data;
 
-    print(data);
+    print('Result from loading: $data');
 
     return Scaffold(
       appBar: AppBar(

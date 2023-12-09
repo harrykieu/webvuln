@@ -1,9 +1,12 @@
 from flask import Flask, request
+from flask_cors import CORS
+import requests
 
 import source.core.utils as utils
 from source.core.backend import WebVuln
 
 app = Flask(__name__)
+CORS(app)
 backend = WebVuln()
 # Debug
 backend.setDebug(True)
@@ -288,9 +291,9 @@ def postResourcesFile():
 
 @app.post("/api/result")
 def postResult():
-    """Create/Update/Remove a result.
+    """Send scan result to frontend.
 
-    This function is used for backend to create, update, or remove a result using `/api/result` endpoint with `POST`.
+    This function is used for backend to send result to frontend using `/api/result` endpoint with `POST`.
 
     The request body should contain a JSON object with the following properties:
     - `result`: Result of the scan.
@@ -311,11 +314,22 @@ def postResult():
             utils.log("/api/result: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if "result" in keys and len(keys) == 1:  # FIX LATER
+    if "result" in keys and len(keys) == 1:
         if app.debug:
             utils.log(f"/api/result: Successfully received data: {data}", "DEBUG")
-        # frontend.recvFlask('/api/result', 'POST', data)
-        return "Success", 200
+        try:
+            req = requests.post(url="http://127.0.0.1:5001", json=data)
+            if req.status_code == 200:
+                return "Success", 200
+            else:
+                print(req.status_code, req.text)
+                print("/api/result: Failed to send result to frontend")
+                return "Failed", 400
+        except Exception as e:
+            if app.debug:
+                utils.log(f"/api/result: {e}", "ERROR")
+            print(e)
+            return "Failed", 400
     else:
         if app.debug:
             utils.log("/api/result: Missing or invalid JSON data", "DEBUG")

@@ -2,9 +2,9 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-
+import 'dart:math';
 import 'package:dio/dio.dart';
+import 'package:webvuln/views/resourcesScreen.dart';
 import 'dart:io';
 import '../model/model.dart';
 
@@ -13,40 +13,65 @@ String baseUrl = 'http://127.0.0.1:5000';
 Options _options = Options(
     headers: {'Content-Type': 'application/json', 'Origin': 'frontend'});
 
-Future<String> listen() async {
-  Completer<String> completer = Completer<String>();
+class WebVulnSocket {
+  final String url;
+  final int port;
+  ServerSocket? server;
 
-  await ServerSocket.bind("0.0.0.0", 5001, shared: true)
-      .then((ServerSocket server) {
-    print('Server listening on ${server.address}:${server.port}');
-    server.listen((Socket socket) {
-      socket.listen((data) async {
-        String response = String.fromCharCodes(data);
-        socket.close();
-        print(response);
+  WebVulnSocket({required this.url, required this.port});
 
-        if (!completer.isCompleted) {
-          completer.complete(response);
+  Future<bool> create() async {
+    try {
+      server = await ServerSocket.bind(url, port, shared: true);
+      return true;
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
+  }
+
+  Future<String> listen() async {
+    // Ensure the server is initialized before listening
+    if (server == null) {
+      print('Error: Server not initialized');
+      return '';
+    }
+
+    try {
+      Socket client = await server!.first; // Wait for the first connection
+
+      print(
+          'Connection from ${client.remoteAddress.address}:${client.remotePort}');
+
+      // Read data until the connection is closed
+      StringBuffer receivedDataBuffer = StringBuffer();
+      await for (List<int> data in client) {
+        receivedDataBuffer.write(String.fromCharCodes(data));
+
+        // Check if the received data indicates the end of communication
+        if (receivedDataBuffer.toString().endsWith('}')) {
+          break;
         }
-      });
-    }, onError: (error) {
-      print(error);
-      if (!completer.isCompleted) {
-        completer.completeError('Error');
       }
-    }, onDone: () {
-      print('done');
-    });
-  });
 
-  return completer.future;
-}
+      // Process the received data or store it in response
+      String response = receivedDataBuffer.toString();
 
-Future<String> checkData() async {
-  if (listen().toString().isEmpty) {
-    return 'No error';
-  } else {
-    return 'Error';
+      // Send a JSON response back to the client
+      client.write("HTTP/1.1 200 OK\n\n");
+
+      // Close the client socket after sending the response
+      await client.close();
+
+      return response;
+    } catch (error) {
+      print('Error during socket communication: $error');
+      return '';
+    }
+  }
+
+  Future<void> close() async {
+    await server?.close();
   }
 }
 
@@ -56,13 +81,10 @@ Future<String> postURL(
     {required List<String> nameURL, required List<String> moduleNumber}) async {
   final data = jsonEncode(URL(url: nameURL, modules: moduleNumber).toJson());
   final url = '$baseUrl/api/scan';
-  print(url);
   try {
     final response = await dio.post(url, data: data, options: _options);
-
     if (response.statusCode == 200) {
-      print(data);
-      print('Sucessfull post data');
+      print('Sucessfully post data');
       return "Data posted successfull";
     } else {
       return "Failed post data";
