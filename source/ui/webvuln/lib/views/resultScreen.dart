@@ -1,5 +1,7 @@
 // ignore_for_file: unused_element
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,10 +24,11 @@ class resultScreen extends StatefulWidget {
 }
 
 class _resultScreenState extends State<resultScreen> {
-  @override
   bool isVisibled = true;
   bool isAppeared = true;
   int number_module = 0;
+
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
@@ -34,22 +37,31 @@ class _resultScreenState extends State<resultScreen> {
     isAppeared = true;
   }
 
+  String __jsonHandle(String jsonD) {
+    // Read the string line by line to find the json format
+    for (String line in jsonD.split('\n')) {
+      if (line.startsWith('{')) {
+        // Handle the json data
+        return line;
+      }
+    }
+    return '';
+  }
+
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
+    String newData = __jsonHandle(widget.data);
     List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
     List<Widget> tables = [
-      TableAll(),
+      TableAll(newData),
       TableXSS(),
       TableSQli(),
       TableRCE(),
       TableLFI()
     ];
     String selectedModule = "All";
-    String data = widget.data;
-
-    print('Result from loading: $data');
 
     return Scaffold(
       appBar: AppBar(
@@ -154,7 +166,7 @@ class _resultScreenState extends State<resultScreen> {
                       Constants.content_vulnerabilities[number_module]
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),

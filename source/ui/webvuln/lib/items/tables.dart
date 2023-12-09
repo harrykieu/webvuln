@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -99,14 +101,31 @@ class CustomDataTable extends StatelessWidget {
     );
   }
 }
+
 class TableAll extends StatelessWidget {
+  TableAll(this.response_data);
+  // ignore: non_constant_identifier_names
+  String response_data;
   @override
   Widget build(BuildContext context) {
+    String domain = "";
+    String scanDate = "";
+    List<dynamic> vuln = [];
+    int numVuln;
+    Map<dynamic, dynamic> dataMap = json.decode(response_data);
+    List<dynamic> resultList = dataMap["result"];
+    for (var result in resultList) {
+      domain = result["domain"];
+      scanDate = result["scanDate"];
+      numVuln = result["numVuln"];
+      vuln = result["vulnerabilities"];
+    }
     List<DataRow> duplicatedRows = List.generate(10, (index) {
       return DataRow(cells: [
-        const DataCell(Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
-        DataCell(Text("XSS", style: text_style_normal)),
-        DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"', style: text_style_code)),
+        const DataCell(
+            Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
+        DataCell(Text(domain, style: text_style_normal)),
+        DataCell(Text(scanDate, style: text_style_code)),
       ]);
     });
 
@@ -128,16 +147,17 @@ class TableAll extends StatelessWidget {
       );
 }
 
-
 class TableXSS extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomDataTable(
       rows: [
         DataRow(cells: [
-          const DataCell(Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
+          const DataCell(
+              Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
           DataCell(Text("XSS", style: text_style_normal)),
-          DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"', style: text_style_code)),
+          DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"',
+              style: text_style_code)),
         ]),
         // Add more rows as needed
       ],
@@ -156,15 +176,18 @@ class TableXSS extends StatelessWidget {
         fontWeight: FontWeight.normal,
       );
 }
+
 class TableSQli extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomDataTable(
       rows: [
         DataRow(cells: [
-          const DataCell(Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
+          const DataCell(
+              Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
           DataCell(Text("SQLi", style: text_style_normal)),
-          DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"', style: text_style_code)),
+          DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"',
+              style: text_style_code)),
         ]),
         // Add more rows as neededlo
       ],
@@ -183,15 +206,18 @@ class TableSQli extends StatelessWidget {
         fontWeight: FontWeight.normal,
       );
 }
+
 class TableLFI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomDataTable(
       rows: [
         DataRow(cells: [
-          const DataCell(Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
+          const DataCell(
+              Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
           DataCell(Text("LFI", style: text_style_normal)),
-          DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"', style: text_style_code)),
+          DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"',
+              style: text_style_code)),
         ]),
         // Add more rows as neededlo
       ],
@@ -210,15 +236,18 @@ class TableLFI extends StatelessWidget {
         fontWeight: FontWeight.normal,
       );
 }
+
 class TableRCE extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomDataTable(
       rows: [
         DataRow(cells: [
-          const DataCell(Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
+          const DataCell(
+              Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
           DataCell(Text("RCE", style: text_style_normal)),
-          DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"', style: text_style_code)),
+          DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"',
+              style: text_style_code)),
         ]),
         // Add more rows as neededlo
       ],

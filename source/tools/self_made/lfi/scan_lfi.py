@@ -1,3 +1,4 @@
+import json
 import requests
 from bs4 import BeautifulSoup as bs
 from urllib.parse import urljoin
@@ -17,7 +18,7 @@ s.headers[
 class LFI:
     def __init__(self, url, lfi_resources):
         self.url = url
-        self.lfi_resources = lfi_resources
+        self.lfi_resources = json.loads(lfi_resources)
         self.payloads = []
         self.result = False
 
