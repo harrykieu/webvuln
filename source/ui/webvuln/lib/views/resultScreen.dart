@@ -37,18 +37,17 @@ class _resultScreenState extends State<resultScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
     double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
+    String data = widget.data;
     List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
     List<Widget> tables = [
-      TableAll(),
+      TableAll(data),
       TableXSS(),
       TableSQli(),
       TableRCE(),
       TableLFI()
     ];
     String selectedModule = "All";
-    String data = widget.data;
-
-    print(data);
+    //g
 
     return Scaffold(
       appBar: AppBar(
@@ -74,6 +73,7 @@ class _resultScreenState extends State<resultScreen> {
                     selectedItem: selectedModule,
                     items: error,
                     onItemSelected: (item) {
+                      print(data);
                       print(item);
                       setState(() {
                         isVisibled = item == 'All';
@@ -153,7 +153,8 @@ class _resultScreenState extends State<resultScreen> {
                       Constants.content_vulnerabilities[number_module]
                     ],
                   ),
-                )
+                ),
+                
               ],
             ),
           ),

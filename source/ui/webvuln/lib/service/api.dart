@@ -33,7 +33,7 @@ Future<String> listen() async {
       print(error);
       if (!completer.isCompleted) {
         completer.completeError('Error');
-      }
+      } 
     }, onDone: () {
       print('done');
     });
