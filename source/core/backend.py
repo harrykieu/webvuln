@@ -204,7 +204,6 @@ class WebVuln:
                                 )
                             return "Failed"
                         LFIResult, LFIPayload = LFI(url, lfi_resources).check_lfi()
-                        # TODO: Fix severity to match formula on Google Docs
                         if LFIResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
@@ -272,7 +271,7 @@ class WebVuln:
                                         f"{ROOTPATH}/logs/xss_log.txt", "r"
                                     ).read(),
                                     "payload": XSSPayload,
-                                    "severity": "High",
+                                    "severity": "Medium",
                                 }
                             )
                     elif module == "fileupload":
@@ -304,7 +303,7 @@ class WebVuln:
                                 {
                                     "type": "IDOR",
                                     "description": f"{url} is vulnerable to IDOR",
-                                    "severity": "High",
+                                    "severity": "Medium",
                                 }
                             )
                     elif module == "pathtraversal":
