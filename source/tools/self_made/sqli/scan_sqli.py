@@ -136,7 +136,7 @@ class SQLi:
             if self.is_vulnerable_sqli(res):
                 print("[+] SQL Injection vulnerability detected, link:", new_url)
                 utils.log(
-                    f"[SQLi] SQL Injection vulnerability detected, link: {new_url}",
+                    f"[SQLi] SQL Injection vulnerability detected, link: {new_url}, \nPayload: {payload['value']}",
                     "INFO",
                     "sqli_log.txt",
                 )
@@ -168,7 +168,7 @@ class SQLi:
                     res = s.get(self.url, params=data)
 
                 url = urljoin(self.url, form_details["action"])
-                res = s.post(url, data=data)  # Thực hiện yêu cầu POST
+                res = s.post(url, data=data) 
 
                 curr_url = self.url
                 results = {"sqli": []}
@@ -179,7 +179,7 @@ class SQLi:
                     )
 
                     utils.log(
-                        f"[SQLi] SQL Injection detected in form, link: {self.url}",
+                        f"[SQLi] SQL Injection detected in form with Payload: {payload['value']}",
                         "INFO",
                         "sqli_log.txt",
                     )
