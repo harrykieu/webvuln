@@ -136,7 +136,7 @@ class SQLi:
             if self.is_vulnerable_sqli(res):
                 print("[+] SQL Injection vulnerability detected, link:", new_url)
                 utils.log(
-                    f"[SQLi] SQL Injection vulnerability detected, link: {new_url}, \nPayload: {payload['value']}",
+                    f"[SQLi] SQL Injection vulnerability detected, link: {new_url}, \nPayload: {payload_str}",
                     "INFO",
                     "sqli_log.txt",
                 )
@@ -179,7 +179,7 @@ class SQLi:
                     )
 
                     utils.log(
-                        f"[SQLi] SQL Injection detected in form with Payload: {payload['value']}",
+                        f"[SQLi] SQL Injection detected in form with Payload: {payload}",
                         "INFO",
                         "sqli_log.txt",
                     )
