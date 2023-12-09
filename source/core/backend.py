@@ -204,6 +204,7 @@ class WebVuln:
                                 )
                             return "Failed"
                         LFIResult, LFIPayload = LFI(url, lfi_resources).check_lfi()
+                   
                         if LFIResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
@@ -231,9 +232,7 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        SQLiResult, SQLiPayload = SQLi(
-                            url, sqli_resources
-                        ).check_sqli()
+                        SQLiResult, SQLiPayload = SQLi(url, sqli_resources).check_sqli()
 
                         if SQLiResult is True:
                             resultURL["numVuln"] += 1
@@ -262,9 +261,7 @@ class WebVuln:
                                     "[backend.py-scanURL] Error: Failed to get resources"
                                 )
                             return "Failed"
-                        XSSResult, XSSPayload = XSS(
-                            url, xss_resources
-                        ).check_xss()
+                        XSSResult, XSSPayload = XSS(url, xss_resources).check_xss()
 
                         if XSSResult is True:
                             resultURL["numVuln"] += 1
@@ -313,7 +310,8 @@ class WebVuln:
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
                         pathTraversalParam = self.resourceHandler(
-                            'GET', {"vulnType": "pathTraversal", "resType": "parameter"})
+                            "GET", {"vulnType": "pathTraversal", "resType": "parameter"}
+                        )
                         resources = self.resourceHandler(
                             "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
@@ -693,69 +691,70 @@ class WebVuln:
                     print("[backend.py-getScanResult] Error: Invalid JSON object")
                 return "Failed"
 
-    # Generate JSON report
-    def generate_json_report(results):
-        json_str = json.dumps(results, indent=4)
-        json_str = json_str.replace(", ", ",\n")
-        json_str = json_str.replace("{", "{\n")
-        json_str = json_str.replace("}", "\n}")
+ # TODO: retrieve path from GUI, save at that location, return "Success" or "Failed" => SOLVED 09/12/2023
+class ReportGenerator:
+    def __init__(self, scan_results, file_path):
+        self.scan_results = scan_results
+        self.file_path = file_path
 
-        with open("report.json", "w") as f:
-            f.write(json_str)
+    def generate_json(self):
+        file_name = os.path.join(self.file_path, 'report.json')
+        with open(file_name, 'w') as f:
+            json.dump(self.scan_results, f, indent=4)
+        return "Success"
 
-    def generateXMLReport(self, results):
-        """Generate XML report from the JSON result.
-
-        :param results: JSON result
-        """
-        with open("report.json") as f:
-            data = json.load(f)
-
-        root = ET.Element("report")
-
-        for item in data:
-            domain = ET.SubElement(root, "domain")
-            domain.text = item["domain"]
-
-            scan_date = ET.SubElement(root, "scan_date")
-            scan_date.text = item["scanDate"]
-
-            vulns = ET.SubElement(root, "vulnerabilities")
-            for vuln in item["vulnerabilities"]:
-                vuln_node = ET.SubElement(vulns, "vulnerability")
-                ET.SubElement(vuln_node, "type").text = vuln["type"]
-                ET.SubElement(vuln_node, "severity").text = vuln["severity"]
+    def generate_xml(self):
+        root = ET.Element('scan_results')
+        for result in self.scan_results:
+            domain = ET.SubElement(root, 'domain')
+            ET.SubElement(domain, 'name').text = result['domain'] 
+            ET.SubElement(domain, 'scan_date').text = str(result['scanDate'])
+            
+            vulns = ET.SubElement(domain, 'vulnerabilities')
+            for vuln in result['vulnerabilities']:
+                v = ET.SubElement(vulns, 'vulnerability')
+                ET.SubElement(v, 'type').text = vuln['type']
+                ET.SubElement(v, 'severity').text = vuln['severity']
+                ET.SubElement(v, 'payload').text = str(vuln['payload'])
+                ET.SubElement(v, 'logs').text = vuln['logs']
 
         tree = ET.ElementTree(root)
-        tree.write("report.xml")
+        file_name = os.path.join(self.file_path, 'report.xml') 
+        tree.write(file_name)
+        
+        return "Success"
 
-    def generatePDFReport(self, results):
-        """Generate PDF report from the JSON result.
-
-        :param results: JSON result
-        """
-        with open("report.json") as f:
-            data = json.load(f)
-
-        html = """
+    def generate_pdf(self):    
+        pdf_content = '''
+        <!DOCTYPE html>
         <html>
         <head>
-        <title>Report</title>
+        <style>
+        body {
+            background-color: white; 
+            font-family: Arial, sans-serif;
+        }
+        </style>
         </head>
         <body>
-        <h1>Vulnerability Report</h1>
-        """
-
-        for item in data:
-            html += f"<h2>{item['domain']}</h2>"
-            html += f"<p>Scan Date: {item['scanDate']}</p>"
-
-            html += "<h3>Vulnerabilities:</h3>"
-            html += "<ul>"
-            for vuln in item["vulnerabilities"]:
-                html += f"<li>{vuln['type']} - {vuln['severity']}</li>"
-            html += "</ul>"
-
-        html += "</body></html>"
-
-        pdfkit.from_string(html, 'report.pdf')
+        '''
+        
+        for result in self.scan_results:
+            pdf_content += f'<h1>Domain: {result["domain"]}</h1>'
+            pdf_content += f'<p>Scan Date: {result["scanDate"]}</p>'
+            pdf_content += f'<p>Vulnerabilities Detected: {result["numVuln"]}</p>'
+            
+            pdf_content += '<h2>Vulnerabilities:</h2>'
+            pdf_content += '<ul>'
+            for vuln in result['vulnerabilities']:
+                pdf_content += f'<li>{vuln["type"]} ({vuln["severity"]}):'
+                pdf_content += f'<p>Payload: {vuln["payload"]}</p>'
+                pdf_content += f'<p>Logs: {vuln["logs"]}</p></li>'
+            pdf_content += '</ul>'
+            
+        pdf_content += '</body></html>'
+        
+        file_name = os.path.join(self.file_path, 'report.pdf')
+        pdfkit.from_string(pdf_content, file_name)
+        
+        return "Success"
