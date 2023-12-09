@@ -4,7 +4,6 @@ def calculateWebsiteSafetyRate(websiteVulns):
     :return: A tuple containing the website safety rate and its severity.
     """
     # Define the CVSS scores for each vulnerability
-    # TODO: Fix vuln names
     vulnerabilities = {
         "SQLI": 8.6,
         "XSS": 6.1,
