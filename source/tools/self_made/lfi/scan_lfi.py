@@ -43,6 +43,7 @@ class LFI:
         try:
             action = form.attrs.get("action").lower()
         except:
+            # TODO: fix all bare except statements
             action = None
 
         method = form.attrs.get("method", "get").lower()
@@ -64,6 +65,7 @@ class LFI:
     # --------------------------------------------------
 
     def check_lfi(self):
+        # TODO: add payload to log, add log to utils
         utils.log(
             f"[LFI] Checking LFI for {self.url}",
             "INFO",
@@ -71,6 +73,15 @@ class LFI:
         )
 
         print("\n[+] Checking LFI")
+
+        if not self.lfi_resources:
+            print("\n[-] Resources not found!")
+            utils.log(
+                "[LFI] Resources not found!",
+                "ERROR",
+                "lfi_log.txt",
+            )
+            return self.result
 
         for payload in self.lfi_resources:
             payload_str = payload["value"]

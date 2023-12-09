@@ -193,7 +193,18 @@ class WebVuln:
                         lfi_resources = self.resourceHandler(
                             "GET", {"vulnType": "lfi", "resType": "payload"}
                         )
+                        if lfi_resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
                         LFIResult, LFIPayload = LFI(url, lfi_resources).check_lfi()
+                        # TODO: Fix severity to match formula on Google Docs
                         if LFIResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
@@ -211,7 +222,18 @@ class WebVuln:
                         sqli_resources = self.resourceHandler(
                             "GET", {"vulnType": "sqli", "resType": "payload"}
                         )
-                        SQLiResult, SQLiPayload = LFI(url, sqli_resources).check_sqli()
+                        if sqli_resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        SQLiResult, SQLiPayload = SQLi(url, sqli_resources).check_sqli()
+
                         if SQLiResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
@@ -227,14 +249,25 @@ class WebVuln:
                     elif module == "xss":
                         print("[+] Checking XSS vulnerability...")
                         xss_resources = self.resourceHandler(
-                            "GET", {"vulnType": "sqli", "resType": "payload"}
+                            "GET", {"vulnType": "xss", "resType": "payload"}
                         )
-                        XSSResult, XSSPayload = LFI(url, xss_resources).check_xss()
+                        if xss_resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        XSSResult, XSSPayload = XSS(url, xss_resources).check_xss()
+
                         if XSSResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
                                 {
-                                    "type": "SQLi",
+                                    "type": "XSS",
                                     "logs": open(
                                         f"{ROOTPATH}/logs/xss_log.txt", "r"
                                     ).read(),
@@ -282,6 +315,26 @@ class WebVuln:
                         resources = self.resourceHandler(
                             "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
+                        if resources == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get resources",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get resources"
+                                )
+                            return "Failed"
+                        if pathTraversalParam == "Failed":
+                            utils.log(
+                                "[backend.py-scanURL] Error: Failed to get parameter",
+                                "ERROR",
+                            )
+                            if self.__debug:
+                                print(
+                                    "[backend.py-scanURL] Error: Failed to get parameter"
+                                )
+                            return "Failed"
                         PTResult, PTPayload = PathTraversal(
                             url, resources, pathTraversalParam
                         ).checkPathTraversal()
@@ -365,7 +418,7 @@ class WebVuln:
                     listResult.append(item)
                 return json.dumps(listResult, default=str)
             else:
-                utils.log("Error: Invalid JSON object", "ERROR")
+                utils.log("[backend.py-findDocument-GET] Error: Invalid JSON object")
                 return "Failed"
         elif method == "POST":
             if (
@@ -456,8 +509,18 @@ class WebVuln:
                                 f"[backend.py-resourceHandler-updateDocument] Error: {e}"
                             )
                         return "Failed"
+                else:
+                    utils.log(
+                        "[backend.py-resourceHandler-POST] Error: Invalid action",
+                        "ERROR",
+                    )
+                    if self.__debug:
+                        print("[backend.py-resourceHandler-POST] Error: Invalid action")
+                    return "Failed"
             else:
-                utils.log("Error: Invalid JSON object", "ERROR")
+                utils.log(
+                    "[backend.py-resourceHandler-POST] Error: Invalid JSON object"
+                )
                 return "Failed"
 
     def fileHandler(self, method, data) -> str | list:
@@ -629,6 +692,7 @@ class WebVuln:
                 return "Failed"
 
     # Generate JSON report
+    # TODO: Fix function name to match camelCase
     def generate_json_report(results):
         json_str = json.dumps(results, indent=4)
         json_str = json_str.replace(", ", ",\n")
@@ -638,7 +702,8 @@ class WebVuln:
         with open("report.json", "w") as f:
             f.write(json_str)
 
-    def generateXMLReport(self, results):
+      # TODO: retrieve path from GUI, save at that location, return "Success" or "Failed"
+    def generateXMLReport(self, path):
         """Generate XML report from the JSON result.
 
         :param results: JSON result
@@ -664,7 +729,7 @@ class WebVuln:
         tree = ET.ElementTree(root)
         tree.write("report.xml")
 
-    def generatePDFReport(self, results):
+    def generatePDFReport(self):
         """Generate PDF report from the JSON result.
 
         :param results: JSON result
@@ -693,4 +758,4 @@ class WebVuln:
 
         html += "</body></html>"
 
-        pdfkit.from_string(html, "report.pdf")
+        #pdfkit.from_string(html, "report.pdf")
