@@ -105,7 +105,7 @@ class XSS:
             if payload["value"] in res.text:
                 print("[+] XSS vulnerability detected, link:", new_url)
                 utils.log(
-                    f"[XSS] XSS vulnerability detected, link: {new_url}",
+                    f"[XSS] XSS vulnerability detected, link: {new_url}, \nPayload: {payload['value']}",
                     "INFO",
                     "xss_log.txt",
                 )
@@ -141,7 +141,7 @@ class XSS:
                 if payload["value"] in res.text:
                     print("[+] XSS vulnerability detected in form, link:", form_action_url)
                     utils.log(
-                        f"[XSS] XSS detected in form, link: {form_action_url}",
+                        f"[XSS] XSS detected in form, link: {form_action_url}, \nPayload: {payload['value']}",
                         "INFO",
                         "xss_log.txt",
                     )
