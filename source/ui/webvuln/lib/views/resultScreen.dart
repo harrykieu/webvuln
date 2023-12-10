@@ -1,5 +1,7 @@
 // ignore_for_file: unused_element
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,6 +13,7 @@ import 'package:webvuln/items/pieGraph.dart';
 import 'package:webvuln/items/tables.dart';
 import 'package:webvuln/views/variable.dart';
 
+// TODO: parse data from loading screen to display on result screen
 class resultScreen extends StatefulWidget {
   final String data;
   const resultScreen({super.key, required this.data});
@@ -21,26 +24,40 @@ class resultScreen extends StatefulWidget {
 }
 
 class _resultScreenState extends State<resultScreen> {
-  @override
   bool isVisibled = true;
   bool isAppeared = true;
   int number_module = 0;
+
+  @override
   void initState() {
-    // TODO: implement initState
+    
     super.initState();
     isVisibled = true;
     number_module = 0;
     isAppeared = true;
   }
 
+  String __jsonHandle(String jsonD) {
+    // Read the string line by line to find the json format
+    for (String line in jsonD.split('\n')) {
+      if (line.startsWith('{')) {
+        // Handle the json data
+        return line;
+      }
+    }
+    return '';
+  }
+
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
-    String data = widget.data;
+    String newData = __jsonHandle(widget.data);
+    Map<dynamic, dynamic> dataMap = json.decode(newData);
+    String severity_point = dataMap["resultPoint"].toString();
     List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
     List<Widget> tables = [
-      TableAll(dataTable: data),
+      TableAll(dataTable: newData),
       TableXSS(),
       TableSQli(),
       TableRCE(),
@@ -48,6 +65,13 @@ class _resultScreenState extends State<resultScreen> {
     ];
     //select module to scan
     String selectedModule = "All";
+    bool isHide(newData) {
+      if (newData['numVuln'] == 0) {
+        return false;
+      } else {
+        return true;
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -55,10 +79,12 @@ class _resultScreenState extends State<resultScreen> {
           borderRadius: BorderRadius.all(Radius.circular(borderRadiusValue)),
           onPressed: () {
             Navigator.pop(context);
-            print(data);
           },
           child: const Icon(Icons.arrow_back, color: Colors.white),
         ),
+        actions: [
+          IconButton(onPressed: (){}, icon: Icon(Icons.download))
+        ],
         toolbarHeight: 80,
         leadingWidth: 100,
         backgroundColor: Colors.transparent,
@@ -70,45 +96,48 @@ class _resultScreenState extends State<resultScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                CustomDropdownButton(
-                    selectedItem: selectedModule,
-                    items: error,
-                    onItemSelected: (item) {
-                      print(data);
-                      print(item);
-                      setState(() {
-                        isVisibled = item == 'All';
-                        print(isVisibled);
-                      });
-                      switch (item) {
-                        case 'All':
-                          setState(() {
-                            number_module = 0;
-                          });
-                          break;
-                        case 'XSS':
-                          setState(() {
-                            number_module = 1;
-                          });
-                          break;
-                        case 'SQLi':
-                          setState(() {
-                            number_module = 2;
-                          });
-                          break;
-                        case 'RCE':
-                          setState(() {
-                            number_module = 3;
-                          });
-                          break;
-                        case 'LFI':
-                          setState(() {
-                            number_module = 4;
-                          });
-                          break;
-                        default:
-                      }
-                    }),
+                Visibility(
+                  visible: isHide(dataMap),
+                  child: CustomDropdownButton(
+                      selectedItem: selectedModule,
+                      items: error,
+                      onItemSelected: (item) {
+                        print(item);
+                        print(newData);
+                        setState(() {
+                          isVisibled = item == 'All';
+                          print(isVisibled);
+                        });
+                        switch (item) {
+                          case 'All':
+                            setState(() {
+                              number_module = 0;
+                            });
+                            break;
+                          case 'XSS':
+                            setState(() {
+                              number_module = 1;
+                            });
+                            break;
+                          case 'SQLi':
+                            setState(() {
+                              number_module = 2;
+                            });
+                            break;
+                          case 'RCE':
+                            setState(() {
+                              number_module = 3;
+                            });
+                            break;
+                          case 'LFI':
+                            setState(() {
+                              number_module = 4;
+                            });
+                            break;
+                          default:
+                        }
+                      }),
+                ),
                 /* Table list errors*/
                 container(screenWidth,
                     child: Column(
@@ -117,6 +146,9 @@ class _resultScreenState extends State<resultScreen> {
                           leading: const Image(
                               image: AssetImage('lib/assets/list.png')),
                           title: Text('List Vulnerabilities',
+                              style: GoogleFonts.montserrat(
+                                  fontSize: 24, fontWeight: FontWeight.bold)),
+                          trailing: Text('Point Severity:$severity_point',
                               style: GoogleFonts.montserrat(
                                   fontSize: 24, fontWeight: FontWeight.bold)),
                         ),

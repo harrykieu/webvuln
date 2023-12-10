@@ -56,16 +56,19 @@ class WebVuln:
             try:
                 utils.log(f"/api/result: Sending data to Flask: {data}", "INFO")
                 if self.__debug:
-                    print(f"{self.blue}/api/result: Sending data to Flask: {data}")
+                    print(
+                        f"{self.blue}/api/result: Sending data to Flask: {data}{self.white}"
+                    )
                 requests.post(
-                    url="http://localhost:5000/api/result",
+                    url="http://127.0.0.1:5000/api/result",
                     data=data,
                     headers={"Content-Type": "application/json", "Origin": "backend"},
                 )
-                requests.post(url="http://localhost:5001", data=data)
             except Exception as e:
                 if self.__debug:
-                    print(f"{self.red}[backend.py-sendResultFlask] Error: {e}")
+                    print(
+                        f"{self.red}[backend.py-sendResultFlask] Error: {e}{self.white}"
+                    )
                 utils.log(f"[backend.py-sendResultFlask] Error: {e}", "ERROR")
                 return "Failed"
             return "Success"

@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
 import 'package:webvuln/views/detail_screen.dart';
+import 'package:webvuln/views/resultScreen.dart';
 
 class CustomDataTable extends StatelessWidget {
   final List<DataRow> rows;
@@ -45,7 +46,9 @@ class CustomDataTable extends StatelessWidget {
                   label: Row(
                     children: [
                       Text('Serverity', style: text_style_bold),
-                      toolTip(content: 'Point severity '),
+                      toolTip(
+                          content:
+                              'Color severity: Green - good, yellow - normal, red - bad'),
                     ],
                   ),
                 ),
@@ -53,7 +56,8 @@ class CustomDataTable extends StatelessWidget {
                   label: Row(
                     children: [
                       Text('Type', style: text_style_bold),
-                      toolTip(content: 'Vulnerabilities type of website'),
+                      toolTip(
+                          content: 'Name of vulnerabilities and type of this'),
                     ],
                   ),
                 ),
@@ -69,11 +73,10 @@ class CustomDataTable extends StatelessWidget {
                   label: Row(
                     children: [
                       Text('Scan Date', style: text_style_bold),
-                      toolTip(content: 'Time and Date scan website'),
+                      toolTip(content: 'Time and Date scan Url'),
                     ],
                   ),
                 ),
-                
               ],
               rows: rows,
             ),
@@ -121,38 +124,45 @@ class TableAll extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String scanDate = "";
-    Map<dynamic, dynamic> dataMap = json.decode(dataTable);
-    String domain(data) {
+    String type(data) {
       if (data["numVuln"] == 0) {
-        return "No vulnerabilities";
+        return 'None vulnerabilities';
       } else {
-        return data["resultSeverity"];
+        return data["vulnerabilities"][0];
       }
     }
 
-    Icon warning_icon(data) {
-      if (data["numVuln"] == 0) {
-        return const Icon(Icons.check_circle_outline, color: Colors.green,size: 30,);
-      }else{
-        return const Icon(Icons.warning, color: Colors.red,size: 30,);
-      }
-    }
-
-    int number_duplitcate(data) {
+    int numVuln(data) {
       if (data["numVuln"] == 0) {
         return 1;
       } else {
-        return data["numVuln"];
+        return 2;
       }
     }
 
-    List<DataRow> duplicatedRows =
-        List.generate(number_duplitcate(dataMap), (index) {
+    Icon icon_warning(data) {
+      if (data["numVuln"] == 0) {
+        return const Icon(
+          Icons.check_circle_outline_outlined,
+          color: Colors.green,
+        );
+        // ignore: curly_braces_in_flow_control_structures
+      } else{
+        return const Icon(
+          Icons.warning_amber_rounded,
+          color: Colors.yellow,
+        );
+      }
+    }
+
+    List<dynamic> vuln = [];
+    Map<dynamic, dynamic> dataMap = json.decode(dataTable);
+    //List<dynamic> resultList = dataMap["result"];
+    List<DataRow> duplicatedRows = List.generate(numVuln(dataMap), (index) {
       return DataRow(cells: [
-        DataCell(warning_icon(dataMap)),
-        DataCell(Text(domain(dataMap), style: text_style_normal)),
-        DataCell(Text(dataMap["scanDate"], style: text_style_code)),
+        DataCell(icon_warning(dataMap)),
+        DataCell(Text(type(dataMap), style: text_style_normal)),
+        DataCell(Text(dataMap["domain"], style: text_style_code)),
         DataCell(Text(dataMap["scanDate"], style: text_style_code)),
       ]);
     });

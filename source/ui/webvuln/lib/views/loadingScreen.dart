@@ -1,31 +1,51 @@
 // ignore_for_file: file_names
 
 import 'dart:async';
-import 'dart:convert';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/resultScreen.dart';
 
 class loadingScreen extends StatefulWidget {
-  const loadingScreen({Key? key}) : super(key: key);
+  const loadingScreen({super.key});
 
   @override
   _loadingScreenState createState() => _loadingScreenState();
 }
 
 class _loadingScreenState extends State<loadingScreen> {
-  late Future<String> serverResponse;
+  late Future<String?> serverResponse;
+  late WebVulnSocket socket;
 
   @override
   void initState() {
     super.initState();
-    serverResponse = listen();
+    socket = WebVulnSocket(url: '0.0.0.0', port: 5001);
+    serverResponse = _initializeSocket();
   }
 
-  Future<String> fetchData() async {
-    await Future.delayed(const Duration(seconds: 2));
-    return "Success";
+  Future<String?> _initializeSocket() async {
+    _closeExistingSocket();
+    try {
+      if (await socket.create()) {
+        final data = await socket.listen();
+        return data;
+      } else {
+        // Handle the case where server initialization fails
+        print('Error: Server not initialized');
+        return null;
+      }
+    } catch (error) {
+      // Handle errors during socket communication
+      print('Error during socket communication: $error');
+      return null;
+    }
+  }
+
+  void _closeExistingSocket() {
+    if (socket.server != null) {
+      socket.close();
+    }
   }
 
   String modifydata(data) {
@@ -48,7 +68,7 @@ class _loadingScreenState extends State<loadingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: FutureBuilder(
+        child: FutureBuilder<String?>(
           future: serverResponse,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -57,14 +77,11 @@ class _loadingScreenState extends State<loadingScreen> {
                 height: 200,
                 child: CircularProgressIndicator(),
               );
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (snapshot.connectionState == ConnectionState.done) {
-              String snapData = snapshot.data!;
-              // FIXME: ERROR!
-              return resultScreen(data: modifydata(snapData));
+            } else if (snapshot.hasError || snapshot.data == null) {
+              return Text('Error: ${snapshot.error ?? "Unknown error"}');
             } else {
-              return const Text('Error');
+              String snapData = snapshot.data!;
+              return resultScreen(data: modifydata(snapData));
             }
           },
         ),

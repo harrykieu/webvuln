@@ -98,24 +98,27 @@ class _scanScreenState extends State<scanScreen> {
 
         //Button Scan URL
         GradientButton(
-            onPressed: () {
+            onPressed: () async {
               Get.to(const loadingScreen());
               List<String> listURL = [];
               listURL.add(urlController.text);
-              if (postURL(
-                          nameURL: listURL,
-                          moduleNumber: Constants.valueSelected)
-                      .toString() ==
-                  "Failed post data") {
-                setState(() {
-                  Constants.contentChild =
-                      const CircularProgressIndicator.adaptive(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  );
-                });
-              } else {
-                Get.to(const loadingScreen());
-              }
+              postURL(
+                nameURL: listURL,
+                moduleNumber: Constants.valueSelected,
+              ).then((result) {
+                if (result == "Failed post data") {
+                  setState(() {
+                    Constants.contentChild =
+                        const CircularProgressIndicator.adaptive(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    );
+                  });
+                } else {
+                  Get.to(const loadingScreen());
+                }
+              }).catchError((error) {
+                print(error);
+              });
             },
             child: Text(
               'Scan',
