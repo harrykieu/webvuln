@@ -40,14 +40,14 @@ class _resultScreenState extends State<resultScreen> {
     String data = widget.data;
     List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
     List<Widget> tables = [
-      TableAll(data),
+      TableAll(dataTable: data),
       TableXSS(),
       TableSQli(),
       TableRCE(),
       TableLFI()
     ];
+    //select module to scan
     String selectedModule = "All";
-    //g
 
     return Scaffold(
       appBar: AppBar(
@@ -55,6 +55,7 @@ class _resultScreenState extends State<resultScreen> {
           borderRadius: BorderRadius.all(Radius.circular(borderRadiusValue)),
           onPressed: () {
             Navigator.pop(context);
+            print(data);
           },
           child: const Icon(Icons.arrow_back, color: Colors.white),
         ),
@@ -154,7 +155,6 @@ class _resultScreenState extends State<resultScreen> {
                     ],
                   ),
                 ),
-                
               ],
             ),
           ),

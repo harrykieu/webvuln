@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names, duplicate_ignore, unused_local_variable
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -43,7 +45,7 @@ class CustomDataTable extends StatelessWidget {
                   label: Row(
                     children: [
                       Text('Serverity', style: text_style_bold),
-                      toolTip(content: 'Info about serverity'),
+                      toolTip(content: 'Point severity '),
                     ],
                   ),
                 ),
@@ -51,7 +53,7 @@ class CustomDataTable extends StatelessWidget {
                   label: Row(
                     children: [
                       Text('Type', style: text_style_bold),
-                      toolTip(content: 'Info about Type error'),
+                      toolTip(content: 'Vulnerabilities type of website'),
                     ],
                   ),
                 ),
@@ -59,10 +61,19 @@ class CustomDataTable extends StatelessWidget {
                   label: Row(
                     children: [
                       Text('Description', style: text_style_bold),
-                      toolTip(content: 'Info about description'),
+                      toolTip(content: 'About domain, path, severity,....'),
                     ],
                   ),
                 ),
+                DataColumn(
+                  label: Row(
+                    children: [
+                      Text('Scan Date', style: text_style_bold),
+                      toolTip(content: 'Time and Date scan website'),
+                    ],
+                  ),
+                ),
+                
               ],
               rows: rows,
             ),
@@ -103,29 +114,46 @@ class CustomDataTable extends StatelessWidget {
 }
 
 class TableAll extends StatelessWidget {
-  TableAll(this.response_data);
+  String dataTable;
+
+  TableAll({super.key, required this.dataTable});
   // ignore: non_constant_identifier_names
-  String response_data;
+
   @override
   Widget build(BuildContext context) {
-    String domain = "";
     String scanDate = "";
-    List<dynamic> vuln = [];
-    int numVuln;
-    Map<dynamic, dynamic> dataMap = json.decode(response_data);
-    List<dynamic> resultList = dataMap["result"];
-    for (var result in resultList) {
-      domain = result["domain"];
-      scanDate = result["scan_date"];
-      numVuln = result["num_vuln"];
-      vuln = result["vuln"];
+    Map<dynamic, dynamic> dataMap = json.decode(dataTable);
+    String domain(data) {
+      if (data["numVuln"] == 0) {
+        return "No vulnerabilities";
+      } else {
+        return data["resultSeverity"];
+      }
     }
-    List<DataRow> duplicatedRows = List.generate(10, (index) {
+
+    Icon warning_icon(data) {
+      if (data["numVuln"] == 0) {
+        return const Icon(Icons.check_circle_outline, color: Colors.green,size: 30,);
+      }else{
+        return const Icon(Icons.warning, color: Colors.red,size: 30,);
+      }
+    }
+
+    int number_duplitcate(data) {
+      if (data["numVuln"] == 0) {
+        return 1;
+      } else {
+        return data["numVuln"];
+      }
+    }
+
+    List<DataRow> duplicatedRows =
+        List.generate(number_duplitcate(dataMap), (index) {
       return DataRow(cells: [
-        const DataCell(
-            Icon(Icons.warning_amber, color: Colors.amber, size: 30)),
-        DataCell(Text(domain, style: text_style_normal)),
-        DataCell(Text(scanDate, style: text_style_code)),
+        DataCell(warning_icon(dataMap)),
+        DataCell(Text(domain(dataMap), style: text_style_normal)),
+        DataCell(Text(dataMap["scanDate"], style: text_style_code)),
+        DataCell(Text(dataMap["scanDate"], style: text_style_code)),
       ]);
     });
 
@@ -148,6 +176,8 @@ class TableAll extends StatelessWidget {
 }
 
 class TableXSS extends StatelessWidget {
+  const TableXSS({super.key});
+
   @override
   Widget build(BuildContext context) {
     return CustomDataTable(
@@ -158,6 +188,8 @@ class TableXSS extends StatelessWidget {
           DataCell(Text("XSS", style: text_style_normal)),
           DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"',
               style: text_style_code)),
+          DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"',
+              style: text_style_code))
         ]),
         // Add more rows as needed
       ],
@@ -178,6 +210,8 @@ class TableXSS extends StatelessWidget {
 }
 
 class TableSQli extends StatelessWidget {
+  const TableSQli({super.key});
+
   @override
   Widget build(BuildContext context) {
     return CustomDataTable(
@@ -188,6 +222,8 @@ class TableSQli extends StatelessWidget {
           DataCell(Text("SQLi", style: text_style_normal)),
           DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"',
               style: text_style_code)),
+          DataCell(Text('"https://www.google.com.vn/intl/vi/about.html"',
+              style: text_style_code))
         ]),
         // Add more rows as neededlo
       ],
@@ -208,6 +244,8 @@ class TableSQli extends StatelessWidget {
 }
 
 class TableLFI extends StatelessWidget {
+  const TableLFI({super.key});
+
   @override
   Widget build(BuildContext context) {
     return CustomDataTable(
@@ -238,6 +276,8 @@ class TableLFI extends StatelessWidget {
 }
 
 class TableRCE extends StatelessWidget {
+  const TableRCE({super.key});
+
   @override
   Widget build(BuildContext context) {
     return CustomDataTable(

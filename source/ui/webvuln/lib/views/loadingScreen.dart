@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:webvuln/service/api.dart';
@@ -27,6 +28,22 @@ class _loadingScreenState extends State<loadingScreen> {
     return "Success";
   }
 
+  String modifydata(data) {
+    String rawData = data;
+    String extractJson(String rawData) {
+      // index to start read data
+      int startIndex = rawData.indexOf('{', rawData.indexOf('"result"'));
+      // index to end process read data
+      int endIndex = rawData.indexOf('}');
+      String jsonData = rawData.substring(startIndex, endIndex + 1);
+      return jsonData;
+    }
+
+    ;
+    String jsonData = extractJson(rawData);
+    return jsonData;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +62,7 @@ class _loadingScreenState extends State<loadingScreen> {
             } else if (snapshot.connectionState == ConnectionState.done) {
               String snapData = snapshot.data!;
               // FIXME: ERROR!
-              return resultScreen(data: snapData);
+              return resultScreen(data: modifydata(snapData));
             } else {
               return const Text('Error');
             }
