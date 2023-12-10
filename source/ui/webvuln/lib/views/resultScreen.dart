@@ -41,6 +41,7 @@ class _resultScreenState extends State<resultScreen> {
   String __jsonHandle(String strJSON) {
     // Read the string line by line to find the json format
     for (String line in strJSON.split('\n')) {
+      print(line);
       if (line.startsWith('{')) {
         // Handle the json data
         return line;
@@ -59,10 +60,10 @@ class _resultScreenState extends State<resultScreen> {
     double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
     // parse json string to list of HistoryTableData object
+    print(widget.data);
     String newData = __jsonHandle(widget.data);
     Map<String, dynamic> json = jsonDecode(newData);
     String severity_point = json["resultPoint"];
-    results = __parseData(json['result'][0]);
     List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
     List<Widget> tables = [
       TableAll(dataTable: newData),
