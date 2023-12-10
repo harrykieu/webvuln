@@ -59,13 +59,13 @@ class _resultScreenState extends State<resultScreen> {
     double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
     // parse json string to list of HistoryTableData object
-    String newData = __jsonHandle(widget.data);
-    Map<String, dynamic> json = jsonDecode(newData);
-    String severity_point = json["resultPoint"];
+    //String newData = __jsonHandle(widget.data);
+    Map<String, dynamic> json = jsonDecode(widget.data);
+    String severity_point = json["resultPoint"].toString();
     results = __parseData(json['result'][0]);
     List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
     List<Widget> tables = [
-      TableAll(dataTable: newData),
+      TableAll(dataTable: widget.data),
       TableXSS(),
       TableSQli(),
       TableRCE(),
@@ -74,7 +74,7 @@ class _resultScreenState extends State<resultScreen> {
     //select module to scan
     String selectedModule = "All";
     bool isHide(newData) {
-      if (newData['numVuln'] == 0) {
+      if (newData["numVuln"] == 0) {
         return false;
       } else {
         return true;
@@ -103,13 +103,13 @@ class _resultScreenState extends State<resultScreen> {
             child: Column(
               children: [
                 Visibility(
-                  visible: isHide(newData),
+                  visible: true,
                   child: CustomDropdownButton(
                       selectedItem: selectedModule,
                       items: error,
                       onItemSelected: (item) {
                         print(item);
-                        print(newData);
+                        print(widget.data);
                         setState(() {
                           isVisibled = item == 'All';
                           print(isVisibled);
@@ -154,7 +154,7 @@ class _resultScreenState extends State<resultScreen> {
                           title: Text('List Vulnerabilities',
                               style: GoogleFonts.montserrat(
                                   fontSize: 24, fontWeight: FontWeight.bold)),
-                          trailing: Text('Point Severity:$severity_point',
+                          trailing: Text('Point Severity:',
                               style: GoogleFonts.montserrat(
                                   fontSize: 24, fontWeight: FontWeight.bold)),
                         ),

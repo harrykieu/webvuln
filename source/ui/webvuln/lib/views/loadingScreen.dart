@@ -81,7 +81,7 @@ class _loadingScreenState extends State<loadingScreen> {
               return Text('Error: ${snapshot.error ?? "Unknown error"}');
             } else {
               String snapData = snapshot.data!;
-              return resultScreen(data: modifydata(snapData));
+              return resultScreen(data: snapData);
             }
           },
         ),

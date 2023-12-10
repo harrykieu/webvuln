@@ -160,10 +160,10 @@ class TableAll extends StatelessWidget {
     //List<dynamic> resultList = dataMap["result"];
     List<DataRow> duplicatedRows = List.generate(numVuln(dataMap), (index) {
       return DataRow(cells: [
-        DataCell(icon_warning(dataMap)),
-        DataCell(Text(type(dataMap), style: text_style_normal)),
-        DataCell(Text(dataMap["domain"], style: text_style_code)),
-        DataCell(Text(dataMap["scanDate"], style: text_style_code)),
+        DataCell(Icon(Icons.warning)),
+        DataCell(Text("domain", style: text_style_normal)),
+        DataCell(Text("domain", style: text_style_code)),
+        DataCell(Text("domain", style: text_style_code)),
       ]);
     });
 
