@@ -6,6 +6,7 @@ import urllib.parse
 import source.core.utils as utils
 import json
 
+
 s = requests.Session()
 s.headers[
     "User-Agent"
@@ -71,14 +72,13 @@ class LFI:
         print("\n[+] Checking LFI")
 
         if not self.lfi_resources:
-            print(f"\n[-] Resources not found!")
+            print("\n[-] Resources not found!")
             utils.log(
                 "[LFI] Resources not found!",
                 "ERROR",
                 "lfi_log.txt",
             )
             return self.result
-            sys.exit(1)
 
         for payload in self.lfi_resources:
             payload_str = payload["value"]
@@ -91,7 +91,7 @@ class LFI:
             if re.search(rb"root:x:0:0", res.content):
                 print("[+] LFI vulnerability detected, link:", new_url)
                 utils.log(
-                    f"[LFI] Local File Injection vulnerability detected, link: {new_url}",
+                    f"[LFI] Local File Injection vulnerability detected, link: {new_url}, \nPayload: {payload_str}",
                     "INFO",
                     "lfi_log.txt",
                 )
@@ -129,7 +129,7 @@ class LFI:
                 if re.search(rb"root:x:0:0", res.content):
                     print("[+] Local File Injection detected, link:", self.url)
                     utils.log(
-                        f"[LFI] Local File Injection detected in form, link: {self.url}",
+                        f"[LFI] Local File Injection detected in form, with Payload: {payload}",
                         "INFO",
                         "lfi_log.txt",
                     )
