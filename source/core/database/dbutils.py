@@ -15,9 +15,13 @@ class DatabaseUtils:
         """
         load_dotenv()
 
-        self.__client = MongoClient(os.getenv("DATABASE_URI"))
-        self.__db = self.__client.get_database("webvuln")
+        database_uri = os.getenv("DATABASE_URI")
 
+        if username is not None and password is not None: 
+            database_uri = f"mongodb://{username}:{password}@{database_uri}"
+            
+        self.__client = MongoClient(database_uri)
+        self.__db = self.__client.get_database("webvuln")
 
         if "resources" not in self.__db.list_collection_names():
             self.__db.create_collection(
@@ -47,7 +51,6 @@ class DatabaseUtils:
                     )
                 },
             )
-
 
     def addDocument(self, collectionName, data) -> bool:
         """Add a document to the collection in the database.
