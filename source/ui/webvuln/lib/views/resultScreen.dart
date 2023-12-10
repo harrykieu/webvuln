@@ -12,6 +12,7 @@ import 'package:webvuln/items/newSubmitButton.dart';
 import 'package:webvuln/items/pieGraph.dart';
 import 'package:webvuln/items/tables.dart';
 import 'package:webvuln/views/variable.dart';
+import 'package:webvuln/model/model.dart';
 
 // TODO: parse data from loading screen to display on result screen
 class resultScreen extends StatefulWidget {
@@ -27,19 +28,19 @@ class _resultScreenState extends State<resultScreen> {
   bool isVisibled = true;
   bool isAppeared = true;
   int number_module = 0;
+  List<HistoryTableData> results = [];
 
   @override
   void initState() {
-    
     super.initState();
     isVisibled = true;
     number_module = 0;
     isAppeared = true;
   }
 
-  String __jsonHandle(String jsonD) {
+  String __jsonHandle(String strJSON) {
     // Read the string line by line to find the json format
-    for (String line in jsonD.split('\n')) {
+    for (String line in strJSON.split('\n')) {
       if (line.startsWith('{')) {
         // Handle the json data
         return line;
@@ -48,13 +49,20 @@ class _resultScreenState extends State<resultScreen> {
     return '';
   }
 
+  List<HistoryTableData> __parseData(Map<String, dynamic> json) {
+    results.add(HistoryTableData.fromJson(json));
+    return results;
+  }
+
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
+    // parse json string to list of HistoryTableData object
     String newData = __jsonHandle(widget.data);
-    Map<dynamic, dynamic> dataMap = json.decode(newData);
-    String severity_point = dataMap["resultPoint"].toString();
+    Map<String, dynamic> json = jsonDecode(newData);
+    String severity_point = json["resultPoint"];
+    results = __parseData(json['result'][0]);
     List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
     List<Widget> tables = [
       TableAll(dataTable: newData),
@@ -82,9 +90,7 @@ class _resultScreenState extends State<resultScreen> {
           },
           child: const Icon(Icons.arrow_back, color: Colors.white),
         ),
-        actions: [
-          IconButton(onPressed: (){}, icon: Icon(Icons.download))
-        ],
+        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.download))],
         toolbarHeight: 80,
         leadingWidth: 100,
         backgroundColor: Colors.transparent,
@@ -97,7 +103,7 @@ class _resultScreenState extends State<resultScreen> {
             child: Column(
               children: [
                 Visibility(
-                  visible: isHide(dataMap),
+                  visible: isHide(newData),
                   child: CustomDropdownButton(
                       selectedItem: selectedModule,
                       items: error,
