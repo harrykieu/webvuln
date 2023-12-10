@@ -5251,7 +5251,6 @@ rotatefile
 deletedSpecs
 conf_group
 criteriaColumnNames
-page
 thumbnail
 compact
 movie

@@ -8,17 +8,17 @@ import source.core.utils as utils
 
 
 class DatabaseUtils:
-    """This class contains the functions to add, delete, find and edit the documents in the collection."""
-
     def __init__(self, username=None, password=None) -> None:
         """Open the connection to the database.
         - `username`: username of the database.
         - `password`: password of the database.
         """
-        # TODO: implement authentication, check if URI already has username and password
         load_dotenv()
+
         self.__client = MongoClient(os.getenv("DATABASE_URI"))
         self.__db = self.__client.get_database("webvuln")
+
+
         if "resources" not in self.__db.list_collection_names():
             self.__db.create_collection(
                 "resources",
@@ -28,6 +28,7 @@ class DatabaseUtils:
                     )
                 },
             )
+            self.__db.resources.create_index([("value")], unique=True)
         if "scanResult" not in self.__db.list_collection_names():
             self.__db.create_collection(
                 "scanResult",
@@ -47,13 +48,13 @@ class DatabaseUtils:
                 },
             )
 
+
     def addDocument(self, collectionName, data) -> bool:
         """Add a document to the collection in the database.
         - `collectionName`: name of the collection.
         - `data`: data of the document.
         If there is more than one document, this function inserts the data using `insert_many()`, otherwise it uses `insert_one()`.
         """
-        # TODO: Fix insert duplicate
         try:
             collection = self.__db.get_collection(collectionName)
             if isinstance(data, list):

@@ -15,7 +15,7 @@ for a in lista:
     print(lista.index(a)) """
 # NOTE: dvwa url must have / at the end
 # print(a.scanURL(['http://localhost/dvwa/vulnerabilities/upload'], ['fileupload']))
-a.scanURL(["http://localhost:12001"], ["fileupload"])
+#a.scanURL(["http://localhost:12001"], ["fileupload"])
 # a.scanURL(["http://google.com/"], ["fileupload"])
 """ scan_results = a.scanURL(
     ["http://localhost:8091/loadImage.php", "http://localhost:12001"],
