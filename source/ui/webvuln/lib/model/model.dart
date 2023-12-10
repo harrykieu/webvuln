@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 class URL {
   final List<String> url;
   final List<String> modules;
