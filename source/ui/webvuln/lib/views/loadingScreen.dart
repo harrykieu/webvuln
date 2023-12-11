@@ -54,12 +54,12 @@ class _loadingScreenState extends State<loadingScreen> {
       // index to start read data
       int startIndex = rawData.indexOf('{', rawData.indexOf('"result"'));
       // index to end process read data
-      int endIndex = rawData.indexOf('}');
+      int endIndex = rawData.lastIndexOf('}');
       String jsonData = rawData.substring(startIndex, endIndex + 1);
+      // FIXME: jsonDecode did not accept '[]' as a valid json format
       return jsonData;
     }
 
-    ;
     String jsonData = extractJson(rawData);
     return jsonData;
   }
