@@ -11,8 +11,8 @@ import 'package:webvuln/items/lineChart.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
 import 'package:webvuln/items/pieGraph.dart';
 import 'package:webvuln/items/tables.dart';
-import 'package:webvuln/views/variable.dart';
 import 'package:webvuln/model/model.dart';
+import 'package:webvuln/views/variable.dart';
 
 // TODO: parse data from loading screen to display on result screen
 class resultScreen extends StatefulWidget {
@@ -42,8 +42,9 @@ class _resultScreenState extends State<resultScreen> {
     // Read the string line by line to find the json format
     for (String line in strJSON.split('\n')) {
       if (line.startsWith('{')) {
+        print(line);
         // Handle the json data
-        return line;
+        return line.trim();
       }
     }
     return '';
@@ -60,7 +61,9 @@ class _resultScreenState extends State<resultScreen> {
     Get.testMode = true;
     // parse json string to list of HistoryTableData object
     String newData = __jsonHandle(widget.data);
+    print(newData);
     Map<String, dynamic> json = jsonDecode(newData);
+    print(json);
     String severity_point = json["resultPoint"];
     results = __parseData(json['result'][0]);
     List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
