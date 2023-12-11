@@ -59,6 +59,15 @@ class IDOR:
             "INFO", "idor.txt"
         )
 
+        #log if no resources are found
+        if not self.resources:
+            print("[!] No resources found")
+            utils.log(
+                "[IDOR] No resources found",
+                "INFO", "idor.txt"
+            )
+            return self.result
+
         urls = self.extract_urls()
         for url in urls:
             for parameter in self.idorParams:
