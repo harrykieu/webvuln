@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:webvuln/service/api.dart';
@@ -48,20 +49,16 @@ class _loadingScreenState extends State<loadingScreen> {
     }
   }
 
-  String modifydata(data) {
-    String rawData = data;
-    String extractJson(String rawData) {
-      // index to start read data
-      int startIndex = rawData.indexOf('{', rawData.indexOf('"result"'));
-      // index to end process read data
-      int endIndex = rawData.lastIndexOf('}');
-      String jsonData = rawData.substring(startIndex, endIndex + 1);
-      // FIXME: jsonDecode did not accept '[]' as a valid json format
-      return jsonData;
-    }
-
-    String jsonData = extractJson(rawData);
-    return jsonData;
+  List<String> modifydata(String rawData) {
+    List<String> list = [];
+    // index to start read data
+    int startIndex = rawData.indexOf('[');
+    // index to end process read data
+    int endIndex = rawData.lastIndexOf(']');
+    String jsonData = rawData.substring(startIndex, endIndex + 1);
+    print(jsonData);
+    list.add(jsonData);
+    return list;
   }
 
   @override

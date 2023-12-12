@@ -16,12 +16,12 @@ import 'package:webvuln/views/variable.dart';
 
 // TODO: parse data from loading screen to display on result screen
 class resultScreen extends StatefulWidget {
-  final String data;
+  final List<String> data;
   const resultScreen({super.key, required this.data});
 
   @override
   State<resultScreen> createState() => _resultScreenState();
-  String get resultData => data;
+  List<String> get resultData => data;
 }
 
 class _resultScreenState extends State<resultScreen> {
@@ -38,17 +38,17 @@ class _resultScreenState extends State<resultScreen> {
     isAppeared = true;
   }
 
-  String __jsonHandle(String strJSON) {
-    // Read the string line by line to find the json format
-    for (String line in strJSON.split('\n')) {
-      print(line);
-      if (line.startsWith('{')) {
-        print(line);
-        // Handle the json data
-        return line.trim();
-      }
-    }
-    return '';
+  List<dynamic> __jsonHandle(List<String> listJSON) {
+    List<String> list = [];
+    // FIXME: handle json string
+    /* String newStr =
+        listJSON.substring(listJSON.indexOf('['), listJSON.lastIndexOf(']') + 1);
+    print(newStr);
+    listJSON = listJSON.replaceAll('$newStr', '{}');
+    print(listJSON);
+    list.add(listJSON);
+    list.add(newStr); */
+    return list;
   }
 
   List<HistoryTableData> __parseData(Map<String, dynamic> json) {
@@ -56,20 +56,20 @@ class _resultScreenState extends State<resultScreen> {
     return results;
   }
 
+  @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
     // parse json string to list of HistoryTableData object
-    print(widget.data);
-    String newData = __jsonHandle(widget.data);
-    print(newData);
-    Map<String, dynamic> json = jsonDecode(newData);
-    print(json);
-    String severity_point = json["resultPoint"];
+    //List<String> newData = __jsonHandle(widget.data);
+    //print(newData);
+    //Map<String, dynamic> json = jsonDecode(newData);
+    //print(json);
+    //String severity_point = json["resultPoint"];
     List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
     List<Widget> tables = [
-      TableAll(dataTable: newData),
+      //TableAll(dataTable: newData),
       TableXSS(),
       TableSQli(),
       TableRCE(),
@@ -107,13 +107,13 @@ class _resultScreenState extends State<resultScreen> {
             child: Column(
               children: [
                 Visibility(
-                  visible: isHide(newData),
+                  visible: isHide(widget.data[0]),
                   child: CustomDropdownButton(
                       selectedItem: selectedModule,
                       items: error,
                       onItemSelected: (item) {
                         print(item);
-                        print(newData);
+                        //print(newData);
                         setState(() {
                           isVisibled = item == 'All';
                           print(isVisibled);
@@ -158,7 +158,7 @@ class _resultScreenState extends State<resultScreen> {
                           title: Text('List Vulnerabilities',
                               style: GoogleFonts.montserrat(
                                   fontSize: 24, fontWeight: FontWeight.bold)),
-                          trailing: Text('Point Severity:$severity_point',
+                          trailing: Text('Point Severity:', //$severity_point',
                               style: GoogleFonts.montserrat(
                                   fontSize: 24, fontWeight: FontWeight.bold)),
                         ),
