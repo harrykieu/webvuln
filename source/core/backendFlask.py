@@ -18,6 +18,42 @@ backend.setDebug(True)
 # - `result`: result of the scan
 # - `type`: type of the report (e.g. html, pdf, etc.)
 
+@app.post("/api/report")
+def report():
+    """Create report.
+
+    This function is used for frontend to create report using `/api/report` endpoint with `POST`.
+
+    The request body should contain a JSON object with the following properties:
+    - `result`: Result of the scan.
+    - `type`: Type of the report (e.g. html, pdf, etc.)
+    """
+    orgHeader = request.headers.get("Origin")
+    if orgHeader != "frontend":
+        if app.debug:
+            utils.log("/api/report: Missing or invalid Origin header", "DEBUG")
+        return "Forbidden", 403
+    contHeader = request.headers.get("Content-Type")
+    if contHeader != "application/json":
+        if app.debug:
+            utils.log("/api/report: Missing or invalid Content-Type header", "DEBUG")
+        return "Bad request", 400
+    data = request.get_json()
+    if not data:
+        if app.debug:
+            utils.log("/api/report: Missing or invalid JSON data", "DEBUG")
+        return "Bad request", 400
+    keys = data.keys()
+    if "result" in keys and "type" in keys and len(keys) == 2:
+        if app.debug:
+            utils.log(f"/api/report: Successfully received data: {data}", "DEBUG")
+        backend.recvFlask("/api/report", "POST", data)
+        return "Success", 200
+    else:
+        if app.debug:
+            utils.log("/api/report: Missing or invalid JSON data", "DEBUG")
+        return "Bad request", 400
+
 
 @app.post("/api/scan")
 def scan():
