@@ -1,8 +1,10 @@
 // ignore_for_file: file_names
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/resultScreen.dart';
 
@@ -48,20 +50,14 @@ class _loadingScreenState extends State<loadingScreen> {
     }
   }
 
-  String modifydata(data) {
-    String rawData = data;
-    String extractJson(String rawData) {
-      // index to start read data
-      int startIndex = rawData.indexOf('{', rawData.indexOf('"result"'));
-      // index to end process read data
-      int endIndex = rawData.lastIndexOf('}');
-      String jsonData = rawData.substring(startIndex, endIndex + 1);
-      // FIXME: jsonDecode did not accept '[]' as a valid json format
-      return jsonData;
-    }
-
-    String jsonData = extractJson(rawData);
-    return jsonData;
+  String extractJson(String rawString) {
+    // Find the index of '{"result":'
+    int startIndex = rawString.indexOf('{', rawString.indexOf('"result"'));
+    int endIndex = rawString.lastIndexOf('}]}');
+    // Extract the substring starting from '{"result":'
+    String resultData = rawString.substring(startIndex, endIndex + 1);
+    print(resultData);
+    return resultData;
   }
 
   @override
@@ -80,8 +76,8 @@ class _loadingScreenState extends State<loadingScreen> {
             } else if (snapshot.hasError || snapshot.data == null) {
               return Text('Error: ${snapshot.error ?? "Unknown error"}');
             } else {
-              String snapData = snapshot.data!;
-              return resultScreen(data: snapData);
+              String? snapData = snapshot.data;
+              return resultScreen(data: extractJson(snapData!));
             }
           },
         ),
