@@ -916,10 +916,7 @@ class _resourceScreenState extends State<resourceScreen> {
                                           String resp = await postResources(
                                               vulnType: vulnType,
                                               resType: type,
-                                              value: [
-                                                value,
-                                                valueEditController.text
-                                              ],
+                                              value: [valueEditController.text],
                                               action: "update");
                                           if (resp ==
                                                   'Failed to Post Resources' ||
