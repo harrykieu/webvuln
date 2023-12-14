@@ -118,50 +118,88 @@ class CustomDataTable extends StatelessWidget {
 
 class TableAll extends StatelessWidget {
   String dataTable;
+  Map<String, dynamic> data_example = {
+    "domain": "http://localhost:12001",
+    "scanDate": "2023-12-14 11:41:02.643412",
+    "numVuln": 1,
+    "vulnerabilities": [
+      {
+        "type": "File Upload",
+        "logs":
+            "2023-12-14 11:41:02.744968+07:00 [INFO] Log file created 2023-12-14 11:41:02.746392+07:00 [INFO] [FileUpload] Checking the domain http://localhost:12001... 2023-12-14 11:41:02.854807+07:00 [INFO] [FileUpload] URL is valid for file upload!!2023-12-14 11:41:02.855835+07:00 [INFO] [FileUpload] Uploading valid files...2023-12-14 11:41:02.899983+07:00 [INFO] [FileUpload] Signature found: 'Successfully uploaded file at: '2023-12-14 11:41:02.902138+07:00 [INFO] [FileUpload] Signature found: 'View all uploaded file at: '2023-12-14 11:41:02.903153+07:00 [INFO] [FileUpload] Valid file upload success!2023-12-14 11:41:02.905157+07:00 [INFO] [FileUpload] Uploading invalid files with valid extension...2023-12-14 11:41:02.972636+07:00 [INFO] [FileUpload] Signature found: 'Successfully uploaded file at: '2023-12-14 11:41:02.973621+07:00 [INFO] [FileUpload] Signature found: 'View all uploaded file at: '2023-12-14 11:41:02.974546+07:00 [INFO] [FileUpload] Invalid file with valid extension upload success!2023-12-14 11:41:02.975545+07:00 [INFO] [FileUpload] File upload vulnerability found!2023-12-14 11:41:02.976653+07:00 [INFO] [FileUpload] File upload scan completed!2023-12-14 11:41:02.977668+07:00 [INFO] [FileUpload] Payloads used: ['validex.jpg']",
+        "payload": ["validex.jpg"],
+        "severity": "High"
+      }
+    ],
+    "resultPoint": 100.0,
+    "resultSeverity": "None",
+    "_id": "657a875e2a14a2a2a5a95d07"
+  };
   TableAll({super.key, required this.dataTable});
   // ignore: non_constant_identifier_names
 
   @override
   Widget build(BuildContext context) {
-     Map<String, dynamic> jsonData = jsonDecode(dataTable);
+    Map<String, dynamic> dataVuln1 = jsonDecode(dataTable);
+    List<Map<String, dynamic>> dataVulnList =
+        List<Map<String, dynamic>>.from(dataVuln1["vulnerabilities"]);
+
+    if (dataVulnList.isEmpty) {
+      return Text('None vulnerabilities');
+    }
+    
+    Map<String, dynamic> dataVuln = dataVulnList[0];
+
     String type(data) {
       if (data["numVuln"] == 0) {
+        print(dataTable);
         return 'None vulnerabilities';
       } else {
-        return data["vulnerabilities"][0];
+        return dataVuln["type"];
       }
     }
 
     int numVuln(data) {
-      if (data["numVuln"] == 0) {
-        return 1;
-      } else {
-        return 2;
+      switch (data['numVuln']) {
+        case 0:
+          return 1;
+        case 1:
+          return 1;
+        case > 1:
+          return data['numVuln'];
+        default:
+          return 1;
       }
     }
 
     Icon icon_warning(data) {
-      if (data["numVuln"] == 0) {
-        return const Icon(
-          Icons.check_circle_outline_outlined,
-          color: Colors.green,
-        );
-        // ignore: curly_braces_in_flow_control_structures
-      } else {
-        return const Icon(
-          Icons.warning_amber_rounded,
-          color: Colors.yellow,
-        );
+      switch (data["severity"]) {
+        case 'High':
+          return const Icon(
+            Icons.warning_amber_sharp,
+            color: Colors.red,
+          );
+        case 'Medium':
+          return const Icon(
+            Icons.warning_amber_sharp,
+            color: Colors.yellow,
+          );
+        default:
+          return const Icon(
+            Icons.check_circle_outline,
+            color: Colors.green,
+          );
       }
     }
 
-    //List<dynamic> resultList = dataMap["result"];
-    List<DataRow> duplicatedRows = List.generate(numVuln(jsonData), (index) {
+    List<DataRow> duplicatedRows =
+        List.generate(numVuln(data_example), (index) {
       return DataRow(cells: [
-        DataCell(icon_warning(jsonData)),
-        DataCell(Text(type(jsonData), style: text_style_normal)),
-        DataCell(Text(jsonData["domain"], style: text_style_code)),
-        DataCell(Text(jsonData["scanDate"], style: text_style_code)),
+        DataCell(icon_warning(dataVuln)),
+        DataCell(Text(type(data_example), style: text_style_normal)),
+        DataCell(Text(dataVuln["severity"].toString(), style: text_style_code)),
+        DataCell(
+            Text(data_example["scanDate"].toString(), style: text_style_code)),
       ]);
     });
 

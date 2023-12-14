@@ -38,7 +38,7 @@ class _resultScreenState extends State<resultScreen> {
   bool isAppeared = true;
   int number_module = 0;
   List<HistoryTableData> results = [];
-
+  
   @override
   void initState() {
     super.initState();
@@ -136,7 +136,7 @@ class _resultScreenState extends State<resultScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(3.0),
                         ),
-                        title:const Row(
+                        title: const Row(
                           children: [
                             Text('Export data format   '),
                           ],
@@ -180,10 +180,9 @@ class _resultScreenState extends State<resultScreen> {
                               TextFormField(
                                 controller: name_file_controller,
                                 decoration: const InputDecoration(
-                                  labelText: 'File name',
-                                  prefixIcon: Icon(Icons.file_copy_outlined),
-                                  border: OutlineInputBorder()
-                                ),
+                                    labelText: 'File name',
+                                    prefixIcon: Icon(Icons.file_copy_outlined),
+                                    border: OutlineInputBorder()),
                               ),
                               Obx(
                                 () => Text(
@@ -209,11 +208,14 @@ class _resultScreenState extends State<resultScreen> {
                                   elevation: 4.0, // Button shadow
                                 ),
                               ),
-                              SizedBox(height: 10,),
+                              SizedBox(
+                                height: 10,
+                              ),
                               ElevatedButton(
                                 onPressed: () {
                                   if (selectedFolderPath.isNotEmpty) {
-                                    createPDF(newData, selectedFolderPath,name_file_controller.text);
+                                    createPDF(newData, selectedFolderPath,
+                                        name_file_controller.text);
                                     showDownloadSuccessSnackbar(context);
                                   } else {
                                     // Handle the case where no folder is selected
@@ -317,7 +319,10 @@ class _resultScreenState extends State<resultScreen> {
                   visible: true,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [containerPieChart(data: widget.data), lineChart()],
+                    children: [
+                      containerPieChart(data: widget.data),
+                      lineChart()
+                    ],
                   ),
                 ),
                 // Description
