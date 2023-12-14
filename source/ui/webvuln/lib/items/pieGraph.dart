@@ -1,15 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 // import 'package:syncfusion_flutter_gauges/gauges.dart';
 // import 'package:fl_chart/fl_chart.dart';
 // import 'package:pie_chart/pie_chart.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'indicators.dart';
 import 'app_colors.dart';
 
 class containerPieChart extends StatefulWidget {
-  const containerPieChart({super.key});
+  String data = '';
+  containerPieChart({super.key, required this.data});
 
   @override
   State<containerPieChart> createState() => _containerPieChartState();
@@ -28,7 +30,9 @@ class _containerPieChartState extends State<containerPieChart> {
           color: Colors.white,
           boxShadow: const [
             BoxShadow(
-                color: Colors.black38, offset: const Offset(0, 4), blurRadius: 10)
+                color: Colors.black38,
+                offset: const Offset(0, 4),
+                blurRadius: 10)
           ]),
       child: Column(
         children: [
@@ -44,118 +48,162 @@ class _containerPieChartState extends State<containerPieChart> {
               ],
             ),
           ),
-          PieChartSample1()
+          PieChartSample1(
+            data: widget.data,
+          )
         ],
       ),
     );
-  } 
+  }
 }
 
+// ignore: must_be_immutable
 class PieChartSample1 extends StatefulWidget {
-  const PieChartSample1({super.key});
+  PieChartSample1({super.key, required this.data});
+  String data;
 
   @override
   State<StatefulWidget> createState() => PieChartSample1State();
 }
 
-class PieChartSample1State extends State {
+class PieChartSample1State extends State<PieChartSample1> {
   int touchedIndex = -1;
+  bool isVisibled = true;
+  double xss = 16;
+  double lfi = 16;
+  double sqli = 16;
+  double rce = 16;
+  double xxe = 16;
+  //dataMap is json data vulnerabilities 
+  //data is json data vulnerabilities
+  void check_vuln(dataMap,data) {
+    
+  }
+  /* data: 
+    dataMap: 
+   */
+  void modify(data, dataMap, visible) {
+    Map<String, dynamic> data_vuln = jsonDecode(dataMap);
+    switch (data["numVuln"]) {
+      case 0:
+        setState(() {
+          visible = false;
+        });
+        break;
+      case 1:
+        setState(() {
+          visible = true;
+          check_vuln(dataMap,data_vuln);
+        });
+      default:
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1.3,
-      child: Column(
-        children: <Widget>[
-          const SizedBox(
-            height: 30,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    String data_example =
+        '''[{"type": "SQLi","logs": "2023-12-04 [INFO] Log file1, "vulnerabilities":created\n2ø23-12-ø4 [INFO] [SQLi] Checking SQLi for http://[INFO] [SQLi] SQL Injection detected in form, link: http://192.168.16ø.128:2Q01/\n2023-12-04 [INFO] [SQLi] Check, "payload": [ ] , "severity": "High"} l, "resultPoint":SQLi done\n"løø.ø, "resultseverity":• , •_id": "656dabd66c184db3941cbaf1"}]}''';
+    Map<String, dynamic> mapData = jsonDecode(widget.data);
+    return Visibility(
+        visible: isVisibled,
+        child: AspectRatio(
+          aspectRatio: 1.3,
+          child: Column(
             children: <Widget>[
-              Indicator(
-                color: AppColors.contentColorBlue,
-                text: 'XSS',
-                isSquare: false,
-                size: touchedIndex == 0 ? 18 : 16,
-                textColor: touchedIndex == 0
-                    ? AppColors.contentColorBlack
-                    : AppColors.menuBackground,
+              const SizedBox(
+                height: 30,
               ),
-              Indicator(
-                color: AppColors.contentColorYellow,
-                text: 'SQLi',
-                isSquare: false,
-                size: touchedIndex == 1 ? 18 : 16,
-                textColor: touchedIndex == 1
-                    ? AppColors.contentColorBlack
-                    : AppColors.menuBackground,
-              ),
-              Indicator(
-                color: AppColors.contentColorPink,
-                text: 'RCE',
-                isSquare: false,
-                size: touchedIndex == 2 ? 18 : 16,
-                textColor: touchedIndex == 2
-                    ? AppColors.contentColorBlack
-                    : AppColors.menuBackground,
-              ),
-              Indicator(
-                color: AppColors.contentColorGreen,
-                text: 'LFI',
-                isSquare: false,
-                size: touchedIndex == 3 ? 18 : 16,
-                textColor: touchedIndex == 3
-                    ? AppColors.contentColorBlack
-                    : AppColors.menuBackground,
-              ),
-              Indicator(
-                color: AppColors.contentColorCyan,
-                text: 'XXE',
-                isSquare: false,
-                size: touchedIndex == 4 ? 18 : 16,
-                textColor: touchedIndex == 4
-                    ? AppColors.contentColorBlack
-                    : AppColors.menuBackground,
-              )
-            ],
-          ),
-          const SizedBox(
-            height: 30,
-          ),
-          Expanded(
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: PieChart(
-                PieChartData(
-                  pieTouchData: PieTouchData(
-                    touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                      setState(() {
-                        if (!event.isInterestedForInteractions ||
-                            pieTouchResponse == null ||
-                            pieTouchResponse.touchedSection == null) {
-                          touchedIndex = -1;
-                          return;
-                        }
-                        touchedIndex = pieTouchResponse
-                            .touchedSection!.touchedSectionIndex;
-                      });
-                    },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Indicator(
+                    color: AppColors.contentColorBlue,
+                    text: 'XSS',
+                    isSquare: false,
+                    size: touchedIndex == 0 ? xss + 2 : xss,
+                    textColor: touchedIndex == 0
+                        ? AppColors.contentColorBlack
+                        : AppColors.menuBackground,
                   ),
-                  startDegreeOffset: 180,
-                  borderData: FlBorderData(
-                    show: false,
+                  Indicator(
+                    color: AppColors.contentColorYellow,
+                    text: 'SQLi',
+                    isSquare: false,
+                    size: touchedIndex == 1 ? sqli + 2 : sqli,
+                    textColor: touchedIndex == 1
+                        ? AppColors.contentColorBlack
+                        : AppColors.menuBackground,
                   ),
-                  sectionsSpace: 1,
-                  centerSpaceRadius: 0,
-                  sections: showingSections(),
+                  Indicator(
+                    color: AppColors.contentColorPink,
+                    text: 'RCE',
+                    isSquare: false,
+                    size: touchedIndex == 2 ? rce + 2 : rce,
+                    textColor: touchedIndex == 2
+                        ? AppColors.contentColorBlack
+                        : AppColors.menuBackground,
+                  ),
+                  Indicator(
+                    color: AppColors.contentColorGreen,
+                    text: 'LFI',
+                    isSquare: false,
+                    size: touchedIndex == 3 ? lfi + 2 : lfi,
+                    textColor: touchedIndex == 3
+                        ? AppColors.contentColorBlack
+                        : AppColors.menuBackground,
+                  ),
+                  Indicator(
+                    color: AppColors.contentColorCyan,
+                    text: 'XXE',
+                    isSquare: false,
+                    size: touchedIndex == 4 ? xxe + 2 : xxe,
+                    textColor: touchedIndex == 4
+                        ? AppColors.contentColorBlack
+                        : AppColors.menuBackground,
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+              Expanded(
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: PieChart(
+                    PieChartData(
+                      pieTouchData: PieTouchData(
+                        touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                          setState(() {
+                            if (!event.isInterestedForInteractions ||
+                                pieTouchResponse == null ||
+                                pieTouchResponse.touchedSection == null) {
+                              touchedIndex = -1;
+                              return;
+                            }
+                            touchedIndex = pieTouchResponse
+                                .touchedSection!.touchedSectionIndex;
+                          });
+                          /*mapData: origin json data
+                            data_example: json data vulnerabilities
+                            isVisibled: appear chart 
+                           */
+                          // modify(mapData, data_example, isVisibled);
+                        },
+                      ),
+                      startDegreeOffset: 180,
+                      borderData: FlBorderData(
+                        show: false,
+                      ),
+                      sectionsSpace: 1,
+                      centerSpaceRadius: 0,
+                      sections: showingSections(),
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   List<PieChartSectionData> showingSections() {

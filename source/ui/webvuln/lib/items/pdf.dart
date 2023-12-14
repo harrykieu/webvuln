@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -25,8 +26,13 @@ Future<void> createPDF(newData, directoryPath, nameFile) async {
   // Render the page
   doc.addPage(
     pw.Page(
+      margin:const  pw.EdgeInsets.all(10),
       build: (pw.Context context) {
-        return pw.Table(
+        return pw.Column(
+          children:[
+            pw.Text('WEBVULN REPORT',style: pw.TextStyle(fontSize: 30,fontBold:pw.Font.timesBold() )),
+            pw.SizedBox(height: 30),
+            pw.Table(
           children: <pw.TableRow>[
             pw.TableRow(
               decoration: pw.BoxDecoration(
@@ -55,7 +61,7 @@ Future<void> createPDF(newData, directoryPath, nameFile) async {
               ],
             ),
           ],
-        );
+        )] );
       },
     ),
   );
