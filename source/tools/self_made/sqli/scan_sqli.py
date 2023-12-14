@@ -1,6 +1,6 @@
 import urllib.parse
 from urllib.parse import urljoin
-
+import re
 import requests
 from bs4 import BeautifulSoup as bs
 
@@ -37,18 +37,7 @@ class SQLi:
 
     # ---------------------------------------------------------------
 
-    forms = []
-
-    def scan_website(self, url):
-        global forms
-        forms = bs(s.get(url).content, "html.parser").find_all("form")
-        if self.check_sqli(url):
-            return True
-        return False
-
-    # -----------------------------------------------------
-
-    def is_vulnerable_sqli(self, response):
+    def is_vulnerable_sqli(self, original_response, modified_response):
         errors = {
             "you have an error in your sql syntax;",
             "warning: mysql",
@@ -56,27 +45,43 @@ class SQLi:
             "quoted string not properly terminated",
         }
 
-        response_time = response.elapsed.total_seconds()
-        if response_time > 10:
-            print("[!] Slow response time detected")
-            return True
+        original_content = original_response.content.decode().lower()
+        modified_content = modified_response.content.decode().lower()
 
-        complex_payload = "1' AND (SELECT * FROM information_schema.tables)='"
-        if complex_payload in response.content.decode().lower():
-            print("[!] Complex payload was successful")
-            return True
+        original_tables = set(re.findall(r'\bfrom\s+(\w+)', original_content))
+        modified_tables = set(re.findall(r'\bfrom\s+(\w+)', modified_content))
 
-        dump_payload = "1' UNION SELECT NULL, NULL, @@version;--"
-        if dump_payload in response.content.decode().lower():
-            print("[!] Data dump was successful")
+        new_tables = modified_tables - original_tables
+        if new_tables:
+            print(f"[!] New tables detected: {new_tables}")
             return True
 
         for error in errors:
-            if error in response.content.decode().lower():
+            if error in original_content:
+                print(f"[!] SQL Injection error detected: {error}")
                 return True
-
+            elif error in modified_content:
+                print(f"[!] SQL Injection error detected: {error}")
+                return True
+            
         return False
 
+    # ---------------------------------
+    def interact_with_form(self, form_url, form_details, payload):
+        data = {}
+        for input_tag in form_details["inputs"]:
+            if input_tag["value"] or input_tag["type"] == "hidden":
+                try:
+                    data[input_tag["name"]] = input_tag["value"] + payload
+                except:
+                    pass
+            elif input_tag["type"] != "submit":
+                data[input_tag["name"]] = f"test{payload}"
+
+        modified_response = s.post(form_url, data=data)
+
+        return modified_response
+    
     # ---------------------------------
 
     def get_all_forms(self, url):
@@ -126,14 +131,18 @@ class SQLi:
             )
             return self.result
 
+        original_response = s.get(self.url)
+
         for payload in self.sqli_resources:
             payload_str = payload["value"]
             encoded_payload = urllib.parse.quote(payload_str.encode("utf-8"))
-            new_url = f"{self.url}?id={encoded_payload}"
+            new_url = f"{self.url}?id={payload_str}"
+
             print("[!] Trying", new_url)
 
-            res = s.get(new_url)
-            if self.is_vulnerable_sqli(res):
+            modified_response = s.get(new_url)
+
+            if self.is_vulnerable_sqli(original_response, modified_response):
                 print("[+] SQL Injection vulnerability detected, link:", new_url)
                 utils.log(
                     f"[SQLi] SQL Injection vulnerability detected, link: {new_url}, \nPayload: {payload_str}",
@@ -144,42 +153,28 @@ class SQLi:
                 self.result = True
                 break
 
+        results = {"sqli": []}
         forms = self.get_all_forms(self.url)
         print(f"[+] Detected {len(forms)} forms on {self.url} and form found: {forms}")
 
         for form in forms:
             form_details = self.get_form_details(form)
             for payload in self.sqli_resources:
-                data = {}
+                payload_str = payload["value"]
+                encoded_payload = urllib.parse.quote(payload_str.encode("utf-8"))
+                current_url = urljoin(self.url, form_details["action"])
+                
+                # Interact with the form using the payload
+                modified_response = self.interact_with_form(current_url, form_details,  payload["value"])
 
-                for input_tag in form_details["inputs"]:
-                    if input_tag["value"] or input_tag["type"] == "hidden":
-                        try:
-                            data[input_tag["name"]] = input_tag["value"] + payload
-                        except:
-                            pass
-                    elif input_tag["type"] != "submit":
-                        data[input_tag["name"]] = f"test{payload}"
-
-                self.url = urljoin(self.url, form_details["action"])
-                if form_details["method"] == "post":
-                    res = s.post(self.url, data=data)
-                elif form_details["method"] == "get":
-                    res = s.get(self.url, params=data)
-
-                url = urljoin(self.url, form_details["action"])
-                res = s.post(url, data=data) 
-
-                curr_url = self.url
-                results = {"sqli": []}
-
-                if self.is_vulnerable_sqli(res):
+                # Compare responses to check for SQL injection vulnerability
+                if self.is_vulnerable_sqli(original_response, modified_response):
                     results["sqli"].append(
-                        {"url": curr_url, "details": "[+] SQLi vulnerability detected"}
+                        {"url": current_url, "details": "[+] SQLi vulnerability detected"}
                     )
 
                     utils.log(
-                        f"[SQLi] SQL Injection detected in form with Payload: {payload}",
+                        f"[SQLi] SQL Injection detected in form with Payload: {payload_str}",
                         "INFO",
                         "sqli_log.txt",
                     )
