@@ -193,13 +193,13 @@ class TableAll extends StatelessWidget {
     }
 
     List<DataRow> duplicatedRows =
-        List.generate(numVuln(data_example), (index) {
+        List.generate(numVuln(dataVuln1), (index) {
       return DataRow(cells: [
         DataCell(icon_warning(dataVuln)),
-        DataCell(Text(type(data_example), style: text_style_normal)),
+        DataCell(Text(type(dataVuln1), style: text_style_normal)),
         DataCell(Text(dataVuln["severity"].toString(), style: text_style_code)),
         DataCell(
-            Text(data_example["scanDate"].toString(), style: text_style_code)),
+            Text(dataVuln["scanDate"].toString(), style: text_style_code)),
       ]);
     });
 
