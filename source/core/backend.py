@@ -18,7 +18,7 @@ from source.tools.self_made.pathtraversal.scan_pathtraversal import PathTraversa
 from source.tools.self_made.sqli.scan_sqli import SQLi
 from source.tools.self_made.xss.scan_xss import XSS
 
-ROOTPATH = Path(__file__).parent.parent.parent
+ROOTPATH = Path(__file__).parent.parent.parent  
 MODULES = [
     "ffuf",
     "dirsearch",

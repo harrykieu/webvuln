@@ -1,14 +1,17 @@
 // ignore_for_file: unused_element
 
 import 'dart:convert';
-
+import 'package:path_provider/path_provider.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:io';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:webvuln/items/custom_dropdown.dart';
 import 'package:webvuln/items/lineChart.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
+import 'package:webvuln/items/pdf.dart';
 import 'package:webvuln/items/pieGraph.dart';
 import 'package:webvuln/items/tables.dart';
 import 'package:webvuln/model/model.dart';
@@ -16,15 +19,21 @@ import 'package:webvuln/views/variable.dart';
 
 // TODO: parse data from loading screen to display on result screen
 class resultScreen extends StatefulWidget {
-  final List<String> data;
+  final String data;
   const resultScreen({super.key, required this.data});
 
   @override
   State<resultScreen> createState() => _resultScreenState();
-  List<String> get resultData => data;
+  String get resultData => data;
+}
+
+class RadioController extends GetxController {
+  RxString type_format = ''.obs;
 }
 
 class _resultScreenState extends State<resultScreen> {
+  final RadioController myController = RadioController();
+  final TextEditingController name_file_controller = TextEditingController();
   bool isVisibled = true;
   bool isAppeared = true;
   int number_module = 0;
@@ -38,22 +47,33 @@ class _resultScreenState extends State<resultScreen> {
     isAppeared = true;
   }
 
-  List<dynamic> __jsonHandle(List<String> listJSON) {
-    List<String> list = [];
-    // FIXME: handle json string
-    /* String newStr =
-        listJSON.substring(listJSON.indexOf('['), listJSON.lastIndexOf(']') + 1);
-    print(newStr);
-    listJSON = listJSON.replaceAll('$newStr', '{}');
-    print(listJSON);
-    list.add(listJSON);
-    list.add(newStr); */
-    return list;
+  String __jsonHandle(String strJSON) {
+    // Read the string line by line to find the json format
+    for (String line in strJSON.split('\n')) {
+      print(line);
+      if (line.startsWith('{')) {
+        // Handle the json data
+        return line;
+      }
+    }
+    return '';
   }
 
   List<HistoryTableData> __parseData(Map<String, dynamic> json) {
     results.add(HistoryTableData.fromJson(json));
     return results;
+  }
+
+  String selectedFolderPath = '';
+
+  Future<void> _pickFolder() async {
+    String? directory = (await FilePicker.platform.getDirectoryPath());
+
+    if (directory != null) {
+      setState(() {
+        selectedFolderPath = directory;
+      });
+    }
   }
 
   @override
@@ -62,27 +82,40 @@ class _resultScreenState extends State<resultScreen> {
     double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
     // parse json string to list of HistoryTableData object
-    //List<String> newData = __jsonHandle(widget.data);
-    //print(newData);
-    //Map<String, dynamic> json = jsonDecode(newData);
-    //print(json);
-    //String severity_point = json["resultPoint"];
+    String newData = __jsonHandle(widget.data);
+    Map<dynamic, dynamic> json = jsonDecode(newData);
+    String severityPoint = json["resultPoint"].toString();
     List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
     List<Widget> tables = [
-      //TableAll(dataTable: newData),
-      TableXSS(),
-      TableSQli(),
-      TableRCE(),
-      TableLFI()
+      TableAll(dataTable: newData),
+      const TableXSS(),
+      const TableSQli(),
+      const TableRCE(),
+      const TableLFI()
     ];
     //select module to scan
     String selectedModule = "All";
     bool isHide(newData) {
-      if (newData['numVuln'] == 0) {
+      if (newData["numVuln"] == 0) {
         return false;
       } else {
         return true;
       }
+    }
+
+    void showDownloadSuccessSnackbar(BuildContext context) {
+      final snackBar = SnackBar(
+        content: Text('Download Successful'),
+        duration: Duration(seconds: 3),
+        action: SnackBarAction(
+          label: 'Dismiss',
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 
     return Scaffold(
@@ -94,7 +127,123 @@ class _resultScreenState extends State<resultScreen> {
           },
           child: const Icon(Icons.arrow_back, color: Colors.white),
         ),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.download))],
+        actions: [
+          IconButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(3.0),
+                        ),
+                        title: const Row(
+                          children: [
+                            Text('Export data format   '),
+                          ],
+                        ),
+                        actions: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(
+                                children: [
+                                  Obx(
+                                    () => Radio(
+                                      value: 'json',
+                                      groupValue:
+                                          myController.type_format.value,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          myController.type_format.value =
+                                              value!;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Text('JSON'),
+                                  Obx(
+                                    () => Radio(
+                                      value: 'PDF',
+                                      groupValue:
+                                          myController.type_format.value,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          myController.type_format.value =
+                                              value!;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Text('PDF'),
+                                ],
+                              ),
+                              TextFormField(
+                                controller: name_file_controller,
+                                decoration: const InputDecoration(
+                                    labelText: 'File name',
+                                    prefixIcon: Icon(Icons.file_copy_outlined),
+                                    border: OutlineInputBorder()),
+                              ),
+                              Obx(
+                                () => Text(
+                                  'Selected format: ${myController.type_format.value == "PDF" ? 'file pdf' : 'file xml/json'}',
+                                  style: TextStyle(fontSize: 18.0),
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              Text('Selected Folder: $selectedFolderPath'),
+                              SizedBox(height: 20),
+                              ElevatedButton(
+                                onPressed: _pickFolder,
+                                child: Text('Pick location to download'),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.blue, // Background color
+                                  onPrimary: Colors.white, // Text color
+                                  padding:
+                                      EdgeInsets.all(16.0), // Button padding
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        8.0), // Button border radius
+                                  ),
+                                  elevation: 4.0, // Button shadow
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  if (selectedFolderPath.isNotEmpty) {
+                                    createPDF(newData, selectedFolderPath,
+                                        name_file_controller.text);
+                                    showDownloadSuccessSnackbar(context);
+                                  } else {
+                                    // Handle the case where no folder is selected
+                                    print('Please pick a folder first.');
+                                  }
+                                },
+                                child: Text('Download'),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.blue, // Background color
+                                  onPrimary: Colors.white, // Text color
+                                  padding:
+                                      EdgeInsets.all(16.0), // Button padding
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        8.0), // Button border radius
+                                  ),
+                                  elevation: 4.0, // Button shadow
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    });
+              },
+              icon: const Icon(Icons.download))
+        ],
         toolbarHeight: 80,
         leadingWidth: 100,
         backgroundColor: Colors.transparent,
@@ -107,13 +256,13 @@ class _resultScreenState extends State<resultScreen> {
             child: Column(
               children: [
                 Visibility(
-                  visible: isHide(widget.data[0]),
+                  visible: isHide(json),
                   child: CustomDropdownButton(
                       selectedItem: selectedModule,
                       items: error,
                       onItemSelected: (item) {
                         print(item);
-                        //print(newData);
+                        print(widget.data);
                         setState(() {
                           isVisibled = item == 'All';
                           print(isVisibled);
@@ -158,7 +307,8 @@ class _resultScreenState extends State<resultScreen> {
                           title: Text('List Vulnerabilities',
                               style: GoogleFonts.montserrat(
                                   fontSize: 24, fontWeight: FontWeight.bold)),
-                          trailing: Text('Point Severity:', //$severity_point',
+                          trailing: Text(
+                              'Point Severity:   $severityPoint points',
                               style: GoogleFonts.montserrat(
                                   fontSize: 24, fontWeight: FontWeight.bold)),
                         ),
@@ -167,7 +317,7 @@ class _resultScreenState extends State<resultScreen> {
                     )),
                 // Graph line and pie chart
                 Visibility(
-                  visible: isVisibled,
+                  visible: isHide(json),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [containerPieChart(), lineChart()],
@@ -210,7 +360,7 @@ class _resultScreenState extends State<resultScreen> {
         width: screenWidth,
         height: 550,
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10)),

@@ -118,12 +118,12 @@ class CustomDataTable extends StatelessWidget {
 
 class TableAll extends StatelessWidget {
   String dataTable;
-
   TableAll({super.key, required this.dataTable});
   // ignore: non_constant_identifier_names
 
   @override
   Widget build(BuildContext context) {
+     Map<String, dynamic> jsonData = jsonDecode(dataTable);
     String type(data) {
       if (data["numVuln"] == 0) {
         return 'None vulnerabilities';
@@ -147,7 +147,7 @@ class TableAll extends StatelessWidget {
           color: Colors.green,
         );
         // ignore: curly_braces_in_flow_control_structures
-      } else{
+      } else {
         return const Icon(
           Icons.warning_amber_rounded,
           color: Colors.yellow,
@@ -155,15 +155,13 @@ class TableAll extends StatelessWidget {
       }
     }
 
-    List<dynamic> vuln = [];
-    Map<dynamic, dynamic> dataMap = json.decode(dataTable);
     //List<dynamic> resultList = dataMap["result"];
-    List<DataRow> duplicatedRows = List.generate(numVuln(dataMap), (index) {
+    List<DataRow> duplicatedRows = List.generate(numVuln(jsonData), (index) {
       return DataRow(cells: [
-        DataCell(icon_warning(dataMap)),
-        DataCell(Text(type(dataMap), style: text_style_normal)),
-        DataCell(Text(dataMap["domain"], style: text_style_code)),
-        DataCell(Text(dataMap["scanDate"], style: text_style_code)),
+        DataCell(icon_warning(jsonData)),
+        DataCell(Text(type(jsonData), style: text_style_normal)),
+        DataCell(Text(jsonData["domain"], style: text_style_code)),
+        DataCell(Text(jsonData["scanDate"], style: text_style_code)),
       ]);
     });
 
@@ -173,13 +171,13 @@ class TableAll extends StatelessWidget {
   }
 
   TextStyle get text_style_normal => GoogleFonts.montserrat(
-        fontSize: 20,
+        fontSize: 24,
         color: Colors.black,
         fontWeight: FontWeight.normal,
       );
 
   TextStyle get text_style_code => GoogleFonts.ubuntu(
-        fontSize: 20,
+        fontSize: 24,
         color: Colors.black,
         fontWeight: FontWeight.normal,
       );
