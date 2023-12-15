@@ -26,7 +26,7 @@ print(scan_results) """
 """ results = loads(scan_results)["result"]
 a.generateJSONReport(results)
  """
-
+a.scanURL(["http://172.29.35.11/DVWA/vulnerabilities/sqli/"], ["sqli"])
 # Push resource to db
 """ with open(f'{ROOTPATH}/source/core/database/data_resources.json', 'r') as f:
     data = f.read()
