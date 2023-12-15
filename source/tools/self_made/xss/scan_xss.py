@@ -101,7 +101,7 @@ class XSS:
                 driver.get(new_url)
 
                 try:
-                    alert = WebDriverWait(driver, 5).until(EC.alert_is_present())
+                    alert = WebDriverWait(driver, 1).until(EC.alert_is_present())
                     alert_text = alert.text
                     alert.accept()
 
