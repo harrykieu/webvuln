@@ -2,9 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 import 'package:dio/dio.dart';
-import 'package:webvuln/views/resourcesScreen.dart';
 import 'dart:io';
 import '../model/model.dart';
 

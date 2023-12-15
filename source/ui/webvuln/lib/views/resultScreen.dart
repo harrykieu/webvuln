@@ -38,7 +38,7 @@ class _resultScreenState extends State<resultScreen> {
   bool isAppeared = true;
   int number_module = 0;
   List<HistoryTableData> results = [];
-
+  
   @override
   void initState() {
     super.initState();
@@ -317,10 +317,13 @@ class _resultScreenState extends State<resultScreen> {
                     )),
                 // Graph line and pie chart
                 Visibility(
-                  visible: isHide(json),
-                  child: const Row(
+                  visible: true,
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [containerPieChart(), lineChart()],
+                    children: [
+                      containerPieChart(data: widget.data),
+                      lineChart()
+                    ],
                   ),
                 ),
                 // Description
