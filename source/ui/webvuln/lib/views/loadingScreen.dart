@@ -50,13 +50,26 @@ class _loadingScreenState extends State<loadingScreen> {
     }
   }
 
-  String extractJson(String rawString) {
+  String extractJson(String response) {
     // Find the index of '{"result":'
-    int startIndex = rawString.indexOf('{', rawString.indexOf('"result"'));
-    int endIndex = rawString.lastIndexOf('}]}');
+    int startIndex = response.indexOf('{', response.indexOf('"result"'));
+    int endIndex = response.lastIndexOf('}]}');
+    // TODO: Handle properly the case where more than 1 result is returned
     // Extract the substring starting from '{"result":'
-    String resultData = rawString.substring(startIndex, endIndex + 1);
-    print(resultData);
+    String resultData = response.substring(startIndex, endIndex + 1);
+    return resultData;
+  }
+
+  List<dynamic> extractJson2(String response) {
+    // Find the index of '{"result":'
+    int startIndex = response.indexOf('[', response.indexOf('"result"'));
+    int endIndex = response.lastIndexOf(']');
+    // TODO: Handle properly the case where more than 1 result is returned
+    // Extract the substring starting from '{"result":'
+    List<dynamic> resultData =
+        jsonDecode(response.substring(startIndex, endIndex + 1));
+    print(resultData.runtimeType);
+    print(resultData[0].runtimeType);
     return resultData;
   }
 
@@ -77,7 +90,8 @@ class _loadingScreenState extends State<loadingScreen> {
               return Text('Error: ${snapshot.error ?? "Unknown error"}');
             } else {
               String? snapData = snapshot.data;
-              return resultScreen(data: extractJson(snapData!));
+              //test
+              return resultScreen(data: extractJson2(snapData!));
             }
           },
         ),

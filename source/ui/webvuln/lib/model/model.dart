@@ -39,13 +39,13 @@ class History {
 
 class Vulnerability {
   final String type;
-  final String log;
+  final String logs;
   final List<String> payload;
   final String severity;
 
   Vulnerability({
     required this.type,
-    required this.log,
+    required this.logs,
     required this.payload,
     required this.severity,
   });
@@ -81,7 +81,7 @@ class HistoryTableData {
       List<String> payloadList = List<String>.from(vulnJson['payload']);
       return Vulnerability(
         type: vulnJson['type'],
-        log: vulnJson['logs'],
+        logs: vulnJson['logs'],
         payload: payloadList,
         severity: vulnJson['severity'],
       );

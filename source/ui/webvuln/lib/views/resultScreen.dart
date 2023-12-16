@@ -1,6 +1,7 @@
 // ignore_for_file: unused_element
 
 import 'dart:convert';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -19,12 +20,12 @@ import 'package:webvuln/views/variable.dart';
 
 // TODO: parse data from loading screen to display on result screen
 class resultScreen extends StatefulWidget {
-  final String data;
+  final List<dynamic> data;
   const resultScreen({super.key, required this.data});
 
   @override
   State<resultScreen> createState() => _resultScreenState();
-  String get resultData => data;
+  List<dynamic> get resultData => data;
 }
 
 class RadioController extends GetxController {
@@ -38,30 +39,13 @@ class _resultScreenState extends State<resultScreen> {
   bool isAppeared = true;
   int number_module = 0;
   List<HistoryTableData> results = [];
-  
+
   @override
   void initState() {
     super.initState();
     isVisibled = true;
     number_module = 0;
     isAppeared = true;
-  }
-
-  String __jsonHandle(String strJSON) {
-    // Read the string line by line to find the json format
-    for (String line in strJSON.split('\n')) {
-      print(line);
-      if (line.startsWith('{')) {
-        // Handle the json data
-        return line;
-      }
-    }
-    return '';
-  }
-
-  List<HistoryTableData> __parseData(Map<String, dynamic> json) {
-    results.add(HistoryTableData.fromJson(json));
-    return results;
   }
 
   String selectedFolderPath = '';
@@ -81,13 +65,42 @@ class _resultScreenState extends State<resultScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
     double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
-    // parse json string to list of HistoryTableData object
-    String newData = __jsonHandle(widget.data);
-    Map<dynamic, dynamic> json = jsonDecode(newData);
-    String severityPoint = json["resultPoint"].toString();
+    List<Vulnerability> listVuln = [];
+    for (var obj in widget.resultData) {
+      List<dynamic> listVulnJSON = obj["vulnerabilities"];
+      for (var vuln in listVulnJSON) {
+        Vulnerability newVuln = Vulnerability(
+          type: vuln["type"].toString(),
+          severity: vuln["severity"].toString(),
+          payload: List<String>.from(vuln["payload"]),
+          logs: vuln["logs"].toString(),
+        );
+        listVuln.add(newVuln);
+      }
+      HistoryTableData newVuln = HistoryTableData(
+          domain: obj["domain"].toString(),
+          numVuln: obj["numVuln"],
+          resultPoint: obj["resultPoint"],
+          id: obj["id"].toString(),
+          resultSeverity: obj["resultSeverity"].toString(),
+          vuln: listVuln,
+          scanDate: obj["scanDate"].toString());
+      results.add(obj);
+    }
+    List<DataRow> dataRows = results
+        .map((e) => DataRow(cells: [
+              DataCell(Text(e.domain)),
+              DataCell(Text(e.scanDate)),
+              DataCell(Text(e.resultSeverity)),
+              DataCell(Text(e.resultPoint.toString())),
+              DataCell(Text(e.numVuln.toString())),
+              DataCell(Text(e.id)),
+            ]))
+        .toList();
+    //String severityPoint = json["resultPoint"].toString();
     List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
     List<Widget> tables = [
-      TableAll(dataTable: newData),
+      //TableAll(dataTable: newData),
       const TableXSS(),
       const TableSQli(),
       const TableRCE(),
@@ -212,10 +225,10 @@ class _resultScreenState extends State<resultScreen> {
                               SizedBox(
                                 height: 10,
                               ),
-                              ElevatedButton(
+                              /*  ElevatedButton(
                                 onPressed: () {
                                   if (selectedFolderPath.isNotEmpty) {
-                                    createPDF(newData, selectedFolderPath,
+                                    //createPDF(newData, selectedFolderPath,
                                         name_file_controller.text);
                                     showDownloadSuccessSnackbar(context);
                                   } else {
@@ -235,7 +248,7 @@ class _resultScreenState extends State<resultScreen> {
                                   ),
                                   elevation: 4.0, // Button shadow
                                 ),
-                              ),
+                              ), */
                             ],
                           ),
                         ],
@@ -262,7 +275,6 @@ class _resultScreenState extends State<resultScreen> {
                       items: error,
                       onItemSelected: (item) {
                         print(item);
-                        print(widget.data);
                         setState(() {
                           isVisibled = item == 'All';
                           print(isVisibled);
@@ -308,11 +320,35 @@ class _resultScreenState extends State<resultScreen> {
                               style: GoogleFonts.montserrat(
                                   fontSize: 24, fontWeight: FontWeight.bold)),
                           trailing: Text(
-                              'Point Severity:   $severityPoint points',
+                              'Point Severity:   ', //$severityPoint points',
                               style: GoogleFonts.montserrat(
                                   fontSize: 24, fontWeight: FontWeight.bold)),
                         ),
-                        tables[number_module]
+                        DataTable2(columns: const [
+                          DataColumn(
+                            label: Row(
+                              children: [Text('Serverity')],
+                            ),
+                          ),
+                          DataColumn(
+                            label: Row(
+                              children: [Text('Type')],
+                            ),
+                          ),
+                          DataColumn(
+                            label: Row(
+                              children: [Text('Description')],
+                            ),
+                          ),
+                          DataColumn(
+                            label: Row(
+                              children: [
+                                Text('Scan Date'),
+                              ],
+                            ),
+                          ),
+                        ], rows: dataRows)
+                        //tables[number_module]
                       ],
                     )),
                 // Graph line and pie chart
@@ -320,8 +356,8 @@ class _resultScreenState extends State<resultScreen> {
                   visible: true,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      containerPieChart(data: widget.data),
+                    children: const [
+                      //containerPieChart(data: widget.data),
                       lineChart()
                     ],
                   ),
