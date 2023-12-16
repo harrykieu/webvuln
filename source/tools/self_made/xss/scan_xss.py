@@ -193,8 +193,9 @@ class XSS:
                             self.payloads.append(payload["value"])
                             self.result = True
                             break
-                        elif isinstance(e, js_error):
-                            print(f"[-] JavaScript error: {js_error}")
+                        # FIXME: Bug at finding javascript error
+                        # elif isinstance(e, js_error):
+                        #    print(f"[-] JavaScript error: {js_error}")
                         else:
                             print(f"[-] An error occurred: {e}")
                             utils.log(
