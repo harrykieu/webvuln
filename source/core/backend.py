@@ -698,6 +698,17 @@ class WebVuln:
                     print("[backend.py-getScanResult] Error: Invalid JSON object")
                 return "Failed"
 
+    def handleReportGeneration(self, data):
+        result = data.get("result")
+        reportType = data.get("reportType")
+
+        if reportType == "json":
+            self.generate_json_report(result)
+        elif reportType == "xml":
+            self.generateXMLReport("/path/to/save/report.xml")
+        elif reportType == "pdf":
+            self.generatePDFReport()
+
     # Generate JSON report
     # TODO: Fix function name to match camelCase
     def generate_json_report(results):

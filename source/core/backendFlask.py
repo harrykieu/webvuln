@@ -6,6 +6,7 @@ import source.core.utils as utils
 
 app = Flask(__name__)
 backend = WebVuln()
+reportGenerate = WebVuln()
 # Debug
 backend.setDebug(True)
 
@@ -45,10 +46,16 @@ def report():
         return "Bad request", 400
     keys = data.keys()
     if "result" in keys and "type" in keys and len(keys) == 2:
-        if app.debug:
-            utils.log(f"/api/report: Successfully received data: {data}", "DEBUG")
-        backend.recvFlask("/api/report", "POST", data)
-        return "Success", 200
+        try:
+            reportGenerate.handleReportGeneration(data["result"], data["type"])
+            if app.debug:
+                utils.log(f"/api/report: Successfully received data: {data}", "INFO")
+            backend.recvFlask("/api/report", "POST", data)
+            return "Success", 200
+        except Exception as e:
+            if app.debug:
+                utils.log(f"/api/report: Error generating report - {str(e)}", "ERROR")
+            return "Failed", 400
     else:
         if app.debug:
             utils.log("/api/report: Missing or invalid JSON data", "DEBUG")
