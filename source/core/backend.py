@@ -204,7 +204,6 @@ class WebVuln:
                                 )
                             return "Failed"
                         LFIResult, LFIPayload = LFI(url, lfi_resources).check_lfi()
-                        # TODO: Fix severity to match formula on Google Docs
                         if LFIResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
@@ -272,7 +271,7 @@ class WebVuln:
                                         f"{ROOTPATH}/logs/xss_log.txt", "r"
                                     ).read(),
                                     "payload": XSSPayload,
-                                    "severity": "High",
+                                    "severity": "Medium",
                                 }
                             )
                     elif module == "fileupload":
@@ -304,7 +303,7 @@ class WebVuln:
                                 {
                                     "type": "IDOR",
                                     "description": f"{url} is vulnerable to IDOR",
-                                    "severity": "High",
+                                    "severity": "Medium",
                                 }
                             )
                     elif module == "pathtraversal":
@@ -702,7 +701,7 @@ class WebVuln:
         with open("report.json", "w") as f:
             f.write(json_str)
 
-    # TODO: retrieve path from GUI, save at that location, return "Success" or "Failed"
+      # TODO: retrieve path from GUI, save at that location, return "Success" or "Failed"
     def generateXMLReport(self, path):
         """Generate XML report from the JSON result.
 
@@ -758,4 +757,4 @@ class WebVuln:
 
         html += "</body></html>"
 
-        pdfkit.from_string(html, "report.pdf")
+        #pdfkit.from_string(html, "report.pdf")
