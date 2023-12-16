@@ -51,7 +51,7 @@ class SQLi:
         response_time = response.elapsed.total_seconds()
         if response_time > 10:
             print("[!] Slow response time detected")
-            return True 
+            return True
 
         # Trying dump complex payload
         complex_payload = "1' AND (SELECT * FROM information_schema.tables)='"
@@ -62,15 +62,15 @@ class SQLi:
         # Try dump normal payload
         dump_payload = f"1' UNION SELECT NULL, NULL, @@version;--"
         if dump_payload in response.content.decode().lower():
-            print("[!] Data dump was successful") 
+            print("[!] Data dump was successful")
             return True
 
         for error in errors:
             if error in response.content.decode().lower():
-                    return True
-            
+                return True
+
         return False
-    
+
     def is_form_vulnerable_sqli(self, original_response, modified_response):
         errors = {
             "you have an error in your sql syntax;",
@@ -82,8 +82,8 @@ class SQLi:
         original_content = original_response.content.decode().lower()
         modified_content = modified_response.content.decode().lower()
 
-        original_tables = set(re.findall(r'\bfrom\s+(\w+)', original_content))
-        modified_tables = set(re.findall(r'\bfrom\s+(\w+)', modified_content))
+        original_tables = set(re.findall(r"\bfrom\s+(\w+)", original_content))
+        modified_tables = set(re.findall(r"\bfrom\s+(\w+)", modified_content))
 
         new_tables = modified_tables - original_tables
         if new_tables:
@@ -97,7 +97,7 @@ class SQLi:
             elif error in modified_content:
                 print(f"[!] SQL Injection error detected: {error}")
                 return True
-            
+
         return False
 
     # ---------------------------------
@@ -115,7 +115,7 @@ class SQLi:
         modified_response = s.post(form_url, data=data)
 
         return modified_response
-    
+
     # ---------------------------------
 
     def get_all_forms(self, url):
@@ -200,12 +200,19 @@ class SQLi:
                     current_url = urljoin(self.url, form_details["action"])
 
                     # Interact with the form using the payload
-                    modified_response = self.interact_with_form(driver, current_url, form_details, payload["value"])
+                    modified_response = self.interact_with_form(
+                        driver, current_url, form_details, payload["value"]
+                    )
 
                     # Compare responses to check for SQL injection vulnerability
-                    if self.is_form_vulnerable_sqli(original_response, modified_response):
+                    if self.is_form_vulnerable_sqli(
+                        original_response, modified_response
+                    ):
                         results["sqli"].append(
-                            {"url": current_url, "details": "[+] SQLi vulnerability detected"}
+                            {
+                                "url": current_url,
+                                "details": "[+] SQLi vulnerability detected",
+                            }
                         )
 
                         utils.log(

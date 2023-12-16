@@ -12,6 +12,12 @@ backend.setDebug(True)
 # Note: the Content-Type header must be set to `application/json` for the request to be parsed correctly.f
 # Note: the Origin header must be set to match the sender's origin ('backend' or 'frontend').
 
+# TODO: API to request create report
+# requirement: origin header = frontend
+# request body: json object with the following properties:
+# - `result`: result of the scan
+# - `type`: type of the report (e.g. html, pdf, etc.)
+
 
 @app.post("/api/scan")
 def scan():
@@ -188,9 +194,6 @@ def getResources():
         return "Bad request", 400
 
 
-# FIX
-
-
 @app.get("/api/resourcesfile")
 def getResourcesFile():
     """Get files for file upload module.
@@ -233,9 +236,6 @@ def getResourcesFile():
         if app.debug:
             utils.log("/api/resourcesfile: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
-
-
-# Fix
 
 
 @app.post("/api/resourcesfile")

@@ -1,10 +1,10 @@
 import json
-from pymongo import MongoClient
 import os
 
-import pymongo
-import source.core.utils as utils
 from dotenv import load_dotenv
+from pymongo import MongoClient
+
+import source.core.utils as utils
 
 
 class DatabaseUtils:
@@ -15,6 +15,7 @@ class DatabaseUtils:
         - `username`: username of the database.
         - `password`: password of the database.
         """
+        # TODO: implement authentication, check if URI already has username and password
         load_dotenv()
         self.__client = MongoClient(os.getenv("DATABASE_URI"))
         self.__db = self.__client.get_database("webvuln")
