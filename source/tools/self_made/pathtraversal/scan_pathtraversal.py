@@ -26,9 +26,18 @@ class PathTraversal:
             "INFO",
             "pathTraversal.txt",
         )
+        if not self.resources:
+            print("\n[-] Resources not found!")
+            utils.log(
+                "[PathTraversal] Resources not found!",
+                "ERROR",
+                "pathTraversal.txt",
+            )
+            return self.result
+               
 
         stopChecking = False
-        
+
         for paramInfo in self.parameterList:
             param = paramInfo["value"]
 

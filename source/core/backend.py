@@ -15,8 +15,6 @@ from source.tools.self_made.xss.scan_xss import XSS
 from source.tools.self_made.idor.scan_idor import IDOR
 from source.core.calSeverity import calculateWebsiteSafetyRate
 
-import xml.etree.ElementTree as ET
-import pdfkit
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [
@@ -204,7 +202,6 @@ class WebVuln:
                                 )
                             return "Failed"
                         LFIResult, LFIPayload = LFI(url, lfi_resources).check_lfi()
-                        # TODO: Fix severity to match formula on Google Docs
                         if LFIResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
@@ -272,7 +269,7 @@ class WebVuln:
                                         f"{ROOTPATH}/logs/xss_log.txt", "r"
                                     ).read(),
                                     "payload": XSSPayload,
-                                    "severity": "High",
+                                    "severity": "Medium",
                                 }
                             )
                     elif module == "fileupload":
@@ -311,7 +308,7 @@ class WebVuln:
                                     "type": "IDOR",
                                     "logs": open(f"{ROOTPATH}/logs/idor.txt", "r").read(),
                                     "payload": idorPayload,
-                                    "severity": "High",
+                                    "severity": "Medium",
                                 }
                             )
                     elif module == "pathtraversal":
