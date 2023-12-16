@@ -6,7 +6,6 @@ import source.core.utils as utils
 
 app = Flask(__name__)
 backend = WebVuln()
-reportGenerate = WebVuln()
 # Debug
 backend.setDebug(True)
 
@@ -47,7 +46,7 @@ def report():
     keys = data.keys()
     if "result" in keys and "type" in keys and len(keys) == 2:
         try:
-            reportGenerate.handleReportGeneration(data["result"], data["type"])
+            backend.handleReportGeneration(data["result"], data["reportType"])
             if app.debug:
                 utils.log(f"/api/report: Successfully received data: {data}", "INFO")
             backend.recvFlask("/api/report", "POST", data)
