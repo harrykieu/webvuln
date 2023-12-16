@@ -269,7 +269,7 @@ class WebVuln:
                                         f"{ROOTPATH}/logs/xss_log.txt", "r"
                                     ).read(),
                                     "payload": XSSPayload,
-                                    "severity": "High",
+                                    "severity": "Medium",
                                 }
                             )
                     elif module == "fileupload":
@@ -301,7 +301,7 @@ class WebVuln:
                                 {
                                     "type": "IDOR",
                                     "description": f"{url} is vulnerable to IDOR",
-                                    "severity": "High",
+                                    "severity": "Medium",
                                 }
                             )
                     elif module == "pathtraversal":
