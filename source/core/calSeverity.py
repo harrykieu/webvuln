@@ -25,7 +25,6 @@ def calculateWebsiteSafetyRate(websiteVulns):
 
     # Define the conversion table for severity
     safetyPercent = {
-        (0, 39): "Critical",
         (40, 69): "High",
         (70, 89): "Medium",
         (90, 99): "Low",
