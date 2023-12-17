@@ -34,7 +34,6 @@ class _mainScreenState extends State<mainScreen> {
 
   final List _selectedItem = [
     const scanScreen(),
-    const resultScreen(),
     const historyScreen(),
     const resourceScreen(),
     const settingScreen()
@@ -106,15 +105,7 @@ class _mainScreenState extends State<mainScreen> {
                         name: 'Resources'),
                     const SizedBox(
                       height: 20,
-                    ),
-                    button(
-                        onPressed: () {
-                          setState(() {
-                            _selectedIndex = 4;
-                          });
-                        },
-                        icon: 'lib/assets/settings.png',
-                        name: 'Settings')
+                    )
                   ],
                 )),
             // Gradient background

@@ -1,9 +1,10 @@
+import datetime
+import os
 import platform
 import subprocess
 import tempfile
-import os
 from pathlib import Path
-import datetime
+
 import pytz
 
 # The root path of the project
