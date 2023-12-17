@@ -5,9 +5,8 @@ from urllib.parse import urljoin
 import re
 import urllib.parse
 import source.core.utils as utils
+import json
 
-# 06/09/2023 : CODE Can cai thien them mot so phuong dien de chen tim ra dia file (can cai tien tu dong 110 tro di)
-# maker : RBKING
 
 s = requests.Session()
 s.headers[
@@ -44,6 +43,7 @@ class LFI:
         try:
             action = form.attrs.get("action").lower()
         except:
+            # TODO: fix all bare except statements
             action = None
 
         method = form.attrs.get("method", "get").lower()
@@ -65,6 +65,7 @@ class LFI:
     # --------------------------------------------------
 
     def check_lfi(self):
+        # TODO: add payload to log, add log to utils
         utils.log(
             f"[LFI] Checking LFI for {self.url}",
             "INFO",
@@ -85,7 +86,7 @@ class LFI:
         for payload in self.lfi_resources:
             payload_str = payload["value"]
             encoded_payload = urllib.parse.quote(payload_str.encode("utf-8"))
-            new_url = f"{self.url}?page={encoded_payload}"
+            new_url = re.sub(r'=.*?(&|$)', '=' + encoded_payload + '\\1', self.url)
 
             print("[!] Trying", new_url)
             res = s.get(new_url)
@@ -93,7 +94,7 @@ class LFI:
             if re.search(rb"root:x:0:0", res.content):
                 print("[+] LFI vulnerability detected, link:", new_url)
                 utils.log(
-                    f"[LFI] Local File Injection vulnerability detected, link: {new_url}",
+                    f"[LFI] Local File Injection vulnerability detected, link: {new_url}, \nPayload: {payload_str}",
                     "INFO",
                     "lfi_log.txt",
                 )
@@ -131,7 +132,7 @@ class LFI:
                 if re.search(rb"root:x:0:0", res.content):
                     print("[+] Local File Injection detected, link:", self.url)
                     utils.log(
-                        f"[LFI] Local File Injection detected in form, link: {self.url}",
+                        f"[LFI] Local File Injection detected in form, with Payload: {payload}",
                         "INFO",
                         "lfi_log.txt",
                     )

