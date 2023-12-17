@@ -1,6 +1,7 @@
 // ignore_for_file: unused_element
 
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -40,6 +41,7 @@ class _resultScreenState extends State<resultScreen> {
   bool isVisibled = true;
   bool isAppeared = true;
   int number_module = 0;
+  String state = 'All';
   List<HistoryTableData> results = [];
 
   @override
@@ -85,9 +87,14 @@ class _resultScreenState extends State<resultScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     Get.testMode = true;
+    List<DropdownMenuItem<String>> dropdownValue = [
+      const DropdownMenuItem(value: 'All', child: Text('All'))
+      // add more dropdown item at the code below
+    ];
     List<dynamic> results = jsonDecode(widget.resultData);
     List<HistoryTableData> newData = [];
     // parse vuln into List<Vulnerability>
+    String allVuln = "";
     List<Vulnerability> listVuln = [];
     for (var obj in results) {
       List<dynamic> listVulnJSON = obj["vulnerabilities"];
@@ -104,34 +111,40 @@ class _resultScreenState extends State<resultScreen> {
       HistoryTableData newVuln = HistoryTableData(
           domain: obj["domain"].toString(),
           numVuln: obj["numVuln"],
-          resultPoint: obj["resultPoint"],
+          resultPoint: obj["resultPoint"].toDouble(),
           id: obj["id"].toString(),
           resultSeverity: obj["resultSeverity"].toString(),
           vuln: listVuln,
           scanDate: obj["scanDate"].toString());
       newData.add(newVuln);
     }
+    // get all vuln available and convert to string, separated by comma
+    for (var vuln in listVuln) {
+      allVuln += "${vuln.type} ";
+      dropdownValue.add(DropdownMenuItem(
+        value: vuln.type.toString(),
+        child: Text(vuln.type),
+      ));
+    }
     List<DataRow> dataRows = newData
         .map((e) => DataRow(cells: [
               DataCell(warnLevel(e.resultSeverity)),
               DataCell(Text(e.domain)),
-              DataCell(Text(e.vuln[0].type)), // TODO: parse based on type
+              DataCell(Text(allVuln)),
               DataCell(Text(e.numVuln.toString())),
               DataCell(Text(e.resultPoint.toString())),
               DataCell(Text(e.scanDate)),
             ]))
         .toList();
     //String severityPoint = json["resultPoint"].toString();
-    List<String> error = ['All', 'XSS', 'SQLi', 'RCE', 'LFI'];
-    List<Widget> tables = [
+    /* List<Widget> tables = [
       //TableAll(dataTable: newData),
       const TableXSS(),
       const TableSQli(),
       const TableRCE(),
       const TableLFI()
-    ];
+    ]; */
     //select module to scan
-    String selectedModule = "All";
     bool isHide(newData) {
       if (newData["numVuln"] == 0) {
         return false;
@@ -140,29 +153,23 @@ class _resultScreenState extends State<resultScreen> {
       }
     }
 
-/*     void showDownloadSuccessSnackbar(BuildContext context) {
-      final snackBar = SnackBar(
-        content: Text('Download Successful'),
-        duration: Duration(seconds: 3),
-        action: SnackBarAction(
-          label: 'Dismiss',
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    } */
-
     return Scaffold(
         backgroundColor: const Color(0xFFF0F0F0),
         body: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // dropdown
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                GradientButton(
+                  horizontalMargin: 40,
+                  verticalMargin: 10,
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Icon(Icons.arrow_back, color: Colors.white),
+                ),
                 Container(
                   margin: const EdgeInsetsDirectional.only(start: 40, top: 10),
                   child: Text("SCAN RESULT",
@@ -171,28 +178,29 @@ class _resultScreenState extends State<resultScreen> {
                 ),
                 Container(
                   margin: const EdgeInsetsDirectional.only(end: 40),
-                  width: 200,
+                  width: 150,
                   height: 40,
                   child: DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        icon: Icon(Icons.filter_alt_outlined, size: 30),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                            borderSide: BorderSide(color: Colors.black12)),
+                        contentPadding: EdgeInsetsDirectional.only(start: 15),
+                      ),
                       focusColor: const Color(0xFFF0F0F0),
                       icon: const Icon(Icons.arrow_drop_down),
                       dropdownColor: Colors.white,
-                      //value: state,
-                      items: const [
-                        DropdownMenuItem(
-                            value: '/normalPost',
-                            child: Text('Normal Resource')),
-                        DropdownMenuItem(
-                            value: '/filePost', child: Text('File Resource'))
-                      ],
+                      value: state,
+                      items: dropdownValue,
                       onSaved: (v) {
                         setState(() {
-                          //state = v!;
+                          state = v!;
                         });
                       },
                       onChanged: (v) {
                         setState(() {
-                          //state = v!;
+                          state = v!;
                         });
                       }),
                 ),
@@ -226,6 +234,45 @@ class _resultScreenState extends State<resultScreen> {
                     ),
                     DataColumn2(label: Text('Scan Date'), size: ColumnSize.S),
                   ], rows: dataRows)),
+              Container(
+                  width: screenWidth,
+                  // TODO: Fix this
+                  height: MediaQuery.of(context).size.height - 700,
+                  margin: const EdgeInsetsDirectional.only(
+                      start: 40, end: 40, top: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 15,
+                        spreadRadius: -7,
+                      )
+                    ],
+                  ),
+                  // TODO: Make the description header unscrollable
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: Row(
+                            children: [
+                              const Image(
+                                  image: AssetImage(
+                                      'lib/assets/Folders_light.png')),
+                              Text(
+                                'Description',
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 24, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Constants.content_vulnerabilities[number_module]
+                      ],
+                    ),
+                  ))
             ]));
     /* return Scaffold(
       appBar: AppBar(
