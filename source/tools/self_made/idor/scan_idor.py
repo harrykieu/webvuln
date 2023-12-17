@@ -62,7 +62,7 @@ class IDOR:
 
         return False
 
-    def check_idor(self, url):
+    def check_idor(self):
         urls = self.extract_urls()
 
         for url in urls:

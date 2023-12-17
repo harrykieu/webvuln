@@ -1,10 +1,8 @@
 import json
 import os
-import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
 
-import pdfkit
 import pymongo
 import requests
 
@@ -17,9 +15,6 @@ from source.tools.self_made.lfi.scan_lfi import LFI
 from source.tools.self_made.pathtraversal.scan_pathtraversal import PathTraversal
 from source.tools.self_made.sqli.scan_sqli import SQLi
 from source.tools.self_made.xss.scan_xss import XSS
-from source.tools.self_made.idor.scan_idor import IDOR
-from source.core.calSeverity import calculateWebsiteSafetyRate
-
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [

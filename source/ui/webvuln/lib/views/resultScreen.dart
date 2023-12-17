@@ -18,14 +18,16 @@ import 'package:webvuln/items/tables.dart';
 import 'package:webvuln/model/model.dart';
 import 'package:webvuln/views/variable.dart';
 
+// parse data function
+
 // TODO: parse data from loading screen to display on result screen
 class resultScreen extends StatefulWidget {
-  final List<dynamic> data;
+  final String data;
   const resultScreen({super.key, required this.data});
 
   @override
   State<resultScreen> createState() => _resultScreenState();
-  List<dynamic> get resultData => data;
+  String get resultData => data;
 }
 
 class RadioController extends GetxController {
@@ -48,7 +50,26 @@ class _resultScreenState extends State<resultScreen> {
     isAppeared = true;
   }
 
-  String selectedFolderPath = '';
+  Icon warnLevel(String severity) {
+    switch (severity) {
+      case 'High':
+        return const Icon(
+          Icons.warning_amber_sharp,
+          color: Colors.red,
+        );
+      case 'Medium':
+        return const Icon(
+          Icons.warning_amber_sharp,
+          color: Colors.yellow,
+        );
+      default:
+        return const Icon(
+          Icons.warning_amber_sharp,
+          color: Colors.blue,
+        );
+    }
+  }
+/*   String selectedFolderPath = '';
 
   Future<void> _pickFolder() async {
     String? directory = (await FilePicker.platform.getDirectoryPath());
@@ -58,15 +79,17 @@ class _resultScreenState extends State<resultScreen> {
         selectedFolderPath = directory;
       });
     }
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double borderRadiusValue = 20.0; // Adjust the radius as needed
     Get.testMode = true;
+    List<dynamic> results = jsonDecode(widget.resultData);
+    List<HistoryTableData> newData = [];
+    // parse vuln into List<Vulnerability>
     List<Vulnerability> listVuln = [];
-    for (var obj in widget.resultData) {
+    for (var obj in results) {
       List<dynamic> listVulnJSON = obj["vulnerabilities"];
       for (var vuln in listVulnJSON) {
         Vulnerability newVuln = Vulnerability(
@@ -77,6 +100,7 @@ class _resultScreenState extends State<resultScreen> {
         );
         listVuln.add(newVuln);
       }
+      // parse json into HistoryTableData
       HistoryTableData newVuln = HistoryTableData(
           domain: obj["domain"].toString(),
           numVuln: obj["numVuln"],
@@ -85,16 +109,16 @@ class _resultScreenState extends State<resultScreen> {
           resultSeverity: obj["resultSeverity"].toString(),
           vuln: listVuln,
           scanDate: obj["scanDate"].toString());
-      results.add(obj);
+      newData.add(newVuln);
     }
-    List<DataRow> dataRows = results
+    List<DataRow> dataRows = newData
         .map((e) => DataRow(cells: [
+              DataCell(warnLevel(e.resultSeverity)),
               DataCell(Text(e.domain)),
-              DataCell(Text(e.scanDate)),
-              DataCell(Text(e.resultSeverity)),
-              DataCell(Text(e.resultPoint.toString())),
+              DataCell(Text(e.vuln[0].type)), // TODO: parse based on type
               DataCell(Text(e.numVuln.toString())),
-              DataCell(Text(e.id)),
+              DataCell(Text(e.resultPoint.toString())),
+              DataCell(Text(e.scanDate)),
             ]))
         .toList();
     //String severityPoint = json["resultPoint"].toString();
@@ -116,7 +140,7 @@ class _resultScreenState extends State<resultScreen> {
       }
     }
 
-    void showDownloadSuccessSnackbar(BuildContext context) {
+/*     void showDownloadSuccessSnackbar(BuildContext context) {
       final snackBar = SnackBar(
         content: Text('Download Successful'),
         duration: Duration(seconds: 3),
@@ -129,9 +153,81 @@ class _resultScreenState extends State<resultScreen> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
+    } */
 
     return Scaffold(
+        backgroundColor: const Color(0xFFF0F0F0),
+        body: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // dropdown
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Container(
+                  margin: const EdgeInsetsDirectional.only(start: 40, top: 10),
+                  child: Text("SCAN RESULT",
+                      style: GoogleFonts.montserrat(
+                          fontSize: 24, fontWeight: FontWeight.bold)),
+                ),
+                Container(
+                  margin: const EdgeInsetsDirectional.only(end: 40),
+                  width: 200,
+                  height: 40,
+                  child: DropdownButtonFormField<String>(
+                      focusColor: const Color(0xFFF0F0F0),
+                      icon: const Icon(Icons.arrow_drop_down),
+                      dropdownColor: Colors.white,
+                      //value: state,
+                      items: const [
+                        DropdownMenuItem(
+                            value: '/normalPost',
+                            child: Text('Normal Resource')),
+                        DropdownMenuItem(
+                            value: '/filePost', child: Text('File Resource'))
+                      ],
+                      onSaved: (v) {
+                        setState(() {
+                          //state = v!;
+                        });
+                      },
+                      onChanged: (v) {
+                        setState(() {
+                          //state = v!;
+                        });
+                      }),
+                ),
+              ]),
+              const Divider(
+                  color: Colors.black,
+                  thickness: 0.2,
+                  indent: 40,
+                  endIndent: 40),
+              container(screenWidth,
+                  child: DataTable2(columns: const [
+                    DataColumn2(
+                        label: Text('Severity'),
+                        tooltip: 'Blue - Low, Yellow - Medium, Red - High',
+                        fixedWidth: 100),
+                    DataColumn2(
+                        label: Text('Domain'),
+                        tooltip: 'Domain of website',
+                        fixedWidth: 400),
+                    DataColumn2(
+                      label: Text('Type'),
+                      tooltip: 'Type of vulnerability',
+                      fixedWidth: 200,
+                    ),
+                    DataColumn2(
+                        label: Text('Number of Vulnerabilities'),
+                        size: ColumnSize.S),
+                    DataColumn2(
+                      label: Text('Severity Point'),
+                      fixedWidth: 200,
+                    ),
+                    DataColumn2(label: Text('Scan Date'), size: ColumnSize.S),
+                  ], rows: dataRows)),
+            ]));
+    /* return Scaffold(
       appBar: AppBar(
         leading: GradientButton(
           borderRadius: BorderRadius.all(Radius.circular(borderRadiusValue)),
@@ -268,8 +364,8 @@ class _resultScreenState extends State<resultScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Visibility(
-                  visible: isHide(json),
+                /* Visibility(
+                  //visible: isHide(json),
                   child: CustomDropdownButton(
                       selectedItem: selectedModule,
                       items: error,
@@ -308,7 +404,7 @@ class _resultScreenState extends State<resultScreen> {
                           default:
                         }
                       }),
-                ),
+                ), */
                 /* Table list errors*/
                 container(screenWidth,
                     child: Column(
@@ -324,10 +420,11 @@ class _resultScreenState extends State<resultScreen> {
                               style: GoogleFonts.montserrat(
                                   fontSize: 24, fontWeight: FontWeight.bold)),
                         ),
+                        // datatable
                         DataTable2(columns: const [
                           DataColumn(
                             label: Row(
-                              children: [Text('Serverity')],
+                              children: [Text('Severity')],
                             ),
                           ),
                           DataColumn(
@@ -391,24 +488,23 @@ class _resultScreenState extends State<resultScreen> {
           ),
         ),
       ),
-    );
+    ); */
   }
 
   Container container(double screenWidth, {required Widget child}) {
     return Container(
         width: screenWidth,
         height: 550,
-        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+        margin: const EdgeInsetsDirectional.only(start: 40, end: 40),
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          boxShadow: [
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
             BoxShadow(
               color: Colors.black38,
-              offset: Offset(0, 4),
-              blurRadius: 10,
-              spreadRadius: 1,
+              blurRadius: 15,
+              spreadRadius: -7,
             )
           ],
         ),
