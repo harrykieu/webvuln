@@ -27,7 +27,7 @@ class GradientButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = this.borderRadius ?? BorderRadius.circular(0);
+    final borderRadius = this.borderRadius ?? BorderRadius.circular(20);
     final horizontalMargin = this.horizontalMargin ?? 10.0;
     final verticalMargin = this.verticalMargin ?? 20.0;
     return Container(

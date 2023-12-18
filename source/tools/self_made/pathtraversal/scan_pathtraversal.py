@@ -1,8 +1,10 @@
-import requests
+import json
 import re
 import urllib.parse
+
+import requests
+
 import source.core.utils as utils
-import json
 
 
 class PathTraversal:
@@ -56,7 +58,8 @@ class PathTraversal:
                     res = requests.get(newUrl)
                     if re.search(rb"root:x:0:0", res.content):
                         print(
-                            "[+] Path Traversal vulnerability detected, link:", newUrl)
+                            "[+] Path Traversal vulnerability detected, link:", newUrl
+                        )
                         utils.log(
                             f"[PathTraversal] Path Traversal vulnerability detected, link: {newUrl}",
                             "INFO",

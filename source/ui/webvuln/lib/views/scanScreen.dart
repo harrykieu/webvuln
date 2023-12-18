@@ -1,16 +1,14 @@
 // ignore_for_file: file_names, camel_case_types
 
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:webvuln/items/newSubmitButton.dart';
 import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/loadingScreen.dart';
 import 'package:webvuln/views/variable.dart';
-
 import '../items/input.dart';
-import '../items/submitButton.dart';
 
 class scanScreen extends StatefulWidget {
   const scanScreen({super.key});
@@ -38,21 +36,6 @@ class _scanScreenState extends State<scanScreen> {
   bool _isVisibled = false;
   int _numberModule = 0;
   String dataReceive = '';
-  void checkNumberSelected() {
-    switch (Constants.valueSelected.length) {
-      case 0:
-        break;
-      case 1:
-        setState(() {
-          _isVisibled = true;
-        });
-      case 2:
-        setState(() {
-          _isVisibled = true;
-        });
-      default:
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,15 +69,9 @@ class _scanScreenState extends State<scanScreen> {
             width: double.infinity,
             height: 100,
             decoration: const BoxDecoration(color: Colors.transparent),
-            child:
-                // Constants.buildInputUser(
-                //   controller: urlController,
-                //    hintName: 'Paste URL here',
-                //    underIcon:const Padding(padding: EdgeInsets.all(10),child: Image(image: AssetImage('lib/assets/suffixIcon.png')),),
-                // )
-                inputUser(
+            child: inputUser(
               controller: urlController,
-              hintName: 'Paste URL here',
+              hintName: 'Paste URL here...',
               underIcon: const Padding(
                   padding: EdgeInsets.all(10),
                   child: Image(image: AssetImage('lib/assets/suffixIcon.png'))),
@@ -120,32 +97,36 @@ class _scanScreenState extends State<scanScreen> {
         ),
 
         //Button Scan URL
-        submitButton(
-          onPressed: () {
-            // String result = postURL(nameURL: urlController.text, moduleNumber: Constants.valueSelected) as String;
-            Get.to(const loadingScreen());
-            if (postURL(
-                            nameURL: urlController.text,
-                            moduleNumber: Constants.valueSelected)
-                        .toString() ==
-                    "Failed post data" ||
-                postURL(
-                            nameURL: urlController.text,
-                            moduleNumber: Constants.valueSelected)
-                        .toString() ==
-                    "Error") {
-              setState(() {
-                Constants.contentChild =
-                    const CircularProgressIndicator.adaptive(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                );
-              });
-            } else {
+        GradientButton(
+            onPressed: () async {
               Get.to(const loadingScreen());
-            }
-          },
-          childButton: contentChild,
-        ),
+              List<String> listURL = [];
+              listURL.add(urlController.text);
+              postURL(
+                nameURL: listURL,
+                moduleNumber: Constants.valueSelected,
+              ).then((result) {
+                if (result == "Failed post data") {
+                  setState(() {
+                    Constants.contentChild =
+                        const CircularProgressIndicator.adaptive(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    );
+                  });
+                } else {
+                  Get.to(const loadingScreen());
+                }
+              }).catchError((error) {
+                print(error);
+              });
+            },
+            child: Text(
+              'Scan',
+              style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ))
       ],
     );
   }
@@ -169,12 +150,12 @@ class _scanScreenState extends State<scanScreen> {
                     return Row(
                       children: [
                         Checkbox(
+                          activeColor: const Color.fromARGB(255, 11, 58, 96),
                           value: Constants.valueCheckbox[index],
                           onChanged: (value) {
                             setState(() {
                               Constants.valueCheckbox[index] = value!;
                               _numberModule = index;
-                              _isVisibled = false;
                               if (value) {
                                 Constants.valueSelected
                                     .add(Constants.nameModule[index]);
@@ -182,7 +163,12 @@ class _scanScreenState extends State<scanScreen> {
                                 Constants.valueSelected
                                     .remove(Constants.nameModule[index]);
                               }
-                              checkNumberSelected();
+                              if (Constants.valueSelected.length == 0) {
+                                _isVisibled = false;
+                              } else {
+                                _isVisibled = true;
+                              }
+                              print(_numberModule);
                               print(Constants.valueSelected);
                             });
                           },
@@ -222,22 +208,16 @@ class _scanScreenState extends State<scanScreen> {
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  visibleBox()
+                  Visibility(
+                    visible: _isVisibled,
+                    child: ListTile(
+                      title: Text(Constants.content[_numberModule]),
+                    ),
+                  )
                 ],
               ),
             ))
       ],
-    );
-  }
-
-  Visibility visibleBox() => Visibility(
-        visible: _isVisibled,
-        child: method_description_module(),
-      );
-
-  ListTile method_description_module() {
-    return ListTile(
-      title: Text(Constants.content[_numberModule]),
     );
   }
 }

@@ -2,19 +2,19 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
-import pymongo
 
+import pymongo
 import requests
-from source.core.database.dbutils import DatabaseUtils
+
 import source.core.utils as utils
+from source.core.calSeverity import calculateWebsiteSafetyRate
+from source.core.database.dbutils import DatabaseUtils
 from source.tools.self_made.fileupload.scan_fileupload import FileUpload
-from source.tools.self_made.pathtraversal.scan_pathtraversal import PathTraversal
+from source.tools.self_made.idor.scan_idor import IDOR
 from source.tools.self_made.lfi.scan_lfi import LFI
+from source.tools.self_made.pathtraversal.scan_pathtraversal import PathTraversal
 from source.tools.self_made.sqli.scan_sqli import SQLi
 from source.tools.self_made.xss.scan_xss import XSS
-from source.tools.self_made.idor.scan_idor import IDOR
-from source.core.calSeverity import calculateWebsiteSafetyRate
-
 
 ROOTPATH = Path(__file__).parent.parent.parent
 MODULES = [
@@ -54,15 +54,19 @@ class WebVuln:
             try:
                 utils.log(f"/api/result: Sending data to Flask: {data}", "INFO")
                 if self.__debug:
-                    print(f"{self.blue}/api/result: Sending data to Flask: {data}")
+                    print(
+                        f"{self.blue}/api/result: Sending data to Flask: {data}{self.white}"
+                    )
                 requests.post(
-                    url="http://localhost:5000/api/result",
+                    url="http://127.0.0.1:5000/api/result",
                     data=data,
                     headers={"Content-Type": "application/json", "Origin": "backend"},
                 )
             except Exception as e:
                 if self.__debug:
-                    print(f"{self.red}[backend.py-sendResultFlask] Error: {e}")
+                    print(
+                        f"{self.red}[backend.py-sendResultFlask] Error: {e}{self.white}"
+                    )
                 utils.log(f"[backend.py-sendResultFlask] Error: {e}", "ERROR")
                 return "Failed"
             return "Success"
@@ -377,7 +381,6 @@ class WebVuln:
             utils.log(f"[backend.py-scanURL] Error: {e}", "ERROR")
             raise e
         return json.dumps(result, default=str)
-        # return "Success"
 
     def resourceHandler(self, method, data) -> str | list:
         """Handle the resources.

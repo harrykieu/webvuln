@@ -1,51 +1,83 @@
+// ignore_for_file: file_names
+
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
-import 'package:preload_page_view/preload_page_view.dart';
+import 'package:get/get.dart';
 import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/resultScreen.dart';
-import 'package:webvuln/views/scanScreen.dart';
 
-class loadingScreen extends StatelessWidget {
+class loadingScreen extends StatefulWidget {
   const loadingScreen({super.key});
-  Future<String> fetchData() async {
-    // postURL(nameURL: nameURL, moduleNumber: moduleNumber)
-    await Future.delayed(const Duration(seconds: 2));
-    return "Success";
+
+  @override
+  _loadingScreenState createState() => _loadingScreenState();
+}
+
+class _loadingScreenState extends State<loadingScreen> {
+  late Future<String?> serverResponse;
+  late WebVulnSocket socket;
+
+  @override
+  void initState() {
+    super.initState();
+    socket = WebVulnSocket(url: '0.0.0.0', port: 5001);
+    serverResponse = _initializeSocket();
   }
 
-  /* void listen() async {
-    await ServerSocket.bind("0.0.0.0", 5001).then((ServerSocket server) {
-      print('Server listening on ${server.address}:${server.port}');
-      server.listen((Socket server) {
-        server.listen((data) {
-          String serverResponse = String.fromCharCodes(data);
-          setState(() {
-            dataReceive = serverResponse;
-            print(dataReceive);
-          });
-        });
-      }, onError: (error) => print(error), onDone: () => print('done'));
-    });
-  } */
+  Future<String?> _initializeSocket() async {
+    _closeExistingSocket();
+    try {
+      if (await socket.create()) {
+        final data = await socket.listen();
+        return data;
+      } else {
+        // Handle the case where server initialization fails
+        print('Error: Server not initialized');
+        return null;
+      }
+    } catch (error) {
+      // Handle errors during socket communication
+      print('Error during socket communication: $error');
+      return null;
+    }
+  }
+
+  void _closeExistingSocket() {
+    if (socket.server != null) {
+      socket.close();
+    }
+  }
+
+  String extractJson(String response) {
+    // Find the index of '{"result":'
+    int startIndex = response.indexOf('[', response.indexOf('"result"'));
+    int endIndex = response.lastIndexOf(']');
+    // TODO: Handle properly the case where more than 1 result is returned
+    // Extract the substring starting from '{"result":'
+    String resultData = response.substring(startIndex, endIndex + 1);
+    return resultData;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: FutureBuilder(
-          future: fetchData(),
+        child: FutureBuilder<String?>(
+          future: serverResponse,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Container(
+              return const SizedBox(
                 width: 200,
                 height: 200,
                 child: CircularProgressIndicator(),
               );
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
+            } else if (snapshot.hasError || snapshot.data == null) {
+              return Text('Error: ${snapshot.error ?? "Unknown error"}');
             } else {
-              return resultScreen();
+              String? snapData = snapshot.data;
+              return resultScreen(data: extractJson(snapData!));
             }
           },
         ),
