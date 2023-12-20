@@ -8,13 +8,13 @@ class ReportGenerator:
         self.scan_results = scan_results
         self.file_path = file_path
 
-    def generate_json(self):
+    def generateJson(self):
         file_name = os.path.join(self.file_path, 'report.json')
         with open(file_name, 'w') as f:
             json.dump(self.scan_results, f, indent=4)
         return "Success"
 
-    def generate_xml(self):
+    def generateXml(self):
         root = ET.Element('scan_results')
         for result in self.scan_results:
             domain = ET.SubElement(root, 'domain')
@@ -35,7 +35,7 @@ class ReportGenerator:
         
         return "Success"
 
-    def generate_pdf(self):    
+    def generatePdf(self):    
         pdf_content = '''
         <!DOCTYPE html>
         <html>
