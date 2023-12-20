@@ -14,7 +14,7 @@ backend.setDebug(True)
 # Note: the Content-Type header must be set to `application/json` for the request to be parsed correctly.f
 # Note: the Origin header must be set to match the sender's origin ('backend' or 'frontend').
 
-# TODO: API to request create report
+# API to request create report
 # requirement: origin header = frontend
 # request body: json object with the following properties:
 # - `result`: result of the scan
@@ -46,9 +46,8 @@ def report():
             utils.log("/api/report: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if "result" in keys and "type" in keys and len(keys) == 2:
+    if "result" in keys and "reportType" in keys and "path" in keys and len(keys) == 2:
         try:
-            backend.handleReportGeneration(data["result"], data["reportType"])
             if app.debug:
                 utils.log(f"/api/report: Successfully received data: {data}", "INFO")
             backend.recvFlask("/api/report", "POST", data)

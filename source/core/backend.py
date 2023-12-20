@@ -2,6 +2,7 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
+from source.core.export import ReportGenerator
 
 import pymongo
 import requests
@@ -88,6 +89,8 @@ class WebVuln:
             return self.fileHandler(method, jsonData)
         elif route == "/api/scan":
             return self.scanURL(jsonData["urls"], jsonData["modules"])
+        elif route == "/api/report":
+            return self.handleReportGeneration(jsonData["result"], jsonData["path"], jsonData["reportType"])
         else:
             utils.log(f"[backend.py-recvFlask] Error: Invalid route {route}", "ERROR")
             if self.__debug:
@@ -698,14 +701,21 @@ class WebVuln:
                     print("[backend.py-getScanResult] Error: Invalid JSON object")
                 return "Failed"
 
-    def handleReportGeneration(self, data):
-        result = data.get("result")
-        reportType = data.get("reportType")
+    def handleReportGeneration(data):
+        try:
+            scanResult = data["result"]
+            reportType = data["reportType"]
+            filePath = data["path"]
 
-        if reportType == "json":
-            self.generate_json_report(result)
-        elif reportType == "xml":
-            self.generateXMLReport("/path/to/save/report.xml")
-        elif reportType == "pdf":
-            self.generatePDFReport()
+            generateReport = ReportGenerator(scanResult, filePath)
+            if reportType == "json":
+                generateReport.generate_json()
+            elif reportType == "xml":
+                generateReport.generate_xml()
+            elif reportType == "pdf":
+                generateReport.generate_pdf()
+            return "Success"  
+        except Exception as e:
+            utils.log(f"[backend.py-handleReportGeneration] Error: {str(e)}", "ERROR")
+            return "Failed"   
 
