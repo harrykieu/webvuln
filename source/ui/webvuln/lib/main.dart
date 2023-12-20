@@ -79,8 +79,8 @@ class _mainScreenState extends State<mainScreen> {
                             _selectedIndex = 1;
                           });
                         },
-                        icon: 'lib/assets/result.png',
-                        name: 'Result'),
+                        icon: 'lib/assets/history.png',
+                        name: 'History'),
                     const SizedBox(
                       height: 20,
                     ),
@@ -90,8 +90,8 @@ class _mainScreenState extends State<mainScreen> {
                             _selectedIndex = 2;
                           });
                         },
-                        icon: 'lib/assets/history.png',
-                        name: 'History'),
+                        icon: 'lib/assets/resources.png',
+                        name: 'Resources'),
                     const SizedBox(
                       height: 20,
                     ),
@@ -101,11 +101,11 @@ class _mainScreenState extends State<mainScreen> {
                             _selectedIndex = 3;
                           });
                         },
-                        icon: 'lib/assets/resources.png',
-                        name: 'Resources'),
+                        icon: 'lib/assets/settings.png',
+                        name: 'Settings'),
                     const SizedBox(
                       height: 20,
-                    )
+                    ),
                   ],
                 )),
             // Gradient background

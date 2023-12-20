@@ -190,15 +190,22 @@ class _resourceScreenState extends State<resourceScreen> {
             children: [
               Container(
                 margin: const EdgeInsetsDirectional.only(start: 40, top: 10),
-                child: Text("RESOURCE TYPE",
+                child: Text("RESOURCE MANAGEMENT",
                     style: GoogleFonts.montserrat(
                         fontSize: 24, fontWeight: FontWeight.bold)),
               ),
               Container(
                 margin: const EdgeInsetsDirectional.only(end: 40),
-                width: 200,
+                width: 250,
                 height: 40,
                 child: DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      icon: Icon(Icons.type_specimen_outlined, size: 30),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          borderSide: BorderSide(color: Colors.black12)),
+                      contentPadding: EdgeInsetsDirectional.only(start: 15),
+                    ),
                     focusColor: const Color(0xFFF0F0F0),
                     icon: const Icon(Icons.arrow_drop_down),
                     dropdownColor: Colors.white,
