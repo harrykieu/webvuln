@@ -26,7 +26,7 @@ class _resultScreenState extends State<resultScreen> {
   bool isVisibled = true;
   bool isAppeared = true;
   String state = 'All';
-  List<HistoryTableData> results = [];
+  List<HistoryTableData> jsonDecoded = [];
 
   @override
   void initState() {
@@ -57,11 +57,11 @@ class _resultScreenState extends State<resultScreen> {
 
   // FIXME: updateTable function is not working
   // function to parse data to table based on the selected module
-  List<DataRow> updateTable(String vulnType, List<HistoryTableData> data) {
-    List<HistoryTableData> newData = [];
+  List<DataRow> updateTable(String vulnType, List<Vulnerability> data) {
+    List<Vulnerability> newData = [];
     if (vulnType != 'All') {
       for (var obj in data) {
-        if (obj.vuln.any((element) => element.type == vulnType)) {
+        if (obj.type == vulnType) {
           newData.add(obj);
         }
       }
@@ -70,12 +70,9 @@ class _resultScreenState extends State<resultScreen> {
     }
     List<DataRow> dataRows = newData
         .map((e) => DataRow(cells: [
-              DataCell(warnLevel(e.resultSeverity)),
-              DataCell(Text(e.domain)),
-              DataCell(Text(e.vuln[0].type)),
-              DataCell(Text(e.numVuln.toString())),
-              DataCell(Text(e.resultPoint.toString())),
-              DataCell(Text(e.scanDate)),
+              DataCell(warnLevel(e.severity)),
+              DataCell(Text(e.type)),
+              DataCell(Text(e.payload.toString())),
             ]))
         .toList();
     return dataRows;
@@ -88,13 +85,12 @@ class _resultScreenState extends State<resultScreen> {
     Get.testMode = true;
     List<DropdownMenuItem<String>> dropdownValue = [
       const DropdownMenuItem(value: 'All', child: Text('All'))
-      // add more dropdown item at the code below
     ];
-    List<dynamic> results = jsonDecode(widget.resultData);
+    List<dynamic> jsonDecoded = jsonDecode(widget.resultData);
     List<HistoryTableData> dataBeforeParse = [];
     // parse vuln into List<Vulnerability>
     List<Vulnerability> listVuln = [];
-    for (var obj in results) {
+    for (var obj in jsonDecoded) {
       List<dynamic> listVulnJSON = obj["vulnerabilities"];
       for (var vuln in listVulnJSON) {
         Vulnerability newVuln = Vulnerability(
@@ -190,30 +186,79 @@ class _resultScreenState extends State<resultScreen> {
                   thickness: 0.2,
                   indent: 40,
                   endIndent: 40),
-              container(screenWidth, screenHeight / 2,
-                  child: DataTable2(columns: const [
-                    DataColumn2(
-                        label: Text('Severity'),
-                        tooltip: 'Blue - Low, Yellow - Medium, Red - High',
-                        fixedWidth: 100),
-                    DataColumn2(
-                        label: Text('Domain'),
-                        tooltip: 'Domain of website',
-                        fixedWidth: 400),
-                    DataColumn2(
-                      label: Text('Type'),
-                      tooltip: 'Type of vulnerability',
-                      fixedWidth: 200,
+              Container(
+                height: screenHeight / 2,
+                width: screenWidth,
+                margin: const EdgeInsetsDirectional.only(
+                    start: 40, end: 40, top: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black38,
+                      blurRadius: 15,
+                      spreadRadius: -7,
+                    )
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: const EdgeInsetsDirectional.only(
+                          top: 20, start: 40, end: 40),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(
+                            'Domain: ${dataBeforeParse[0].domain}',
+                            style: GoogleFonts.montserrat(
+                                fontSize: 24, fontWeight: FontWeight.normal),
+                          ),
+                          const Spacer(),
+                          Text(
+                            'Result Point: ${dataBeforeParse[0].resultPoint}',
+                            style: GoogleFonts.montserrat(
+                                fontSize: 24, fontWeight: FontWeight.normal),
+                          )
+                        ],
+                      ),
                     ),
-                    DataColumn2(
-                        label: Text('Number of Vulnerabilities'),
-                        size: ColumnSize.S),
-                    DataColumn2(
-                      label: Text('Severity Point'),
-                      fixedWidth: 200,
+                    Container(
+                      width: screenWidth,
+                      height: screenHeight / 2 - 100,
+                      margin: const EdgeInsetsDirectional.only(
+                          start: 40, end: 40, top: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo[200],
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black38,
+                            blurRadius: 15,
+                            spreadRadius: -7,
+                          )
+                        ],
+                      ),
+                      child: DataTable2(columns: const [
+                        DataColumn2(
+                          label: Text('Severity'),
+                          tooltip: 'Blue - Low, Yellow - Medium, Red - High',
+                        ),
+                        DataColumn2(
+                          label: Text('Type'),
+                          tooltip: 'Type of vulnerability',
+                        ),
+                        DataColumn2(
+                          label: Text('Payloads used'),
+                          tooltip: 'Payloads used to get the result',
+                        ),
+                      ], rows: updateTable(state, listVuln)),
                     ),
-                    DataColumn2(label: Text('Scan Date'), size: ColumnSize.S),
-                  ], rows: updateTable(state, dataBeforeParse))),
+                  ],
+                ),
+              ),
               Container(
                   width: screenWidth,
                   height: screenHeight / 2 - 150,
