@@ -5,7 +5,7 @@ def calculateWebsiteSafetyRate(websiteVulns):
     """
     # Define the CVSS scores for each vulnerability
     vulnerabilities = {
-        "SQLI": 8.6,
+        "SQLi": 8.6,
         "XSS": 6.1,
         "LFI": 8.6,
         "Path Traversal": 5.8,

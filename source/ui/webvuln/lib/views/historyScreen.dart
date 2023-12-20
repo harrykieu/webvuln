@@ -218,7 +218,7 @@ class _historyScreenState extends State<historyScreen> {
                     }
                     List<dynamic> jsonD = jsonDecode(resp);
                     List<HistoryTableData> newData = jsonD
-                        .map((json) => HistoryTableData.fromJson(json))
+                        .map((json) => HistoryTableData.fromJsonHistory(json))
                         .toList();
                     updateTable(newData, context);
                   },
