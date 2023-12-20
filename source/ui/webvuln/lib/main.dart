@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:webvuln/views/historyScreen.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
-import 'package:webvuln/views/resultScreen.dart';
 import 'package:webvuln/views/scanScreen.dart';
 import 'package:webvuln/views/settingScreen.dart';
 
@@ -44,6 +43,7 @@ class _mainScreenState extends State<mainScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
     Get.testMode = true;
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         drawerEnableOpenDragGesture: false,
         backgroundColor: const Color(0xFF03112e),
@@ -79,8 +79,8 @@ class _mainScreenState extends State<mainScreen> {
                             _selectedIndex = 1;
                           });
                         },
-                        icon: 'lib/assets/result.png',
-                        name: 'Result'),
+                        icon: 'lib/assets/history.png',
+                        name: 'History'),
                     const SizedBox(
                       height: 20,
                     ),
@@ -90,8 +90,8 @@ class _mainScreenState extends State<mainScreen> {
                             _selectedIndex = 2;
                           });
                         },
-                        icon: 'lib/assets/history.png',
-                        name: 'History'),
+                        icon: 'lib/assets/resources.png',
+                        name: 'Resources'),
                     const SizedBox(
                       height: 20,
                     ),
@@ -101,8 +101,8 @@ class _mainScreenState extends State<mainScreen> {
                             _selectedIndex = 3;
                           });
                         },
-                        icon: 'lib/assets/resources.png',
-                        name: 'Resources'),
+                        icon: 'lib/assets/settings.png',
+                        name: 'Settings'),
                     const SizedBox(
                       height: 20,
                     )

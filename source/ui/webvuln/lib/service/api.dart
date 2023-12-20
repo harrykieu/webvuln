@@ -81,11 +81,15 @@ Future<String> postURL(
   final url = '$baseUrl/api/scan';
   try {
     final response = await dio.post(url, data: data, options: _options);
-    if (response.statusCode == 200) {
-      print('Sucessfully post data');
-      return "Data posted successfull";
-    } else {
-      return "Failed post data";
+    switch (response.statusCode) {
+      case 200:
+        return "post data success";
+      case 400:
+        return "Not found data";
+      case 500:
+        return "Connection crasshed";
+      default:
+        return 'None';
     }
   } catch (e) {
     print(ContentType.json);

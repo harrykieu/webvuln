@@ -118,23 +118,6 @@ class CustomDataTable extends StatelessWidget {
 
 class TableAll extends StatelessWidget {
   String dataTable;
-  Map<String, dynamic> data_example = {
-    "domain": "http://localhost:12001",
-    "scanDate": "2023-12-14 11:41:02.643412",
-    "numVuln": 1,
-    "vulnerabilities": [
-      {
-        "type": "File Upload",
-        "logs":
-            "2023-12-14 11:41:02.744968+07:00 [INFO] Log file created 2023-12-14 11:41:02.746392+07:00 [INFO] [FileUpload] Checking the domain http://localhost:12001... 2023-12-14 11:41:02.854807+07:00 [INFO] [FileUpload] URL is valid for file upload!!2023-12-14 11:41:02.855835+07:00 [INFO] [FileUpload] Uploading valid files...2023-12-14 11:41:02.899983+07:00 [INFO] [FileUpload] Signature found: 'Successfully uploaded file at: '2023-12-14 11:41:02.902138+07:00 [INFO] [FileUpload] Signature found: 'View all uploaded file at: '2023-12-14 11:41:02.903153+07:00 [INFO] [FileUpload] Valid file upload success!2023-12-14 11:41:02.905157+07:00 [INFO] [FileUpload] Uploading invalid files with valid extension...2023-12-14 11:41:02.972636+07:00 [INFO] [FileUpload] Signature found: 'Successfully uploaded file at: '2023-12-14 11:41:02.973621+07:00 [INFO] [FileUpload] Signature found: 'View all uploaded file at: '2023-12-14 11:41:02.974546+07:00 [INFO] [FileUpload] Invalid file with valid extension upload success!2023-12-14 11:41:02.975545+07:00 [INFO] [FileUpload] File upload vulnerability found!2023-12-14 11:41:02.976653+07:00 [INFO] [FileUpload] File upload scan completed!2023-12-14 11:41:02.977668+07:00 [INFO] [FileUpload] Payloads used: ['validex.jpg']",
-        "payload": ["validex.jpg"],
-        "severity": "High"
-      }
-    ],
-    "resultPoint": 100.0,
-    "resultSeverity": "None",
-    "_id": "657a875e2a14a2a2a5a95d07"
-  };
   TableAll({super.key, required this.dataTable});
   // ignore: non_constant_identifier_names
 
@@ -143,11 +126,11 @@ class TableAll extends StatelessWidget {
     Map<String, dynamic> dataVuln1 = jsonDecode(dataTable);
     List<Map<String, dynamic>> dataVulnList =
         List<Map<String, dynamic>>.from(dataVuln1["vulnerabilities"]);
-
+  
     if (dataVulnList.isEmpty) {
-      return Text('None vulnerabilities');
+      return Text("This website haven't vulnerabilities",style: GoogleFonts.montserrat(fontSize: 30,fontWeight: FontWeight.normal),);
     }
-    
+
     Map<String, dynamic> dataVuln = dataVulnList[0];
 
     String type(data) {
@@ -165,8 +148,10 @@ class TableAll extends StatelessWidget {
           return 1;
         case 1:
           return 1;
-        case > 1:
-          return data['numVuln'];
+        case 2:
+          return 2;
+        case 3:
+          return 3;
         default:
           return 1;
       }
@@ -192,14 +177,16 @@ class TableAll extends StatelessWidget {
       }
     }
 
-    List<DataRow> duplicatedRows =
-        List.generate(numVuln(dataVuln1), (index) {
+    List<DataRow> duplicatedRows = List.generate(numVuln(dataVuln), (index) {
       return DataRow(cells: [
         DataCell(icon_warning(dataVuln)),
-        DataCell(Text(type(dataVuln1), style: text_style_normal)),
+
+        DataCell(Text(type(dataVuln), style: text_style_normal)),
+        //using current data
         DataCell(Text(dataVuln["severity"].toString(), style: text_style_code)),
+        //using origin data
         DataCell(
-            Text(dataVuln["scanDate"].toString(), style: text_style_code)),
+            Text(dataVuln1["scanDate"].toString(), style: text_style_code)),
       ]);
     });
 
@@ -222,10 +209,19 @@ class TableAll extends StatelessWidget {
 }
 
 class TableXSS extends StatelessWidget {
-  const TableXSS({super.key});
+  String data;
+  TableXSS({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
+    Map<String, dynamic> dataXSS = jsonDecode(data);
+    List<Map<String, dynamic>> dataXSSList =
+        List<Map<String, dynamic>>.from(dataXSS["vulnerabilities"]);
+    
+    Map<String,dynamic> jsonXSS = dataXSSList[0];
+    if (dataXSSList.isEmpty) {
+      return const Text('None vulnerabilities');
+    }
     return CustomDataTable(
       rows: [
         DataRow(cells: [
