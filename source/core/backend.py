@@ -1,5 +1,6 @@
 import json
 import os
+import platform
 from datetime import datetime
 from pathlib import Path
 
@@ -38,6 +39,12 @@ class WebVuln:
         self.white = "\033[0m"  # White color code for text output
         self.green = "\033[32m"  # Green color code for text output
         self.blue = "\033[94m"  # Light blue color code for text output
+        if platform.system() == "Windows":
+            logFolder = "\\logs"
+        else:
+            logFolder = "/logs"
+        if not os.path.exists(f"{ROOTPATH}{logFolder}"):
+            os.mkdir(f"{ROOTPATH}{logFolder}")
 
     def setDebug(self, debug: bool) -> None:
         self.__debug = debug
@@ -45,7 +52,7 @@ class WebVuln:
     def getDebug(self) -> bool:
         return self.__debug
 
-    def sendResultFlask(self, data) -> str:
+    def __sendResultFlask(self, data) -> str:
         """Send data to Flask.
 
         :param data: JSON object"""
@@ -81,13 +88,13 @@ class WebVuln:
         if self.__debug:
             print(f"{self.blue}{method} {route}: {jsonData.keys()}{self.white}")
         if route == "/api/history":
-            return self.getScanResult(method, jsonData)
+            return self.__getScanResult(method, jsonData)
         elif route == "/api/resourcesnormal":
-            return self.resourceHandler(method, jsonData)
+            return self.__resourceHandler(method, jsonData)
         elif route == "/api/resourcesfile":
-            return self.fileHandler(method, jsonData)
+            return self.__fileHandler(method, jsonData)
         elif route == "/api/scan":
-            return self.scanURL(jsonData["urls"], jsonData["modules"])
+            return self.__scanURL(jsonData["urls"], jsonData["modules"])
         else:
             utils.log(f"[backend.py-recvFlask] Error: Invalid route {route}", "ERROR")
             if self.__debug:
@@ -96,7 +103,7 @@ class WebVuln:
                 )
             raise ValueError(f"Invalid route {route}")
 
-    def scanURL(self, urls, modules):
+    def __scanURL(self, urls, modules):
         """Scan the URLs.
 
         :param urls: List of URLs
@@ -122,6 +129,7 @@ class WebVuln:
         }
         ```
         """
+        # TODO: check for logs folder first
         # Remove all other log files
         for file in Path(f"{ROOTPATH}/logs").iterdir():
             if file.is_file() and file.name != "log.txt":
@@ -192,7 +200,7 @@ class WebVuln:
                 for module in modules:
                     if module == "lfi":
                         print("[+] Checking LFI vulnerability...")
-                        lfi_resources = self.resourceHandler(
+                        lfi_resources = self.__resourceHandler(
                             "GET", {"vulnType": "lfi", "resType": "payload"}
                         )
                         if lfi_resources == "Failed":
@@ -220,7 +228,7 @@ class WebVuln:
                             )
                     elif module == "sqli":
                         print("[+] Checking SQLi vulnerability...")
-                        sqli_resources = self.resourceHandler(
+                        sqli_resources = self.__resourceHandler(
                             "GET", {"vulnType": "sqli", "resType": "payload"}
                         )
                         if sqli_resources == "Failed":
@@ -249,7 +257,7 @@ class WebVuln:
                             )
                     elif module == "xss":
                         print("[+] Checking XSS vulnerability...")
-                        xss_resources = self.resourceHandler(
+                        xss_resources = self.__resourceHandler(
                             "GET", {"vulnType": "xss", "resType": "payload"}
                         )
                         if xss_resources == "Failed":
@@ -278,7 +286,7 @@ class WebVuln:
                             )
                     elif module == "fileupload":
                         print("[+] Checking file upload vulnerability...")
-                        resources = self.fileHandler("GET", {"description": ""})
+                        resources = self.__fileHandler("GET", {"description": ""})
                         if "dvwa" in url:
                             a = FileUpload(url, resources, isDVWA=True)
                         else:
@@ -310,10 +318,10 @@ class WebVuln:
                             )
                     elif module == "pathtraversal":
                         print("[+] Checking path traversal vulnerability...")
-                        pathTraversalParam = self.resourceHandler(
+                        pathTraversalParam = self.__resourceHandler(
                             "GET", {"vulnType": "pathTraversal", "resType": "parameter"}
                         )
-                        resources = self.resourceHandler(
+                        resources = self.__resourceHandler(
                             "GET", {"vulnType": "pathTraversal", "resType": "payload"}
                         )
                         if resources == "Failed":
@@ -367,7 +375,7 @@ class WebVuln:
                 raise e
         result = {"result": listResult}
         try:
-            self.sendResultFlask(json.dumps(result, default=str))
+            self.__sendResultFlask(json.dumps(result, default=str))
         except Exception as e:
             if self.__debug:
                 print(f"[backend.py-scanURL] Error: {e}")
@@ -375,7 +383,7 @@ class WebVuln:
             raise e
         return json.dumps(result, default=str)
 
-    def resourceHandler(self, method, data) -> str | list:
+    def __resourceHandler(self, method, data) -> str | list:
         """Handle the resources.
 
         :param method: `GET` or `POST`
@@ -523,7 +531,7 @@ class WebVuln:
                 )
                 return "Failed"
 
-    def fileHandler(self, method, data) -> str | list:
+    def __fileHandler(self, method, data) -> str | list:
         """Handle the file resources.
 
         :param method: `GET` or `POST`
@@ -641,7 +649,7 @@ class WebVuln:
                 )
                 return "Failed"
 
-    def getScanResult(self, method, data) -> str | list:
+    def __getScanResult(self, method, data) -> str | list:
         """Get all the scan results from the database.
 
         :param method: GET
@@ -682,6 +690,7 @@ class WebVuln:
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
+                print(listResult[0])
                 return json.dumps(listResult, default=str)
             else:
                 utils.log(

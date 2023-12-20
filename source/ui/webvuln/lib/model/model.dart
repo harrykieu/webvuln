@@ -70,10 +70,40 @@ class HistoryTableData {
     required this.scanDate,
   });
 
+  factory HistoryTableData.fromJsonHistory(dynamic json) {
+    List<Map<String, dynamic>> vulnListJson =
+        List<Map<String, dynamic>>.from(json['vulnerabilities']);
+    List<Vulnerability> vulnList = vulnListJson.map((vulnJson) {
+      List<String> payloadList = List<String>.from(vulnJson['payload']);
+      return Vulnerability(
+        type: vulnJson['type'],
+        logs: vulnJson['logs'],
+        payload: payloadList,
+        severity: vulnJson['severity'],
+      );
+    }).toList();
+
+    return HistoryTableData(
+      id: json['_id'],
+      domain: json['domain'],
+      numVuln: json['numVuln'],
+      vuln: vulnList,
+      resultSeverity: json['resultSeverity'],
+      resultPoint: json['resultPoint'].toDouble(),
+      scanDate: json['scanDate'],
+    );
+  }
+
   factory HistoryTableData.fromJson(Map<String, dynamic> json) {
-    List<Map<String, dynamic>> resultListJson =
-        List<Map<String, dynamic>>.from(json['result']);
-    Map<String, dynamic> resultData = resultListJson.first;
+    List<Map<String, dynamic>> resultListJson = [];
+    try {
+      resultListJson = List<Map<String, dynamic>>.from(json['result']);
+    } catch (e) {
+      // TODO: handle properly
+      throw Exception('No result found or invalid result in database');
+    }
+    Map<String, dynamic> resultData =
+        resultListJson.first; // TODO: fix this (why first?)
 
     List<Map<String, dynamic>> vulnListJson =
         List<Map<String, dynamic>>.from(resultData['vulnerabilities']);
