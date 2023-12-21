@@ -96,6 +96,8 @@ class WebVuln:
             return self.__fileHandler(method, jsonData)
         elif route == "/api/scan":
             return self.__scanURL(jsonData["urls"], jsonData["modules"])
+        elif route == "/api/report":
+            return self.__handleReportGeneration(jsonData)
         else:
             utils.log(f"[backend.py-recvFlask] Error: Invalid route {route}", "ERROR")
             if self.__debug:
@@ -130,8 +132,7 @@ class WebVuln:
         }
         ```
         """
-        # TODO: check for logs folder first
-        # Remove all other log files
+
         for file in Path(f"{ROOTPATH}/logs").iterdir():
             if file.is_file() and file.name != "log.txt":
                 os.remove(file)
@@ -708,13 +709,13 @@ class WebVuln:
                     print("[backend.py-getScanResult] Error: Invalid JSON object")
                 return "Failed"
 
-    def handleReportGeneration(data):
+    def __handleReportGeneration(self, data):
         try:
             scanResult = data["result"]
             reportType = data["reportType"]
-            filePath = data["path"]
+            
 
-            generateReport = ReportGenerator(scanResult, filePath)
+            generateReport = ReportGenerator(scanResult, f"{ROOTPATH}\\reports")
             if reportType == "json":
                 generateReport.generate_json()
             elif reportType == "xml":

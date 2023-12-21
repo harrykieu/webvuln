@@ -46,7 +46,7 @@ def report():
             utils.log("/api/report: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if "result" in keys and "reportType" in keys and "path" in keys and len(keys) == 2:
+    if "result" in keys and "reportType" in keys and len(keys) == 2:
         try:
             if app.debug:
                 utils.log(f"/api/report: Successfully received data: {data}", "INFO")
