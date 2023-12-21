@@ -37,7 +37,8 @@ A website vulnerability scanner for coders without any knowledge of web security
 
 ## Install for pdfkit-generate report as PDF
 https://github.com/JazzCore/python-pdfkit/wiki/Installing-wkhtmltopdf
-set path: for Window: https://youtube.com/watch?v=gb9e3m98avk
+
+- set path: for Window: https://youtube.com/watch?v=gb9e3m98avk
 
 
 ## How to run
