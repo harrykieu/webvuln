@@ -128,7 +128,7 @@ class TableAll extends StatelessWidget {
         List<Map<String, dynamic>>.from(dataVuln1["vulnerabilities"]);
   
     if (dataVulnList.isEmpty) {
-      return Text("This website haven't vulnerabilities",style: GoogleFonts.montserrat(fontSize: 30,fontWeight: FontWeight.normal),);
+      return const Text('No vulnerabilities');
     }
 
     Map<String, dynamic> dataVuln = dataVulnList[0];
@@ -136,7 +136,7 @@ class TableAll extends StatelessWidget {
     String type(data) {
       if (data["numVuln"] == 0) {
         print(dataTable);
-        return 'None vulnerabilities';
+        return 'No vulnerabilities';
       } else {
         return dataVuln["type"];
       }
@@ -177,16 +177,14 @@ class TableAll extends StatelessWidget {
       }
     }
 
-    List<DataRow> duplicatedRows = List.generate(numVuln(dataVuln), (index) {
+    List<DataRow> duplicatedRows = List.generate(numVuln(dataVuln1), (index) {
       return DataRow(cells: [
         DataCell(icon_warning(dataVuln)),
 
         DataCell(Text(type(dataVuln), style: text_style_normal)),
         //using current data
         DataCell(Text(dataVuln["severity"].toString(), style: text_style_code)),
-        //using origin data
-        DataCell(
-            Text(dataVuln1["scanDate"].toString(), style: text_style_code)),
+        DataCell(Text(dataVuln["scanDate"].toString(), style: text_style_code)),
       ]);
     });
 

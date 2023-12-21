@@ -95,17 +95,16 @@ class _scanScreenState extends State<scanScreen> {
         const SizedBox(
           height: 30,
         ),
-
         //Button Scan URL
         GradientButton(
             onPressed: () async {
               Get.to(const loadingScreen());
               List<String> listURL = [];
               listURL.add(urlController.text);
+              runShell(command_line: '');
               postURL(
                 nameURL: listURL,
                 moduleNumber: Constants.valueSelected,
-                
               ).then((result) {
                 if (result == "Failed post data") {
                   setState(() {

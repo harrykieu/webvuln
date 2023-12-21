@@ -105,7 +105,7 @@ class _mainScreenState extends State<mainScreen> {
                         name: 'Settings'),
                     const SizedBox(
                       height: 20,
-                    )
+                    ),
                   ],
                 )),
             // Gradient background

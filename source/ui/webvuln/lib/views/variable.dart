@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Constants {
+  final String directtoryDownload;
+  final String fuffLocation;
+  final String databaseIp;
+  Constants({required this.directtoryDownload,required this.fuffLocation,required this.databaseIp});
   static Widget contentChild = Text(
     'Scan',
     style: GoogleFonts.montserrat(
@@ -24,22 +28,26 @@ class Constants {
       ListTile(
         leading: Icon(Icons.bug_report_outlined),
         title: Text('Injection:'),
-        subtitle: Text('Description: Injection vulnerabilities occur when untrusted data is sent to an interpreter as part of a command or query, leading to unintended execution of commands.'),
+        subtitle: Text(
+            'Description: Injection vulnerabilities occur when untrusted data is sent to an interpreter as part of a command or query, leading to unintended execution of commands.'),
       ),
       ListTile(
         leading: Icon(Icons.bug_report_outlined),
         title: Text('Broken Authentication:'),
-        subtitle: Text('Description: This involves security flaws related to the authentication and session management functions, leading to unauthorized access and compromised user accounts.'),
+        subtitle: Text(
+            'Description: This involves security flaws related to the authentication and session management functions, leading to unauthorized access and compromised user accounts.'),
       ),
       ListTile(
         leading: Icon(Icons.bug_report_outlined),
         title: Text('Sensitive Data Exposure:'),
-        subtitle: Text('Description: In this scenario, applications fail to adequately protect sensitive information, leading to potential exposure of confidential data.'),
+        subtitle: Text(
+            'Description: In this scenario, applications fail to adequately protect sensitive information, leading to potential exposure of confidential data.'),
       ),
       ListTile(
         leading: Icon(Icons.bug_report_outlined),
         title: Text('XML External Entities (XXE):'),
-        subtitle: Text('Description: XXE vulnerabilities occur when an application parses XML input that can contain external entities with malicious content, leading to various attacks'),
+        subtitle: Text(
+            'Description: XXE vulnerabilities occur when an application parses XML input that can contain external entities with malicious content, leading to various attacks'),
       )
     ],
   );

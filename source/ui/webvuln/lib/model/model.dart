@@ -39,13 +39,13 @@ class History {
 
 class Vulnerability {
   final String type;
-  final String log;
+  final String logs;
   final List<String> payload;
   final String severity;
 
   Vulnerability({
     required this.type,
-    required this.log,
+    required this.logs,
     required this.payload,
     required this.severity,
   });
@@ -71,24 +71,30 @@ class HistoryTableData {
   });
 
   factory HistoryTableData.fromJson(Map<String, dynamic> json) {
-    List<dynamic> vulnListJson = json['vulnerabilities'];
+    List<Map<String, dynamic>> resultListJson =
+        List<Map<String, dynamic>>.from(json['result']);
+    Map<String, dynamic> resultData = resultListJson.first;
+
+    List<Map<String, dynamic>> vulnListJson =
+        List<Map<String, dynamic>>.from(resultData['vulnerabilities']);
     List<Vulnerability> vulnList = vulnListJson.map((vulnJson) {
       List<String> payloadList = List<String>.from(vulnJson['payload']);
       return Vulnerability(
         type: vulnJson['type'],
-        log: vulnJson['logs'],
+        logs: vulnJson['logs'],
         payload: payloadList,
         severity: vulnJson['severity'],
       );
     }).toList();
+
     return HistoryTableData(
-      id: json['_id'],
-      domain: json['domain'],
-      numVuln: json['numVuln'],
+      id: resultData['_id'],
+      domain: resultData['domain'],
+      numVuln: resultData['numVuln'],
       vuln: vulnList,
-      resultSeverity: json['resultSeverity'],
-      resultPoint: json['resultPoint'],
-      scanDate: json['scanDate'],
+      resultSeverity: resultData['resultSeverity'],
+      resultPoint: resultData['resultPoint'],
+      scanDate: resultData['scanDate'],
     );
   }
 }
