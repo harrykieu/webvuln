@@ -2,17 +2,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/historyScreen.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
+import 'package:flutter_isolate/flutter_isolate.dart';
+import 'package:get_it/get_it.dart';
+import 'package:injectable/injectable.dart';
 import 'package:webvuln/views/scanScreen.dart';
 import 'package:webvuln/views/settingScreen.dart';
 
 // import '../views/scanScreen2.dart';
 // import 'views/draft.dart';
 
+
+// Future<void> runbackground() async{
+//   final getIt =
+// }
 void main() async {
-  runShell(command_line: 'calc.exe');
+  // runShell(command_line: 'calc.exe');
   runApp(const mainScreen());
 }
 
