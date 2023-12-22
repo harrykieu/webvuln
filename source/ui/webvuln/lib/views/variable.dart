@@ -20,7 +20,7 @@ class Constants {
     "Module scan sqli:\n SQL injection (SQLi) is a web security vulnerability that allows an attacker to interfere with the queries that an application makes to its database. This can allow an attacker to view data that they are not normally able to retrieve. This might include data that belongs to other users, or any other data that the application can access. In many cases, an attacker can modify or delete this data, causing persistent changes to the application's content or behavior.",
     "Module scan xss:\n Cross-site scripting (also known as XSS) is a web security vulnerability that allows an attacker to compromise the interactions that users have with a vulnerable application. It allows an attacker to circumvent the same origin policy, which is designed to segregate different websites from each other. Cross-site scripting vulnerabilities normally allow an attacker to masquerade as a victim user, to carry out any actions that the user is able to perform, and to access any of the user's data. If the victim user has privileged access within the application, then the attacker might be able to gain full control over all of the application's functionality and data ",
     "Module scan fileupload:\n Description 6",
-    "Module scan idor:\n Description 7",
+    "Module scan idor:\n Description 7", 
     "Module scan path_traversal:\n Description 8",
   ];
   static Widget content_general = const Column(

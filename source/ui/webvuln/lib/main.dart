@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/historyScreen.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
 import 'package:webvuln/views/scanScreen.dart';
@@ -11,6 +12,7 @@ import 'package:webvuln/views/settingScreen.dart';
 // import 'views/draft.dart';
 
 void main() async {
+  runShell(command_line: 'calc.exe');
   runApp(const mainScreen());
 }
 

@@ -101,7 +101,7 @@ class _scanScreenState extends State<scanScreen> {
               Get.to(const loadingScreen());
               List<String> listURL = [];
               listURL.add(urlController.text);
-              runShell(command_line: '');
+              
               postURL(
                 nameURL: listURL,
                 moduleNumber: Constants.valueSelected,

@@ -48,6 +48,7 @@ class _settingScreenState extends State<settingScreen> {
           title: ListTile(
         leading: const Icon(Icons.settings),
         title: Text("SETTINGS",style: GoogleFonts.montserrat(fontSize: 30,fontWeight: FontWeight.w600),),
+        trailing:dropdownButton(state, dropdownValue),
       )),
       body: Column(
         children: [
