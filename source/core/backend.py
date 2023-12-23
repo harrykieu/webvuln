@@ -733,11 +733,11 @@ class WebVuln:
             generateReport = ReportGenerator(scanResult, f"{ROOTPATH}\\reports")
             checkGenerateReport =  False
             if reportType == "json":
-                generateReport.generate_json()
+                generateReport.generateJson()
             elif reportType == "xml":
-                generateReport.generate_xml()
+                generateReport.generateXml()
             elif reportType == "pdf":
-                generateReport.generate_pdf()
+                generateReport.generatePdf()
             
             if checkGenerateReport:
                 utils.log("[backend.py-handleReportGeneration] Success: Report generated", "INFO")
