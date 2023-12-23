@@ -9,12 +9,22 @@ import 'package:get/get.dart';
 import 'package:webvuln/views/historyScreen.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
 import 'package:webvuln/views/scanScreen.dart';
+import 'package:external_path/external_path.dart';
 import 'package:webvuln/views/settingScreen.dart';
 
 void main() async {
   //TestWidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   runApp(const mainScreen());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
 }
 
 class mainScreen extends StatefulWidget {
@@ -46,6 +56,7 @@ class _mainScreenState extends State<mainScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
     Get.testMode = true;
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         drawerEnableOpenDragGesture: false,
         backgroundColor: const Color(0xFF03112e),

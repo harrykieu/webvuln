@@ -4,6 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Constants {
+  final String directtoryDownload;
+  final String fuffLocation;
+  final String databaseIp;
+  Constants(
+      {required this.directtoryDownload,
+      required this.fuffLocation,
+      required this.databaseIp});
   static Widget contentChild = Text(
     'Scan',
     style: GoogleFonts.montserrat(

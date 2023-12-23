@@ -15,6 +15,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 // TODO: parse data from loading screen to display on result screen
 class resultScreen extends StatefulWidget {
   final String data;
+
   const resultScreen({super.key, required this.data});
 
   @override
