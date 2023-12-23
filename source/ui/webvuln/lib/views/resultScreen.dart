@@ -9,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
 import 'package:webvuln/model/model.dart';
 import 'package:webvuln/views/variable.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 // parse data function
 
 // TODO: parse data from loading screen to display on result screen
@@ -26,6 +26,7 @@ class _resultScreenState extends State<resultScreen> {
   bool isVisibled = true;
   bool isAppeared = true;
   String state = 'All';
+  String exportState = dotenv.env['DEFAULT_EXPORT_TYPE']!;
   List<HistoryTableData> jsonDecoded = [];
 
   @override
@@ -55,7 +56,6 @@ class _resultScreenState extends State<resultScreen> {
     }
   }
 
-  // FIXME: updateTable function is not working
   // function to parse data to table based on the selected module
   List<DataRow> updateTable(String vulnType, List<Vulnerability> data) {
     List<Vulnerability> newData = [];
@@ -118,15 +118,6 @@ class _resultScreenState extends State<resultScreen> {
         value: vuln.type.toString(),
         child: Text(vuln.type),
       ));
-    }
-    //dataRows = updateTable(state, dataBeforeParse);
-    //select module to scan
-    bool isHide(newData) {
-      if (newData["numVuln"] == 0) {
-        return false;
-      } else {
-        return true;
-      }
     }
 
     return Scaffold(
@@ -213,13 +204,13 @@ class _resultScreenState extends State<resultScreen> {
                         children: [
                           Text(
                             'Domain: ${dataBeforeParse[0].domain}',
-                            style: GoogleFonts.montserrat(
+                            style: GoogleFonts.cabin(
                                 fontSize: 24, fontWeight: FontWeight.normal),
                           ),
                           const Spacer(),
                           Text(
                             'Result Point: ${dataBeforeParse[0].resultPoint}',
-                            style: GoogleFonts.montserrat(
+                            style: GoogleFonts.cabin(
                                 fontSize: 24, fontWeight: FontWeight.normal),
                           )
                         ],
@@ -261,7 +252,7 @@ class _resultScreenState extends State<resultScreen> {
               ),
               Container(
                   width: screenWidth,
-                  height: screenHeight / 2 - 150,
+                  height: screenHeight / 2 - 200,
                   margin: const EdgeInsetsDirectional.only(
                       start: 40, end: 40, top: 20),
                   decoration: BoxDecoration(
@@ -275,7 +266,6 @@ class _resultScreenState extends State<resultScreen> {
                       )
                     ],
                   ),
-                  // TODO: Make the description header unscrollable
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
@@ -293,10 +283,71 @@ class _resultScreenState extends State<resultScreen> {
                             ],
                           ),
                         ),
-                        Constants.content_vulnerabilities[0]
+                        Constants.vulnDesc,
                       ],
                     ),
-                  ))
+                  )),
+              Container(
+                width: screenWidth,
+                height: 70,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      margin: const EdgeInsetsDirectional.symmetric(
+                          horizontal: 0, vertical: 10),
+                      width: 200,
+                      child: DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.filter_alt_outlined, size: 30),
+                            border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                                borderSide: BorderSide(color: Colors.black12)),
+                            contentPadding:
+                                EdgeInsetsDirectional.only(start: 15),
+                          ),
+                          focusColor: const Color(0xFFF0F0F0),
+                          icon: const Icon(Icons.arrow_drop_down),
+                          dropdownColor: Colors.white,
+                          value: exportState,
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'csv',
+                              child: Text('CSV'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'json',
+                              child: Text('JSON'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'pdf',
+                              child: Text('PDF'),
+                            )
+                          ],
+                          onSaved: (v) {
+                            setState(() {
+                              exportState = v!;
+                            });
+                          },
+                          onChanged: (v) {
+                            setState(() {
+                              exportState = v!;
+                            });
+                          }),
+                    ),
+                    GradientButton(
+                      horizontalMargin: 40,
+                      verticalMargin: 10,
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      onPressed: () {
+                        print("Exporting data to $exportState");
+                      },
+                      child: const Icon(Icons.download, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
             ]));
   }
 
