@@ -27,7 +27,7 @@ class _scanScreenState extends State<scanScreen> {
     });
     super.initState();
   }
-  // Future 
+  // Future
 
   final TextEditingController urlController = TextEditingController();
   Widget contentChild = Text(
@@ -42,7 +42,7 @@ class _scanScreenState extends State<scanScreen> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width - 200; 
+    double screenWidth = MediaQuery.of(context).size.width - 200;
     return Column(
       children: [
         const SizedBox(

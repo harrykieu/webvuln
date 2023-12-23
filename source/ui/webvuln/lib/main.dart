@@ -9,7 +9,6 @@ import 'package:get/get.dart';
 import 'package:webvuln/views/historyScreen.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
 import 'package:webvuln/views/scanScreen.dart';
-import 'package:external_path/external_path.dart';
 import 'package:webvuln/views/settingScreen.dart';
 
 void main() async {
