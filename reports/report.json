@@ -11,6 +11,22 @@
                     "validex.jpg"
                 ],
                 "severity": "High"
+            },
+            {
+                "type": "lmao lmao",
+                "logs": "Scan log details",
+                "payload": [
+                    "validex.jpg"
+                ],
+                "severity": "High"
+            },
+            {
+                "type": "bruh",
+                "logs": "Scan log details",
+                "payload": [
+                    "validex.jpg"
+                ],
+                "severity": "High"
             }
         ]
     }

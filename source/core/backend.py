@@ -7,6 +7,7 @@ from source.core.export import ReportGenerator
 
 import pymongo
 import requests
+import pytz
 
 import source.core.utils as utils
 from source.core.calSeverity import calculateWebsiteSafetyRate
@@ -710,19 +711,40 @@ class WebVuln:
                 return "Failed"
 
     def __handleReportGeneration(self, data):
+        #generate reports
         try:
             scanResult = data["result"]
             reportType = data["reportType"]
+            if reportType not in ["json", "xml", "pdf"]:
+                utils.log("[backend.py-handleReportGeneration] Error: Invalid report type", "ERROR")
+                return "Failed"
+            if scanResult == "":
+                utils.log("[backend.py-handleReportGeneration] Error: Empty scan result", "ERROR")
+                return "Failed"
             
-
+            if platform.system() == "Windows":
+                reportFolder = "\\reports"
+            else:
+                reportFolder = "/reports"
+            if not os.path.exists(f"{ROOTPATH}{reportFolder}"):
+                os.mkdir(f"{ROOTPATH}{reportFolder}")
+            
+            
             generateReport = ReportGenerator(scanResult, f"{ROOTPATH}\\reports")
+            checkGenerateReport =  False
             if reportType == "json":
                 generateReport.generate_json()
             elif reportType == "xml":
                 generateReport.generate_xml()
             elif reportType == "pdf":
                 generateReport.generate_pdf()
-            return "Success"  
+            
+            if checkGenerateReport:
+                utils.log("[backend.py-handleReportGeneration] Success: Report generated", "INFO")
+                return "Success"
+            else:
+                utils.log("[backend.py-handleReportGeneration] Error: Failed to generate report", "ERROR")
+                return "Failed"
         except Exception as e:
             utils.log(f"[backend.py-handleReportGeneration] Error: {str(e)}", "ERROR")
             return "Failed"   
