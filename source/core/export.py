@@ -2,6 +2,8 @@ import os
 import json
 import pdfkit
 import xml.etree.ElementTree as ET
+import source.core.utils as utils
+
 
 
 class ReportGenerator:
@@ -14,11 +16,12 @@ class ReportGenerator:
             fileName = os.path.join(self.filePath, 'report.json')
             with open(fileName, 'w') as f:
                 json.dump(self.scanResults, f, indent=4)
-            return "Success"
+            return True
         except Exception as e:
-            return f"Failed: {e}"
+            utils.log(e)
+            return False
 
-    def generate_xml(self):
+    def generateXml(self):
         try:
             root = ET.Element('scanResults')
             for result in self.scanResults:
@@ -38,19 +41,20 @@ class ReportGenerator:
             fileName = os.path.join(self.filePath, 'report.xml')
             tree.write(fileName)
 
-            return "Success"
+            return True
         except Exception as e:
-            return f"Failed: {e}"
+            utils.log(e)
+            return False
 
-    def generate_pdf(self):
+    def generatePdf(self):
         try:
-            pdf_content = '''
+            pdfContent = '''
             <!DOCTYPE html>
             <html>
             <head>
             <style>
             body {
-                background-color: white; 
+                background-color: white;
                 font-family: Cambria;
             }
             </style>
@@ -59,32 +63,30 @@ class ReportGenerator:
             '''
 
             for result in self.scanResults:
-                pdf_content += '<h1>WEBVULN REPORT</h1>'
-                pdf_content += f'<p>Domain: {result["domain"]}</p>'
-                pdf_content += '<h2>Scan Date: </h2>'
-                pdf_content += f'<p>{result["scanDate"]}</p>'
+                pdfContent += '<h1>WEBVULN REPORT</h1>'
+                pdfContent += f'<p>Domain: {result["domain"]}</p>'
+                pdfContent += '<h2>Scan Date: </h2>'
+                pdfContent += f'<p>{result["scanDate"]}</p>'
 
-                pdf_content += '<h2>Vulnerabilities:</h2>'
-                pdf_content += f'<p>Vulnerabilities Detected: {result["numVuln"]}</p>'
-                pdf_content += '<ul>'
+                pdfContent += '<h2>Vulnerabilities:</h2>'
+                pdfContent += f'<p>Vulnerabilities Detected: {result["numVuln"]}</p>'
+                pdfContent += '<ul>'
                 for vuln in result['vulnerabilities']:
-                    pdf_content += f'<li>{vuln["type"]} ({vuln["severity"]}):'
-                    pdf_content += f'<p>Payload: {vuln["payload"]}</p>'
+                    pdfContent += f'<li>{vuln["type"]} ({vuln["severity"]}):'
+                    pdfContent += f'<p>Payload: {vuln["payload"]}</p>'
 
                     log_lines = vuln['logs'].split('\n')
-                    pdf_content += '<ul>'
+                    pdfContent += '<ul>'
                     for line in log_lines:
-                        pdf_content += f'<li>{line}</li>'
-                    pdf_content += '</ul>'
+                        pdfContent += f'<li>{line}</li>'
+                    pdfContent += '</ul>'
 
-                    pdf_content += '</li>'
-
-            pdf_content += '</body></html>'
-
+                    pdfContent += '</li>'
+            pdfContent += '</body></html>'
 
             fileName = os.path.join(self.filePath, 'report.pdf')
-            pdfkit.from_file(pdf_content, fileName)
-
-            return "Success"
+            pdfkit.from_string(pdfContent, fileName)
+            return True
         except Exception as e:
-            return f"Failed: {e}"
+            utils.log(e)
+            return False
