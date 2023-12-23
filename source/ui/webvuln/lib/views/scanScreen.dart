@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
+import 'package:external_path/external_path.dart';
 import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/loadingScreen.dart';
 import 'package:webvuln/views/variable.dart';
@@ -26,6 +27,7 @@ class _scanScreenState extends State<scanScreen> {
     });
     super.initState();
   }
+  // Future 
 
   final TextEditingController urlController = TextEditingController();
   Widget contentChild = Text(
@@ -40,7 +42,7 @@ class _scanScreenState extends State<scanScreen> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width - 200;
+    double screenWidth = MediaQuery.of(context).size.width - 200; 
     return Column(
       children: [
         const SizedBox(
@@ -55,7 +57,7 @@ class _scanScreenState extends State<scanScreen> {
             decoration: const BoxDecoration(color: Colors.transparent),
             child: ListTile(
               title: Text(
-                'SCAN URL',
+                'WEBVULN',
                 style: GoogleFonts.montserrat(
                     fontSize: 100,
                     color: Colors.white,
@@ -71,10 +73,13 @@ class _scanScreenState extends State<scanScreen> {
             decoration: const BoxDecoration(color: Colors.transparent),
             child: inputUser(
               controller: urlController,
-              hintName: 'Paste URL here...',
+              hintName: 'Paste URL here to scan ...',
               underIcon: const Padding(
                   padding: EdgeInsets.all(10),
-                  child: Image(image: AssetImage('lib/assets/suffixIcon.png'))),
+                  child: SizedBox(
+                    width: 10,
+                    height: 10,
+                  )),
             )),
 
         //Box Module scan
@@ -99,9 +104,10 @@ class _scanScreenState extends State<scanScreen> {
         GradientButton(
             onPressed: () async {
               Get.to(const loadingScreen());
+              // var path = await ExternalPath.getExternalStorageDirectories();
+              // print(path);
               List<String> listURL = [];
               listURL.add(urlController.text);
-              
               postURL(
                 nameURL: listURL,
                 moduleNumber: Constants.valueSelected,
@@ -120,12 +126,10 @@ class _scanScreenState extends State<scanScreen> {
                 print(error);
               });
             },
-            child: Text(
-              'Scan',
-              style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+            child: const Icon(
+              Icons.search_rounded,
+              size: 45,
+              color: Colors.white,
             ))
       ],
     );
@@ -203,7 +207,7 @@ class _scanScreenState extends State<scanScreen> {
                       color: Color(0xFF1A35C3),
                     ),
                     title: Text(
-                      'Description',
+                      'Scan URL',
                       style: GoogleFonts.montserrat(
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),

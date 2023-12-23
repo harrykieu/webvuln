@@ -261,43 +261,47 @@ class _resultScreenState extends State<resultScreen> {
                 ),
               ),
               Container(
-                  width: screenWidth,
-                  height: screenHeight / 2 - 150,
-                  margin: const EdgeInsetsDirectional.only(
-                      start: 40, end: 40, top: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: 15,
-                        spreadRadius: -7,
-                      )
-                    ],
-                  ),
-                  // TODO: Make the description header unscrollable
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: Row(
-                            children: [
-                              const Image(
-                                  image: AssetImage(
-                                      'lib/assets/Folders_light.png')),
-                              Text(
-                                'Description',
-                                style: GoogleFonts.montserrat(
-                                    fontSize: 24, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
+                width: screenWidth,
+                height: screenHeight / 2 - 150,
+                margin: const EdgeInsetsDirectional.only(start: 40, end: 40, top: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black38,
+                      blurRadius: 15,
+                      spreadRadius: -7,
+                    )
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: Image(image: AssetImage('lib/assets/Folders_light.png')),
+                      title: Text(
+                        'Description',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
-                        Constants.content_vulnerabilities[0]
-                      ],
+                      ),
                     ),
-                  ))
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Constants.content_vulnerabilities[0],
+                            // Add other scrollable content here
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+
+
             ]));
   }
 

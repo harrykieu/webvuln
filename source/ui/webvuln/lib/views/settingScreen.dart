@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
 import 'package:webvuln/views/variable.dart';
@@ -31,170 +32,179 @@ class _settingScreenState extends State<settingScreen> {
 
   Widget build(BuildContext context) {
     bool _switchValue = false;
-    String state = 'All';
+    String state = 'PDF';
     List<DropdownMenuItem<String>> dropdownValue = [
       const DropdownMenuItem(value: 'PDF', child: Text('PDF')),
-      //const DropdownMenuItem(value: 'HTML', child: Text('HTML')),
       const DropdownMenuItem(value: 'XML', child: Text('XML')),
       const DropdownMenuItem(value: 'JSON', child: Text('JSON')),
-      //const DropdownMenuItem(value: 'TXT', child: Text('TXT')),
-      const DropdownMenuItem(value: 'All', child: Text('All')),
-      //const DropdownMenuItem(value: 'json/xml', child: Text('json/xml'))
-      // add more dropdown item at the code below
     ];
     return Scaffold(
       backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
           title: ListTile(
         leading: const Icon(Icons.settings),
-        title: Text("SETTINGS",style: GoogleFonts.montserrat(fontSize: 30,fontWeight: FontWeight.w600),),
-        trailing:dropdownButton(state, dropdownValue),
+        title: Text(
+          "SETTINGS",
+          style:
+              GoogleFonts.montserrat(fontSize: 30, fontWeight: FontWeight.w600),
+        ),
       )),
-      body: Column(
-        children: [
-          container(context,
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height - 100,
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 80,
-                    padding: const EdgeInsets.all(10),
-                    margin: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF4B55B6),
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 1,
-                          offset:
-                              const Offset(0, 1), // changes position of shadow
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            container(context,
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height - 100,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 80,
+                        padding: const EdgeInsets.all(10),
+                        margin: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4B55B6),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 1,
+                              offset: const Offset(
+                                  0, 1), // changes position of shadow
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.data_array,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      title: Text(
-                        "Theme",
-                        style: GoogleFonts.montserrat(
-                            fontSize: 20, color: Colors.white),
-                      ),
-                      subtitle: Text(
-                        "Change theme apllication",
-                        style: GoogleFonts.montserrat(
-                            fontSize: 16, color: Colors.white),
-                      ),
-                      trailing: Switch(
-                        // thumb color (round icon)
-                        activeColor: Colors.amber,
-                        activeTrackColor: Colors.cyan,
-                        inactiveThumbColor: Colors.blueGrey.shade600,
-                        inactiveTrackColor: Colors.grey.shade400,
-                        splashRadius: 50.0,
-                        // boolean variable value
-                        value: _switchValue,
-                        // changes the state of the switch
-                        onChanged: (value) =>
-                            setState(() => _switchValue = value),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 80,
-                    margin: EdgeInsets.all(10),
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF4B55B6),
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 1,
-                          offset:
-                              const Offset(0, 1), // changes position of shadow
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.data_array,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          title: Text(
+                            "Theme",
+                            style: GoogleFonts.montserrat(
+                                fontSize: 20, color: Colors.white),
+                          ),
+                          subtitle: Text(
+                            "Change application theme",
+                            style: GoogleFonts.montserrat(
+                                fontSize: 16, color: Colors.white),
+                          ),
+                          trailing: Switch(
+                            // thumb color (round icon)
+                            activeColor: Colors.amber,
+                            activeTrackColor: Colors.cyan,
+                            inactiveThumbColor: Colors.blueGrey.shade600,
+                            inactiveTrackColor: Colors.grey.shade400,
+                            splashRadius: 50.0,
+                            // boolean variable value
+                            value: _switchValue,
+                            // changes the state of the switch
+                            onChanged: (value) =>
+                                setState(() => _switchValue = value),
+                          ),
                         ),
-                      ],
-                    ),
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.file_copy_rounded,
-                        color: Colors.white,
-                        size: 20,
                       ),
-                      title: Text(
-                        "Format file export:",
-                        style: GoogleFonts.montserrat(
-                            fontSize: 20, color: Colors.white),
+                      Container(
+                        width: double.infinity,
+                        height: 80,
+                        margin: EdgeInsets.all(10),
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4B55B6),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 1,
+                              offset: const Offset(
+                                  0, 1), // changes position of shadow
+                            ),
+                          ],
+                        ),
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.file_copy_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          title: Text(
+                            "File format export:",
+                            style: GoogleFonts.montserrat(
+                                fontSize: 20, color: Colors.white),
+                          ),
+                          subtitle: Text(
+                            "Default file format to export",
+                            style: GoogleFonts.montserrat(
+                                fontSize: 16, color: Colors.white),
+                          ),
+                          trailing: dropdownButton(state, dropdownValue),
+                        ),
                       ),
-                      subtitle: Text(
-                        "Change format file",
-                        style: GoogleFonts.montserrat(
-                            fontSize: 16, color: Colors.white),
+                      listtile(context,
+                          title: 'Database IP:             ',
+                          trailing: IconButton(
+                              onPressed: () {
+                                print(_databaseController.text);
+                              },
+                              icon: const Icon(
+                                Icons.save_as_outlined,
+                                color: Colors.white,
+                              )),
+                          controller: _databaseController),
+                      listtile(context,
+                          title: 'Change export location:',
+                          trailing: IconButton(
+                              onPressed: () {
+                                _pickFolder(controller: _locationController);
+                              },
+                              icon: const Icon(
+                                Icons.folder,
+                                color: Colors.white,
+                              )),
+                          controller: _locationController),
+                      listtile(context,
+                          title: 'Fuff location:            ',
+                          trailing: IconButton(
+                              onPressed: () {
+                                _pickFolder(
+                                    controller: _fuff_location_Controller);
+                              },
+                              icon: const Icon(
+                                Icons.folder,
+                                color: Colors.white,
+                              )),
+                          controller: _fuff_location_Controller),
+                      SizedBox(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height / 5,
                       ),
-                      trailing: dropdownButton(state, dropdownValue),
-                    ),
+                      GradientButton(
+                          onPressed: () {
+                            setState(() {
+                              _databaseController.text =
+                                  DotEnv().env['DATABASE_URI'].toString();
+                            });
+                            Constants(
+                                directtoryDownload: _locationController.text,
+                                fuffLocation: _fuff_location_Controller.text,
+                                databaseIp: _databaseController.text);
+                          },
+                          child: Text(
+                            'Save',
+                            style: GoogleFonts.montserrat(
+                                fontSize: 20, color: Colors.white),
+                          ))
+                    ],
                   ),
-                  listtile(context,
-                      title: 'Database IP:             ',
-                      trailing: IconButton(
-                          onPressed: () {
-                            print(_databaseController.text);
-                          },
-                          icon: const Icon(
-                            Icons.save_as_outlined,
-                            color: Colors.white,
-                          )),
-                      controller: _databaseController),
-                  listtile(context,
-                      title: 'Change export location:',
-                      trailing: IconButton(
-                          onPressed: () {
-                            _pickFolder(controller: _locationController);
-                          },
-                          icon: const Icon(
-                            Icons.folder,
-                            color: Colors.white,
-                          )),
-                      controller: _locationController),
-                  listtile(context,
-                      title: 'Fuff location:            ',
-                      trailing: IconButton(
-                          onPressed: () {
-                            _pickFolder(controller: _fuff_location_Controller);
-                          },
-                          icon: const Icon(
-                            Icons.folder,
-                            color: Colors.white,
-                          )),
-                      controller: _fuff_location_Controller),
-                  SizedBox(
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height / 5,
-                  ),
-                  GradientButton(
-                      onPressed: () {
-                        Constants(
-                            directtoryDownload: _locationController.text,
-                            fuffLocation: _fuff_location_Controller.text,
-                            databaseIp: _databaseController.text);
-                      },
-                      child: Text(
-                        'Save',
-                        style: GoogleFonts.montserrat(
-                            fontSize: 20, color: Colors.white),
-                      ))
-                ],
-              ))
-        ],
+                ))
+          ],
+        ),
       ),
     );
   }

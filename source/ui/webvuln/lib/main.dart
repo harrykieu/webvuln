@@ -4,22 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:webvuln/views/historyScreen.dart';
 import 'package:webvuln/views/resourcesScreen.dart';
-import 'package:flutter_isolate/flutter_isolate.dart';
-import 'package:get_it/get_it.dart';
-import 'package:injectable/injectable.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:webvuln/views/scanScreen.dart';
+import 'package:external_path/external_path.dart';
 import 'package:webvuln/views/settingScreen.dart';
 
-// import '../views/scanScreen2.dart';
-// import 'views/draft.dart';
-
-
-// Future<void> runbackground() async{
-//   final getIt =
-// }
 void main() async {
   // runShell(command_line: 'calc.exe');
+  // var path = await ExternalPath.getExternalStorageDirectories();
+  // print(path);
+  // await DotEnv().load(fileName: '../../../../.env');
   runApp(const mainScreen());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
 }
 
 class mainScreen extends StatefulWidget {
