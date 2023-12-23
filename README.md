@@ -36,7 +36,9 @@ A website vulnerability scanner for coders without any knowledge of web security
 [Here](https://www.figma.com/file/GaYOiOhGOmMFxXdlmdPTDr/Project-Scanner-website?type=design&node-id=0-1&mode=design)
 
 ## Install for pdfkit-generate report as PDF
-https://wkhtmltopdf.org/downloads.html
+https://github.com/JazzCore/python-pdfkit/wiki/Installing-wkhtmltopdf                                      
+- Guide: https://www.youtube.com/watch?v=XX9nhxVF8Z4
+
 
 ## How to run
 - Install Docker
