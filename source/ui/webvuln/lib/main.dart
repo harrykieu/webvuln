@@ -34,7 +34,6 @@ class _mainScreenState extends State<mainScreen> {
 
   final List _selectedItem = [
     const scanScreen(),
-    const resultScreen(),
     const historyScreen(),
     const resourceScreen(),
     const settingScreen()
@@ -80,17 +79,6 @@ class _mainScreenState extends State<mainScreen> {
                             _selectedIndex = 1;
                           });
                         },
-                        icon: 'lib/assets/result.png',
-                        name: 'Result'),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    button(
-                        onPressed: () {
-                          setState(() {
-                            _selectedIndex = 2;
-                          });
-                        },
                         icon: 'lib/assets/history.png',
                         name: 'History'),
                     const SizedBox(
@@ -99,7 +87,7 @@ class _mainScreenState extends State<mainScreen> {
                     button(
                         onPressed: () {
                           setState(() {
-                            _selectedIndex = 3;
+                            _selectedIndex = 2;
                           });
                         },
                         icon: 'lib/assets/resources.png',
@@ -110,11 +98,14 @@ class _mainScreenState extends State<mainScreen> {
                     button(
                         onPressed: () {
                           setState(() {
-                            _selectedIndex = 4;
+                            _selectedIndex = 3;
                           });
                         },
                         icon: 'lib/assets/settings.png',
-                        name: 'Settings')
+                        name: 'Settings'),
+                    const SizedBox(
+                      height: 20,
+                    ),
                   ],
                 )),
             // Gradient background

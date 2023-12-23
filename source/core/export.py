@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 import source.core.utils as utils
 
 
+
 class ReportGenerator:
     def __init__(self, scanResults, filePath):
         self.scanResults = scanResults
@@ -81,12 +82,10 @@ class ReportGenerator:
                     pdfContent += '</ul>'
 
                     pdfContent += '</li>'
-
             pdfContent += '</body></html>'
 
             fileName = os.path.join(self.filePath, 'report.pdf')
             pdfkit.from_string(pdfContent, fileName)
-
             return True
         except Exception as e:
             utils.log(e)

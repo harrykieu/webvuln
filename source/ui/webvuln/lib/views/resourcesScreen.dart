@@ -86,143 +86,19 @@ class _resourceScreenState extends State<resourceScreen> {
                 DataCell(Text(tableData.createdDate)),
                 DataCell(Text(tableData.editedDate)),
                 DataCell(TextButton(
-                  child: const Icon(Icons.delete),
-                  onPressed: () async {
-                    showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                                title: Row(
-                                  children: [
-                                    const Icon(Icons.warning),
-                                    const SizedBox(width: 5),
-                                    Text('Warning',
-                                        style: GoogleFonts.montserrat(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold))
-                                  ],
-                                ),
-                                content: Text(
-                                    'Are you sure you want to delete this resource?',
-                                    style: GoogleFonts.montserrat(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.normal)),
-                                alignment: Alignment.center,
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('Cancel')),
-                                  TextButton(
-                                      onPressed: () async {
-                                        Navigator.pop(context);
-                                        String resp = await postResourcesFile(
-                                            fileName: tableData.fileName,
-                                            description: tableData.description,
-                                            base64value: tableData.base64value,
-                                            action: "remove");
-                                        if (resp ==
-                                                'Failed to Post Resources' ||
-                                            resp.contains(
-                                                'Error post resources')) {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) => AlertDialog(
-                                                      title: Row(
-                                                        children: [
-                                                          const Icon(
-                                                              Icons.error),
-                                                          const SizedBox(
-                                                              width: 5),
-                                                          Text('Error',
-                                                              style: GoogleFonts
-                                                                  .montserrat(
-                                                                      fontSize:
-                                                                          18,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold))
-                                                        ],
-                                                      ),
-                                                      content: Text(
-                                                          'Failed to delete resource!',
-                                                          style: GoogleFonts
-                                                              .montserrat(
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal)),
-                                                      alignment:
-                                                          Alignment.center,
-                                                      actions: [
-                                                        TextButton(
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child: const Text(
-                                                                'OK'))
-                                                      ]));
-                                        } else {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) => AlertDialog(
-                                                      title: Row(
-                                                        children: [
-                                                          const Icon(
-                                                              Icons.check),
-                                                          const SizedBox(
-                                                              width: 5),
-                                                          Text('Success',
-                                                              style: GoogleFonts
-                                                                  .montserrat(
-                                                                      fontSize:
-                                                                          18,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold))
-                                                        ],
-                                                      ),
-                                                      content: Text(
-                                                          'Resource deleted successfully! Press Find again to see changes!',
-                                                          style: GoogleFonts
-                                                              .montserrat(
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal)),
-                                                      alignment:
-                                                          Alignment.center,
-                                                      actions: [
-                                                        TextButton(
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child: const Text(
-                                                                'OK'))
-                                                      ]));
-                                        }
-                                      },
-                                      child: const Text('OK'))
-                                ]));
-                  },
-                )),
-                DataCell(TextButton(
-                    onPressed: () async {
-                      String resp = await postResourcesFile(
-                          fileName: tableData.fileName,
-                          description: tableData.description,
-                          base64value: tableData.base64value,
-                          action: "edit"); // FIXME: Not correct
-                      if (resp == 'Failed to Post Resources' ||
-                          resp.contains('Error post resources')) {
-                        print("Failed to edit resource");
-                      } else {
-                        print("Edited resource successfully");
-                      }
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) => Dialog(
+                              child: editDataFile(
+                                  fileName: tableData.fileName,
+                                  description: tableData.description,
+                                  base64value: tableData.base64value,
+                                  createdDate: tableData.createdDate,
+                                  editedDate: tableData.editedDate,
+                                  context: context)));
                     },
-                    child: const Icon(Icons.edit)))
+                    child: const Icon(Icons.remove_red_eye))),
               ]))
           .toList();
     });
@@ -261,7 +137,7 @@ class _resourceScreenState extends State<resourceScreen> {
     final TextEditingController valueController = TextEditingController();
     final TextEditingController actionController = TextEditingController();
     final double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width *
+    final double screenWidth = MediaQuery.of(context).size.width *
         (1 - 0.13); // 0.13 is width of sidebar
     Widget inputWidget;
     Widget tableWidget;
@@ -314,15 +190,22 @@ class _resourceScreenState extends State<resourceScreen> {
             children: [
               Container(
                 margin: const EdgeInsetsDirectional.only(start: 40, top: 10),
-                child: Text("RESOURCE TYPE",
+                child: Text("RESOURCE MANAGEMENT",
                     style: GoogleFonts.montserrat(
                         fontSize: 24, fontWeight: FontWeight.bold)),
               ),
               Container(
                 margin: const EdgeInsetsDirectional.only(end: 40),
-                width: 200,
+                width: 250,
                 height: 40,
                 child: DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      icon: Icon(Icons.type_specimen_outlined, size: 30),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          borderSide: BorderSide(color: Colors.black12)),
+                      contentPadding: EdgeInsetsDirectional.only(start: 15),
+                    ),
                     focusColor: const Color(0xFFF0F0F0),
                     icon: const Icon(Icons.arrow_drop_down),
                     dropdownColor: Colors.white,
@@ -537,9 +420,37 @@ class _resourceScreenState extends State<resourceScreen> {
             GradientButton(
                 horizontalMargin: 50,
                 onPressed: () async {
-                  print(fileState);
                   String response =
                       await getResourcesFile(description: fileState);
+                  if (response == '[]') {
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title: Row(
+                                children: [
+                                  const Icon(Icons.error),
+                                  const SizedBox(width: 5),
+                                  Text('Error',
+                                      style: GoogleFonts.montserrat(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold))
+                                ],
+                              ),
+                              content: Text(
+                                  'No resource found with given criteria!',
+                                  style: GoogleFonts.montserrat(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.normal)),
+                              alignment: Alignment.center,
+                              actions: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('OK'))
+                              ],
+                            ));
+                  }
                   List<dynamic> jsonD = jsonDecode(response);
                   List<ResourceFileTableData> newData = jsonD
                       .map((json) => ResourceFileTableData.fromJson(json))
@@ -564,20 +475,20 @@ class _resourceScreenState extends State<resourceScreen> {
                 color: Colors.white24),
             child: Container(
               decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  color: Colors.brown.shade100),
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                color: Colors.brown.shade100,
+              ),
               child: DataTable2(
                   columnSpacing: 20,
                   columns: const [
-                    DataColumn2(label: Text('File name'), size: ColumnSize.S),
-                    DataColumn2(label: Text('Description'), size: ColumnSize.S),
+                    DataColumn2(label: Text('File name'), fixedWidth: 100),
+                    DataColumn2(label: Text('Description'), fixedWidth: 100),
                     DataColumn2(
                         label: Text('Base64 Value'), size: ColumnSize.L),
                     DataColumn2(
                         label: Text('Created Date'), size: ColumnSize.S),
                     DataColumn2(label: Text('Edited Date'), size: ColumnSize.S),
-                    DataColumn2(label: Text('Delete'), size: ColumnSize.S),
-                    DataColumn2(label: Text('Edit'), size: ColumnSize.S),
+                    DataColumn2(label: Text('Info'), fixedWidth: 40),
                   ],
                   rows: dataRowList),
             )),
@@ -1012,10 +923,7 @@ class _resourceScreenState extends State<resourceScreen> {
                                           String resp = await postResources(
                                               vulnType: vulnType,
                                               resType: type,
-                                              value: [
-                                                value,
-                                                valueEditController.text
-                                              ],
+                                              value: [valueEditController.text],
                                               action: "update");
                                           if (resp ==
                                                   'Failed to Post Resources' ||
@@ -1210,6 +1118,252 @@ class _resourceScreenState extends State<resourceScreen> {
           ],
         ));
   }
+
+  Container editDataFile(
+      {required String fileName,
+      required String description,
+      required String base64value,
+      required String createdDate,
+      required String editedDate,
+      required BuildContext context}) {
+    return Container(
+        width: 1000,
+        height: 300,
+        margin: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text("RESOURCE INFORMATION",
+                    style: GoogleFonts.montserrat(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black)),
+                const Spacer(),
+                IconButton(
+                  onPressed: () async {
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                                title: Row(
+                                  children: [
+                                    const Icon(Icons.warning),
+                                    const SizedBox(width: 5),
+                                    Text('Warning',
+                                        style: GoogleFonts.montserrat(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold))
+                                  ],
+                                ),
+                                content: Text(
+                                    'Are you sure you want to delete this resource?',
+                                    style: GoogleFonts.montserrat(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal)),
+                                alignment: Alignment.center,
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('Cancel')),
+                                  TextButton(
+                                      onPressed: () async {
+                                        Navigator.pop(context);
+                                        String resp = await postResourcesFile(
+                                            fileName: fileName,
+                                            description: description,
+                                            base64value: base64value,
+                                            action: "remove");
+                                        if (resp ==
+                                                'Failed to Post Resources' ||
+                                            resp.contains(
+                                                'Error post resources')) {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                      title: Row(
+                                                        children: [
+                                                          const Icon(
+                                                              Icons.error),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          Text('Error',
+                                                              style: GoogleFonts
+                                                                  .montserrat(
+                                                                      fontSize:
+                                                                          18,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold))
+                                                        ],
+                                                      ),
+                                                      content: Text(
+                                                          'Failed to delete resource!',
+                                                          style: GoogleFonts
+                                                              .montserrat(
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal)),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      actions: [
+                                                        TextButton(
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: const Text(
+                                                                'OK'))
+                                                      ]));
+                                        } else {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                      title: Row(
+                                                        children: [
+                                                          const Icon(
+                                                              Icons.check),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          Text('Success',
+                                                              style: GoogleFonts
+                                                                  .montserrat(
+                                                                      fontSize:
+                                                                          18,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold))
+                                                        ],
+                                                      ),
+                                                      content: Text(
+                                                          'Resource deleted successfully! Press Find again to see changes!',
+                                                          style: GoogleFonts
+                                                              .montserrat(
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal)),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      actions: [
+                                                        TextButton(
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: const Text(
+                                                                'OK'))
+                                                      ]));
+                                        }
+                                      },
+                                      child: const Text('OK'))
+                                ]));
+                  },
+                  icon: const Icon(Icons.delete),
+                ),
+              ],
+            ),
+            const Divider(
+                color: Colors.black, thickness: 0.2, indent: 0, endIndent: 0),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("File name:",
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    )),
+                Text(fileName,
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.black))
+              ],
+            ),
+            const Divider(
+                color: Colors.black, thickness: 0.2, indent: 0, endIndent: 0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Description:",
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    )),
+                Text(description,
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.black))
+              ],
+            ),
+            const Divider(
+                color: Colors.black, thickness: 0.2, indent: 0, endIndent: 0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Base64 value:",
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    )),
+                const SizedBox(width: 100),
+                Container(
+                  width: 750,
+                  height: 50,
+                  alignment: Alignment.centerRight,
+                  child: SingleChildScrollView(
+                      child: Text(base64value,
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black))),
+                )
+              ],
+            ),
+            const Divider(
+                color: Colors.black, thickness: 0.2, indent: 0, endIndent: 0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Created date:",
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    )),
+                Text(createdDate,
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.black)),
+              ],
+            ),
+            const Divider(
+                color: Colors.black, thickness: 0.2, indent: 0, endIndent: 0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Edited date:",
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    )),
+                Text(editedDate,
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.black))
+              ],
+            )
+          ],
+        ));
+  }
 }
 
 Container getBoxInput(
@@ -1231,9 +1385,9 @@ Container getBoxInput(
 Container postBoxInput(
     {required TextEditingController controller, required String content}) {
   return Container(
-    width: 400,
+    width: 350,
     height: 50,
-    margin: const EdgeInsetsDirectional.symmetric(horizontal: 10, vertical: 20),
+    margin: const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 20),
     child: inputUser(
       controller: controller,
       hintName: content,

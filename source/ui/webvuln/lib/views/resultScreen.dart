@@ -1,255 +1,278 @@
-// ignore_for_file: unused_element
+// ignore_for_file: unused_element, camel_case_types
 
+import 'dart:convert';
+
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:webvuln/items/lineChart.dart';
 import 'package:webvuln/items/newSubmitButton.dart';
-import 'package:webvuln/items/pieGraph.dart';
-import 'package:flutter_dropdown/flutter_dropdown.dart';
-import 'package:webvuln/items/tables.dart';
-import 'package:webvuln/views/detail_screen.dart';
-import 'package:just_the_tooltip/just_the_tooltip.dart';
+import 'package:webvuln/model/model.dart';
+import 'package:webvuln/views/variable.dart';
 
+// parse data function
+
+// TODO: parse data from loading screen to display on result screen
 class resultScreen extends StatefulWidget {
-  const resultScreen({super.key});
+  final String data;
+  const resultScreen({super.key, required this.data});
 
   @override
   State<resultScreen> createState() => _resultScreenState();
+  String get resultData => data;
 }
 
 class _resultScreenState extends State<resultScreen> {
+  bool isVisibled = true;
+  bool isAppeared = true;
+  String state = 'All';
+  List<HistoryTableData> results = [];
+
+  @override
+  void initState() {
+    super.initState();
+    isVisibled = true;
+    isAppeared = true;
+  }
+
+  Icon warnLevel(String severity) {
+    switch (severity) {
+      case 'High':
+        return const Icon(
+          Icons.warning_amber_sharp,
+          color: Colors.red,
+        );
+      case 'Medium':
+        return const Icon(
+          Icons.warning_amber_sharp,
+          color: Colors.yellow,
+        );
+      default:
+        return const Icon(
+          Icons.warning_amber_sharp,
+          color: Colors.blue,
+        );
+    }
+  }
+
+  // FIXME: updateTable function is not working
+  // function to parse data to table based on the selected module
+  List<DataRow> updateTable(String vulnType, List<HistoryTableData> data) {
+    List<HistoryTableData> newData = [];
+    if (vulnType != 'All') {
+      for (var obj in data) {
+        if (obj.vuln.any((element) => element.type == vulnType)) {
+          newData.add(obj);
+        }
+      }
+    } else {
+      newData = data;
+    }
+    List<DataRow> dataRows = newData
+        .map((e) => DataRow(cells: [
+              DataCell(warnLevel(e.resultSeverity)),
+              DataCell(Text(e.domain)),
+              DataCell(Text(e.vuln[0].type)),
+              DataCell(Text(e.numVuln.toString())),
+              DataCell(Text(e.resultPoint.toString())),
+              DataCell(Text(e.scanDate)),
+            ]))
+        .toList();
+    return dataRows;
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double borderRadiusValue = 20.0; // Adjust the radius as needed
+    double screenHeight = MediaQuery.of(context).size.height;
     Get.testMode = true;
-    return Scaffold(
-      appBar: AppBar(
-        leading: GradientButton(
-          borderRadius: BorderRadius.all(Radius.circular(borderRadiusValue)),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        toolbarHeight: 80,
-        leadingWidth: 100,
-        backgroundColor: Colors.transparent,
-      ),
-      body: ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadiusValue),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Table list errors
-              const listVulnerabilities(),
-              // Graph line and pie chart
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [const containerPieChart(), lineChart()],
-              ),
-              // Description
-              Container(
-                width: screenWidth - (0.13 * screenWidth),
-                height: 200,
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black38,
-                      offset: Offset(0, 4),
-                      blurRadius: 10,
-                      spreadRadius: 1,
-                    )
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    ListTile(
-                      title: Row(
-                        children: [
-                          const Image(
-                              image:
-                                  AssetImage('lib/assets/Folders_light.png')),
-                          Text(
-                            '  Description',
-                            style: GoogleFonts.montserrat(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                          tool_tip(content: 'Info about description')
-                        ],
-                      ),
-                    ),
-                    ListTile(
-                      title: Text(
-                        'SQL injection, also known as SQLI, is a common attack vector that uses malicious SQL code for backend database manipulation to access information that was not intended to be displayed',
-                        style: GoogleFonts.montserrat(
-                            fontSize: 20, fontWeight: FontWeight.normal),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  JustTheTooltip tool_tip({required String content}) {
-    return JustTheTooltip(
-      content: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          content,
-        ),
-      ),
-      child: const Icon(
-        Icons.info_outline_rounded,
-        color: Colors.black,
-        size: 16,
-      ),
-    );
-  }
-}
-
-class listVulnerabilities extends StatefulWidget {
-  const listVulnerabilities({super.key});
-
-  @override
-  State<listVulnerabilities> createState() => _listVulnerabilitiesState();
-}
-
-class _listVulnerabilitiesState extends State<listVulnerabilities> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    _selectedModule = 'XSS';
-    super.initState();
-  }
-
-  List<String> error = ['XSS', 'SQLi', 'LFI', 'RCE'];
-  List<String> headersTable = ['Severity', 'Type', 'Vulnerabilities'];
-  List<String> rowsTableXSS = ['yellow', 'XSS error', 'google.com'];
-  List<String> rowsTableSQL = ['SQL injection', 'google.com'];
-  List<String> rowsTableLFI = ['LFI error', 'google.com'];
-  List<String> rowsTableRCE = ['RCE', 'google.com'];
-  String _selectedModule = 'XSS';
-
-  //important!! number_error is recognized as the number of error get api from backend
-  int number_error = 2;
-  // ignore: non_constant_identifier_names
-  TextStyle text_style_title = GoogleFonts.montserrat(
-      fontSize: 24, color: Colors.black, fontWeight: FontWeight.bold);
-  TextStyle text_style_bold = GoogleFonts.montserrat(
-      fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold);
-  TextStyle text_style_normal = GoogleFonts.montserrat(
-      fontSize: 20, color: Colors.black, fontWeight: FontWeight.normal);
-  TextStyle text_style_normal_white = GoogleFonts.montserrat(
-      fontSize: 20, color: Colors.white, fontWeight: FontWeight.normal);
-  TextStyle text_style_code = GoogleFonts.ubuntu(
-      fontSize: 20, color: Colors.black, fontWeight: FontWeight.normal);
-
-  Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    List<Widget> listVulnerabilities = [
-      tableXSS(),
-      Text(
-        '404 Not found!!',
-        style: text_style_bold,
-      ),
-      Container(
-          width: 100,
-          height: 50,
-          margin: EdgeInsetsDirectional.only(start: width - 800),
-          child: DropDown(
-            items: error,
-            initialValue: _selectedModule,
-            dropDownType: DropDownType.Button,
-            onChanged: (val) {
-              setState(() {
-                _selectedModule = val as String;
-              });
-              print(_selectedModule);
-            },
-          ),
-        ),
-      Container(
-        color: Colors.transparent,
-      )
+    List<DropdownMenuItem<String>> dropdownValue = [
+      const DropdownMenuItem(value: 'All', child: Text('All'))
+      // add more dropdown item at the code below
     ];
-    @override
-    Widget checkNumberErrors(numberError) {
-      if (numberError == 0) {
-        return listVulnerabilities[1];
+    List<dynamic> results = jsonDecode(widget.resultData);
+    List<HistoryTableData> dataBeforeParse = [];
+    // parse vuln into List<Vulnerability>
+    List<Vulnerability> listVuln = [];
+    for (var obj in results) {
+      List<dynamic> listVulnJSON = obj["vulnerabilities"];
+      for (var vuln in listVulnJSON) {
+        Vulnerability newVuln = Vulnerability(
+          type: vuln["type"].toString(),
+          severity: vuln["severity"].toString(),
+          payload: List<String>.from(vuln["payload"]),
+          logs: vuln["logs"].toString(),
+        );
+        listVuln.add(newVuln);
+      }
+      // parse json into HistoryTableData
+      HistoryTableData newVuln = HistoryTableData(
+          domain: obj["domain"].toString(),
+          numVuln: obj["numVuln"],
+          resultPoint: obj["resultPoint"].toDouble(),
+          id: obj["id"].toString(),
+          resultSeverity: obj["resultSeverity"].toString(),
+          vuln: listVuln,
+          scanDate: obj["scanDate"].toString());
+      dataBeforeParse.add(newVuln);
+    }
+    // get all vuln available and convert to string, separated by comma
+    for (var vuln in listVuln) {
+      dropdownValue.add(DropdownMenuItem(
+        value: vuln.type.toString(),
+        child: Text(vuln.type),
+      ));
+    }
+    //dataRows = updateTable(state, dataBeforeParse);
+    //select module to scan
+    bool isHide(newData) {
+      if (newData["numVuln"] == 0) {
+        return false;
       } else {
-        return listVulnerabilities[0];
+        return true;
       }
     }
 
-    Widget visibleDropdown(numberError) {
-      if (numberError == 0) {
-        return listVulnerabilities[3];
-      } else {
-        return listVulnerabilities[2];
-      }
-    }
+    return Scaffold(
+        backgroundColor: const Color(0xFFF0F0F0),
+        body: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // dropdown
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                GradientButton(
+                  horizontalMargin: 40,
+                  verticalMargin: 10,
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Icon(Icons.arrow_back, color: Colors.white),
+                ),
+                Container(
+                  margin: const EdgeInsetsDirectional.only(start: 40, top: 10),
+                  child: Text("SCAN RESULT",
+                      style: GoogleFonts.montserrat(
+                          fontSize: 24, fontWeight: FontWeight.bold)),
+                ),
+                Container(
+                  margin: const EdgeInsetsDirectional.only(end: 40),
+                  width: 200,
+                  height: 40,
+                  child: DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        icon: Icon(Icons.filter_alt_outlined, size: 30),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                            borderSide: BorderSide(color: Colors.black12)),
+                        contentPadding: EdgeInsetsDirectional.only(start: 15),
+                      ),
+                      focusColor: const Color(0xFFF0F0F0),
+                      icon: const Icon(Icons.arrow_drop_down),
+                      dropdownColor: Colors.white,
+                      value: state,
+                      items: dropdownValue,
+                      onSaved: (v) {
+                        setState(() {
+                          state = v!;
+                        });
+                      },
+                      onChanged: (v) {
+                        setState(() {
+                          state = v!;
+                        });
+                      }),
+                ),
+              ]),
+              const Divider(
+                  color: Colors.black,
+                  thickness: 0.2,
+                  indent: 40,
+                  endIndent: 40),
+              container(screenWidth, screenHeight / 2,
+                  child: DataTable2(columns: const [
+                    DataColumn2(
+                        label: Text('Severity'),
+                        tooltip: 'Blue - Low, Yellow - Medium, Red - High',
+                        fixedWidth: 100),
+                    DataColumn2(
+                        label: Text('Domain'),
+                        tooltip: 'Domain of website',
+                        fixedWidth: 400),
+                    DataColumn2(
+                      label: Text('Type'),
+                      tooltip: 'Type of vulnerability',
+                      fixedWidth: 200,
+                    ),
+                    DataColumn2(
+                        label: Text('Number of Vulnerabilities'),
+                        size: ColumnSize.S),
+                    DataColumn2(
+                      label: Text('Severity Point'),
+                      fixedWidth: 200,
+                    ),
+                    DataColumn2(label: Text('Scan Date'), size: ColumnSize.S),
+                  ], rows: updateTable(state, dataBeforeParse))),
+              Container(
+                  width: screenWidth,
+                  height: screenHeight / 2 - 150,
+                  margin: const EdgeInsetsDirectional.only(
+                      start: 40, end: 40, top: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 15,
+                        spreadRadius: -7,
+                      )
+                    ],
+                  ),
+                  // TODO: Make the description header unscrollable
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: Row(
+                            children: [
+                              const Image(
+                                  image: AssetImage(
+                                      'lib/assets/Folders_light.png')),
+                              Text(
+                                'Description',
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 24, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Constants.content_vulnerabilities[0]
+                      ],
+                    ),
+                  ))
+            ]));
+  }
 
-    //table chinh
+  Container container(double screenWidth, double screenHeight,
+      {required Widget child}) {
     return Container(
-      width: width - 100,
-      height: 500,
-      margin: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
-      decoration: const BoxDecoration(
+        width: screenWidth,
+        height: screenHeight,
+        margin: const EdgeInsetsDirectional.only(start: 40, end: 40),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: [
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
             BoxShadow(
               color: Colors.black38,
-              offset: Offset(0, 4),
-              blurRadius: 5,
+              blurRadius: 15,
+              spreadRadius: -7,
             )
           ],
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      child: Column(
-        children: [
-          ListTile(
-            title: Row(
-              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                const Image(image: AssetImage('lib/assets/list.png')),
-                Text(
-                  '   List vulnerabilities',
-                  style: text_style_title,
-                ),
-                visibleDropdown(number_error)
-              ],
-            ),
-          ),
-          checkNumberErrors(number_error)
-        ],
-      ),
-    );
-  }
-
-  
-
-  JustTheTooltip tool_tip({required String content}) {
-    return JustTheTooltip(
-        content: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            content,
-          ),
         ),
-        child: const Icon(
-          Icons.info_outline,
-          color: Colors.black,
-          size: 16,
-        ));
+        child: child);
   }
 }

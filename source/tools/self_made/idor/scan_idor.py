@@ -1,7 +1,8 @@
+import random
+import re
+
 import requests
 from bs4 import BeautifulSoup
-import re
-import random
 
 
 class IDOR:
@@ -61,7 +62,7 @@ class IDOR:
 
         return False
 
-    def check_idor(self, url):
+    def check_idor(self):
         urls = self.extract_urls()
 
         for url in urls:

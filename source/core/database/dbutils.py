@@ -32,7 +32,7 @@ class DatabaseUtils:
                     )
                 },
             )
-            self.__db.resources.create_index([("value")], unique=True)
+            self.__db.resources.create_index([("value",1),("vulnType",1)], unique=True)
         if "scanResult" not in self.__db.list_collection_names():
             self.__db.create_collection(
                 "scanResult",

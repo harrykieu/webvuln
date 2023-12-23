@@ -143,7 +143,7 @@ class XSS:
                         driver.get(form_action_url)
                         for key, value in data.items():
                             element_name = key
-                            element = WebDriverWait(driver, 10).until(
+                            element = WebDriverWait(driver, 1).until(
                                 EC.presence_of_element_located((By.NAME, element_name))
                             )
                             driver.execute_script(
