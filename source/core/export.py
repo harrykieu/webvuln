@@ -2,6 +2,7 @@ import os
 import json
 import pdfkit
 import xml.etree.ElementTree as ET
+import source.core.utils as utils
 
 
 class ReportGenerator:
@@ -14,9 +15,10 @@ class ReportGenerator:
             fileName = os.path.join(self.filePath, 'report.json')
             with open(fileName, 'w') as f:
                 json.dump(self.scanResults, f, indent=4)
-            return "Success"
+            return True
         except Exception as e:
-            return f"Failed: {e}"
+            utils.log(e)
+            return False
 
     def generateXml(self):
         try:
@@ -38,9 +40,10 @@ class ReportGenerator:
             fileName = os.path.join(self.filePath, 'report.xml')
             tree.write(fileName)
 
-            return "Success"
+            return True
         except Exception as e:
-            return f"Failed: {e}"
+            utils.log(e)
+            return False
 
     def generatePdf(self):
         try:
@@ -84,6 +87,7 @@ class ReportGenerator:
             fileName = os.path.join(self.filePath, 'report.pdf')
             pdfkit.from_string(pdfContent, fileName)
 
-            return "Success"
+            return True
         except Exception as e:
-            return f"Failed: {e}"
+            utils.log(e)
+            return False
