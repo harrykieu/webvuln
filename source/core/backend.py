@@ -730,21 +730,31 @@ class WebVuln:
                 os.mkdir(f"{ROOTPATH}{reportFolder}")
             
             
-            generateReport = ReportGenerator(scanResult, f"{ROOTPATH}\\reports")
-            checkGenerateReport =  False
+            generateReport = ReportGenerator(scanResult, f"{ROOTPATH}\\reports") 
             if reportType == "json":
                 generateReport.generateJson()
+                if generateReport.generateJson():
+                    utils.log("[backend.py-handleReportGeneration] Success: Report generated", "INFO")
+                    return "Success"
+                else:
+                    utils.log("[backend.py-handleReportGeneration] Error: Failed to generate report", "ERROR")
+                    return "Failed"
             elif reportType == "xml":
-                generateReport.generateXml()
+                if generateReport.generateXml():
+                    utils.log("[backend.py-handleReportGeneration] Success: Report generated", "INFO")
+                    return "Success"
+                else:
+                    utils.log("[backend.py-handleReportGeneration] Error: Failed to generate report", "ERROR")
+                    return "Failed"
             elif reportType == "pdf":
                 generateReport.generatePdf()
-            
-            if checkGenerateReport:
-                utils.log("[backend.py-handleReportGeneration] Success: Report generated", "INFO")
-                return "Success"
-            else:
-                utils.log("[backend.py-handleReportGeneration] Error: Failed to generate report", "ERROR")
-                return "Failed"
+                if generateReport.generatePdf():
+                    utils.log("[backend.py-handleReportGeneration] Success: Report generated", "INFO")
+                    return "Success"
+                else:
+                    utils.log("[backend.py-handleReportGeneration] Error: Failed to generate report", "ERROR")
+                    return "Failed"
+
         except Exception as e:
             utils.log(f"[backend.py-handleReportGeneration] Error: {str(e)}", "ERROR")
             return "Failed"   

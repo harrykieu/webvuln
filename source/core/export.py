@@ -4,7 +4,9 @@ import pdfkit
 import xml.etree.ElementTree as ET
 import source.core.utils as utils
 
+from pdfkit.api import configuration
 
+wkhtml_path = pdfkit.configuration(wkhtmltopdf = "C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe")
 
 class ReportGenerator:
     def __init__(self, scanResults, filePath):
@@ -85,8 +87,8 @@ class ReportGenerator:
             pdfContent += '</body></html>'
 
             fileName = os.path.join(self.filePath, 'report.pdf')
-            pdfkit.from_string(pdfContent, fileName)
+            pdfkit.from_string(pdfContent, fileName, configuration=wkhtml_path)
             return True
         except Exception as e:
-            utils.log(e)
+            utils.log(e, "ERROR")
             return False
