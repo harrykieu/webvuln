@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:webvuln/items/newSubmitButton.dart';
-import 'package:webvuln/views/variable.dart';
+import 'package:webvuln/items/gradient_button.dart';
+import 'package:webvuln/variable.dart';
 
-class settingScreen extends StatefulWidget {
-  const settingScreen({super.key});
+class SettingScreen extends StatefulWidget {
+  const SettingScreen({super.key});
 
   @override
-  State<settingScreen> createState() => _settingScreenState();
+  State<SettingScreen> createState() => _SettingScreenState();
 }
 
-class _settingScreenState extends State<settingScreen> {
+class _SettingScreenState extends State<SettingScreen> {
   @override
   TextEditingController _databaseController = TextEditingController();
   TextEditingController _formatController = TextEditingController();
@@ -46,7 +46,7 @@ class _settingScreenState extends State<settingScreen> {
         title: Text(
           "SETTINGS",
           style:
-              GoogleFonts.montserrat(fontSize: 30, fontWeight: FontWeight.w600),
+              GoogleFonts.montserrat(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       )),
       body: SingleChildScrollView(

@@ -1,14 +1,13 @@
+// ignore_for_file: file_names, must_be_immutable, camel_case_types
+
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-// import 'package:syncfusion_flutter_gauges/gauges.dart';
-// import 'package:fl_chart/fl_chart.dart';
-// import 'package:pie_chart/pie_chart.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'indicators.dart';
+
 import 'app_colors.dart';
+import 'indicators.dart';
 
 class containerPieChart extends StatefulWidget {
   String data;

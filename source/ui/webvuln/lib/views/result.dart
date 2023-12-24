@@ -1,29 +1,27 @@
-// ignore_for_file: unused_element, camel_case_types
+// ignore_for_file: avoid_print
 
 import 'dart:convert';
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:webvuln/items/newSubmitButton.dart';
+import 'package:webvuln/items/gradient_button.dart';
 import 'package:webvuln/model/model.dart';
-import 'package:webvuln/views/variable.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-// parse data function
+import 'package:webvuln/variable.dart';
 
-// TODO: parse data from loading screen to display on result screen
-class resultScreen extends StatefulWidget {
+class ResultScreen extends StatefulWidget {
   final String data;
 
-  const resultScreen({super.key, required this.data});
+  const ResultScreen({super.key, required this.data});
 
   @override
-  State<resultScreen> createState() => _resultScreenState();
+  State<ResultScreen> createState() => _ResultScreenState();
   String get resultData => data;
 }
 
-class _resultScreenState extends State<resultScreen> {
+class _ResultScreenState extends State<ResultScreen> {
   bool isVisibled = true;
   bool isAppeared = true;
   String state = 'All';
@@ -123,61 +121,47 @@ class _resultScreenState extends State<resultScreen> {
 
     return Scaffold(
         backgroundColor: const Color(0xFFF0F0F0),
+        appBar: AppBar(
+            title: ListTile(
+          leading: const Icon(Icons.checklist_rounded),
+          title: Text("SCAN RESULT",
+              style: GoogleFonts.montserrat(
+                  fontSize: 24, fontWeight: FontWeight.bold)),
+          trailing: SizedBox(
+            width: 200,
+            height: 40,
+            child: DropdownButtonFormField<String>(
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.filter_alt_outlined, size: 30),
+                  alignLabelWithHint: true,
+                  label: Text('Filter by type'),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderSide: BorderSide(color: Colors.black12)),
+                  contentPadding: EdgeInsetsDirectional.only(start: 15),
+                ),
+                focusColor: const Color(0xFFF0F0F0),
+                icon: const Icon(Icons.arrow_drop_down),
+                dropdownColor: Colors.white,
+                value: state,
+                items: dropdownValue,
+                onSaved: (v) {
+                  setState(() {
+                    state = v!;
+                  });
+                },
+                onChanged: (v) {
+                  setState(() {
+                    state = v!;
+                  });
+                }),
+          ),
+        )),
         body: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // dropdown
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                GradientButton(
-                  horizontalMargin: 40,
-                  verticalMargin: 10,
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Icon(Icons.arrow_back, color: Colors.white),
-                ),
-                Container(
-                  margin: const EdgeInsetsDirectional.only(start: 40, top: 10),
-                  child: Text("SCAN RESULT",
-                      style: GoogleFonts.montserrat(
-                          fontSize: 24, fontWeight: FontWeight.bold)),
-                ),
-                Container(
-                  margin: const EdgeInsetsDirectional.only(end: 40),
-                  width: 200,
-                  height: 40,
-                  child: DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        icon: Icon(Icons.filter_alt_outlined, size: 30),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(15)),
-                            borderSide: BorderSide(color: Colors.black12)),
-                        contentPadding: EdgeInsetsDirectional.only(start: 15),
-                      ),
-                      focusColor: const Color(0xFFF0F0F0),
-                      icon: const Icon(Icons.arrow_drop_down),
-                      dropdownColor: Colors.white,
-                      value: state,
-                      items: dropdownValue,
-                      onSaved: (v) {
-                        setState(() {
-                          state = v!;
-                        });
-                      },
-                      onChanged: (v) {
-                        setState(() {
-                          state = v!;
-                        });
-                      }),
-                ),
-              ]),
-              const Divider(
-                  color: Colors.black,
-                  thickness: 0.2,
-                  indent: 40,
-                  endIndent: 40),
               Container(
                 height: screenHeight / 2,
                 width: screenWidth,
@@ -205,14 +189,14 @@ class _resultScreenState extends State<resultScreen> {
                         children: [
                           Text(
                             'Domain: ${dataBeforeParse[0].domain}',
-                            style: GoogleFonts.cabin(
-                                fontSize: 24, fontWeight: FontWeight.normal),
+                            style: GoogleFonts.montserrat(
+                                fontSize: 24, fontWeight: FontWeight.w500),
                           ),
                           const Spacer(),
                           Text(
                             'Result Point: ${dataBeforeParse[0].resultPoint}',
-                            style: GoogleFonts.cabin(
-                                fontSize: 24, fontWeight: FontWeight.normal),
+                            style: GoogleFonts.montserrat(
+                                fontSize: 24, fontWeight: FontWeight.w500),
                           )
                         ],
                       ),
@@ -233,20 +217,33 @@ class _resultScreenState extends State<resultScreen> {
                           )
                         ],
                       ),
-                      child: DataTable2(columns: const [
+                      child: DataTable2(columns: [
                         DataColumn2(
-                          label: Text('Severity'),
+                          label: Text(
+                            'Severity',
+                            style: GoogleFonts.montserrat(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
                           tooltip: 'Blue - Low, Yellow - Medium, Red - High',
                         ),
                         DataColumn2(
-                          label: Text('Type'),
+                          label: Text(
+                            'Type',
+                            style: GoogleFonts.montserrat(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
                           tooltip: 'Type of vulnerability',
                         ),
                         DataColumn2(
-                          label: Text('Payloads used'),
+                          label: Text(
+                            'Payloads used',
+                            style: GoogleFonts.montserrat(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
                           tooltip: 'Payloads used to get the result',
                         ),
                       ], rows: updateTable(state, listVuln)),
+                      // TODO: make row clickable to show more info
                     ),
                   ],
                 ),
@@ -276,10 +273,11 @@ class _resultScreenState extends State<resultScreen> {
                               const Image(
                                   image: AssetImage(
                                       'lib/assets/Folders_light.png')),
+                              const SizedBox(width: 10),
                               Text(
-                                'Description',
+                                'VULNERABILITIES DETAILS',
                                 style: GoogleFonts.montserrat(
-                                    fontSize: 24, fontWeight: FontWeight.bold),
+                                    fontSize: 22, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -288,7 +286,7 @@ class _resultScreenState extends State<resultScreen> {
                       ],
                     ),
                   )),
-              Container(
+              SizedBox(
                 width: screenWidth,
                 height: 70,
                 child: Row(
@@ -300,13 +298,15 @@ class _resultScreenState extends State<resultScreen> {
                       width: 200,
                       child: DropdownButtonFormField<String>(
                           decoration: const InputDecoration(
-                            icon: Icon(Icons.filter_alt_outlined, size: 30),
+                            icon:
+                                Icon(Icons.document_scanner_outlined, size: 30),
                             border: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(15)),
                                 borderSide: BorderSide(color: Colors.black12)),
                             contentPadding:
                                 EdgeInsetsDirectional.only(start: 15),
+                            label: Text('Export report as'),
                           ),
                           focusColor: const Color(0xFFF0F0F0),
                           icon: const Icon(Icons.arrow_drop_down),
@@ -342,9 +342,16 @@ class _resultScreenState extends State<resultScreen> {
                       verticalMargin: 10,
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
                       onPressed: () {
+                        // TODO: implement export function
                         print("Exporting data to $exportState");
                       },
-                      child: const Icon(Icons.download, color: Colors.white),
+                      child: const Text(
+                        'Export',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ),

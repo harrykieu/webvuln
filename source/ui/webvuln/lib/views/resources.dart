@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, avoid_print, depend_on_referenced_packages, use_build_context_synchronously
+// ignore_for_file: avoid_print, depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:convert';
 import 'dart:io';
@@ -8,20 +8,20 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path/path.dart';
-import 'package:webvuln/items/newSubmitButton.dart';
+import 'package:webvuln/items/gradient_button.dart';
 import 'package:webvuln/model/model.dart';
 import 'package:webvuln/service/api.dart';
 
 import '../items/input.dart';
 
-class resourceScreen extends StatefulWidget {
-  const resourceScreen({super.key});
+class ResourceScreen extends StatefulWidget {
+  const ResourceScreen({super.key});
 
   @override
-  State<resourceScreen> createState() => _resourceScreenState();
+  State<ResourceScreen> createState() => _ResourceScreenState();
 }
 
-class _resourceScreenState extends State<resourceScreen> {
+class _ResourceScreenState extends State<ResourceScreen> {
   late String state;
   late String fileGetState;
   late String fileSendState;
@@ -45,6 +45,7 @@ class _resourceScreenState extends State<resourceScreen> {
 
   void updateTableNormal(List<ResourceNormalTableData> newData,
       TextEditingController valueEditController, BuildContext context) {
+    // BUG: Data rendering too slow
     setState(() {
       normalTableDataList = newData;
       dataRowList = normalTableDataList
@@ -80,11 +81,16 @@ class _resourceScreenState extends State<resourceScreen> {
       fileTableDataList = newData;
       dataRowList = fileTableDataList
           .map((tableData) => DataRow(cells: [
-                DataCell(Text(tableData.fileName)),
-                DataCell(Text(tableData.description)),
-                DataCell(Text(tableData.base64value)),
-                DataCell(Text(tableData.createdDate)),
-                DataCell(Text(tableData.editedDate)),
+                DataCell(Text(tableData.fileName,
+                    style: GoogleFonts.montserrat(fontSize: 16))),
+                DataCell(Text(tableData.description,
+                    style: GoogleFonts.montserrat(fontSize: 16))),
+                DataCell(Text(tableData.base64value,
+                    style: GoogleFonts.montserrat(fontSize: 16))),
+                DataCell(Text(tableData.createdDate,
+                    style: GoogleFonts.montserrat(fontSize: 16))),
+                DataCell(Text(tableData.editedDate,
+                    style: GoogleFonts.montserrat(fontSize: 16))),
                 DataCell(TextButton(
                     onPressed: () {
                       showDialog(
@@ -180,61 +186,53 @@ class _resourceScreenState extends State<resourceScreen> {
     }
     return Scaffold(
       backgroundColor: const Color(0xFFF0F0F0),
+      appBar: AppBar(
+          leadingWidth: screenWidth * (1 - 0.13),
+          title: ListTile(
+            leading: const Icon(Icons.storage_outlined),
+            title: Text("RESOURCE MANAGEMENT",
+                style: GoogleFonts.montserrat(
+                    fontSize: 24, fontWeight: FontWeight.bold)),
+            trailing: SizedBox(
+              width: 250,
+              height: 40,
+              child: DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.type_specimen_outlined, size: 30),
+                    label: Text('Resource type'),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        borderSide: BorderSide(color: Colors.black12)),
+                    contentPadding: EdgeInsetsDirectional.only(start: 15),
+                  ),
+                  focusColor: Colors.white,
+                  icon: const Icon(Icons.arrow_drop_down),
+                  dropdownColor: Colors.white,
+                  value: state,
+                  items: const [
+                    DropdownMenuItem(
+                        value: '/normalPost', child: Text('Normal Resource')),
+                    DropdownMenuItem(
+                        value: '/filePost', child: Text('File Resource'))
+                  ],
+                  onSaved: (v) {
+                    setState(() {
+                      state = v!;
+                    });
+                  },
+                  onChanged: (v) {
+                    setState(() {
+                      state = v!;
+                    });
+                  }),
+            ),
+          )),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // dropdown
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                margin: const EdgeInsetsDirectional.only(start: 40, top: 10),
-                child: Text("RESOURCE MANAGEMENT",
-                    style: GoogleFonts.montserrat(
-                        fontSize: 24, fontWeight: FontWeight.bold)),
-              ),
-              Container(
-                margin: const EdgeInsetsDirectional.only(end: 40),
-                width: 250,
-                height: 40,
-                child: DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      icon: Icon(Icons.type_specimen_outlined, size: 30),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                          borderSide: BorderSide(color: Colors.black12)),
-                      contentPadding: EdgeInsetsDirectional.only(start: 15),
-                    ),
-                    focusColor: const Color(0xFFF0F0F0),
-                    icon: const Icon(Icons.arrow_drop_down),
-                    dropdownColor: Colors.white,
-                    value: state,
-                    items: const [
-                      DropdownMenuItem(
-                          value: '/normalPost', child: Text('Normal Resource')),
-                      DropdownMenuItem(
-                          value: '/filePost', child: Text('File Resource'))
-                    ],
-                    onSaved: (v) {
-                      setState(() {
-                        state = v!;
-                      });
-                    },
-                    onChanged: (v) {
-                      setState(() {
-                        state = v!;
-                      });
-                    }),
-              ),
-            ],
-          ),
-          const Divider(
-              color: Colors.black, thickness: 0.2, indent: 40, endIndent: 40),
           //table
           tableWidget,
           // search box
-          inputWidget,
+          inputWidget
         ],
       ),
     );
@@ -250,8 +248,8 @@ class _resourceScreenState extends State<resourceScreen> {
   }) {
     return Container(
       width: screenWidth,
-      height: screenHeight / 2,
-      margin: const EdgeInsetsDirectional.only(start: 40, end: 40),
+      height: screenHeight / 2 + 50,
+      margin: const EdgeInsetsDirectional.only(start: 40, end: 40, top: 10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: Colors.white,
@@ -329,7 +327,7 @@ class _resourceScreenState extends State<resourceScreen> {
           ],
         ),
         Container(
-            height: screenHeight / 2 - 50 - 20 - 20 - 10 - 10,
+            height: screenHeight / 2 - 70,
             width: screenWidth,
             margin: const EdgeInsetsDirectional.only(
                 start: 40, end: 40, bottom: 10),
@@ -344,16 +342,50 @@ class _resourceScreenState extends State<resourceScreen> {
                   color: Colors.blue.shade100),
               child: DataTable2(
                 columnSpacing: 10,
-                columns: const [
-                  DataColumn2(label: Text('Vulnerability'), fixedWidth: 100),
-                  DataColumn2(label: Text('Resource Type'), fixedWidth: 120),
-                  DataColumn2(label: Text('Value'), size: ColumnSize.L),
-                  DataColumn2(label: Text('Created Date'), size: ColumnSize.S),
+                columns: [
                   DataColumn2(
-                    label: Text('Edited Date'),
+                      label: Text(
+                        'Vulnerability',
+                        style: GoogleFonts.montserrat(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      fixedWidth: 150),
+                  DataColumn2(
+                      label: Text(
+                        'Resource Type',
+                        style: GoogleFonts.montserrat(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      fixedWidth: 200),
+                  DataColumn2(
+                      label: Text(
+                        'Value',
+                        style: GoogleFonts.montserrat(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      size: ColumnSize.L),
+                  DataColumn2(
+                      label: Text(
+                        'Created Date',
+                        style: GoogleFonts.montserrat(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      size: ColumnSize.S),
+                  DataColumn2(
+                    label: Text(
+                      'Edited Date',
+                      style: GoogleFonts.montserrat(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                     size: ColumnSize.S,
                   ),
-                  DataColumn2(label: Text('Info'), fixedWidth: 40),
+                  DataColumn2(
+                      label: Text(
+                        'Info',
+                        style: GoogleFonts.montserrat(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      fixedWidth: 60),
                 ],
                 rows: dataRowList,
               ),
@@ -369,8 +401,8 @@ class _resourceScreenState extends State<resourceScreen> {
       required BuildContext context}) {
     return Container(
       width: screenWidth,
-      height: screenHeight / 2,
-      margin: const EdgeInsetsDirectional.only(start: 40, end: 40),
+      height: screenHeight / 2 + 50,
+      margin: const EdgeInsetsDirectional.only(start: 40, end: 40, top: 10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: Colors.white,
@@ -396,6 +428,12 @@ class _resourceScreenState extends State<resourceScreen> {
               width: 400,
               margin: const EdgeInsetsDirectional.only(end: 40),
               child: DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                      alignLabelWithHint: true,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          borderSide: BorderSide(color: Colors.black12)),
+                      contentPadding: EdgeInsetsDirectional.only(start: 15)),
                   focusColor: Colors.white,
                   icon: const Icon(Icons.arrow_drop_down),
                   dropdownColor: Colors.white,
@@ -465,7 +503,7 @@ class _resourceScreenState extends State<resourceScreen> {
           ],
         ),
         Container(
-            height: screenHeight / 2 - 50 - 20 - 20 - 10,
+            height: screenHeight / 2 - 70,
             width: screenWidth,
             margin: const EdgeInsetsDirectional.symmetric(horizontal: 40),
             decoration: const BoxDecoration(
@@ -480,15 +518,49 @@ class _resourceScreenState extends State<resourceScreen> {
               ),
               child: DataTable2(
                   columnSpacing: 20,
-                  columns: const [
-                    DataColumn2(label: Text('File name'), fixedWidth: 100),
-                    DataColumn2(label: Text('Description'), fixedWidth: 100),
+                  columns: [
                     DataColumn2(
-                        label: Text('Base64 Value'), size: ColumnSize.L),
+                        label: Text(
+                          'File name',
+                          style: GoogleFonts.montserrat(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        fixedWidth: 150),
                     DataColumn2(
-                        label: Text('Created Date'), size: ColumnSize.S),
-                    DataColumn2(label: Text('Edited Date'), size: ColumnSize.S),
-                    DataColumn2(label: Text('Info'), fixedWidth: 40),
+                        label: Text(
+                          'Description',
+                          style: GoogleFonts.montserrat(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        fixedWidth: 200),
+                    DataColumn2(
+                        label: Text(
+                          'Base64 Value',
+                          style: GoogleFonts.montserrat(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        size: ColumnSize.L),
+                    DataColumn2(
+                        label: Text(
+                          'Created Date',
+                          style: GoogleFonts.montserrat(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        size: ColumnSize.S),
+                    DataColumn2(
+                        label: Text(
+                          'Edited Date',
+                          style: GoogleFonts.montserrat(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        size: ColumnSize.S),
+                    DataColumn2(
+                        label: Text(
+                          'Info',
+                          style: GoogleFonts.montserrat(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        fixedWidth: 60),
                   ],
                   rows: dataRowList),
             )),
@@ -619,6 +691,12 @@ class _resourceScreenState extends State<resourceScreen> {
                 width: 400,
                 margin: const EdgeInsetsDirectional.only(end: 40, top: 10),
                 child: DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                        alignLabelWithHint: true,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                            borderSide: BorderSide(color: Colors.black12)),
+                        contentPadding: EdgeInsetsDirectional.only(start: 15)),
                     focusColor: Colors.white,
                     icon: const Icon(Icons.arrow_drop_down),
                     dropdownColor: Colors.white,

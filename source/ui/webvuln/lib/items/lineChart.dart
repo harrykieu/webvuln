@@ -1,12 +1,14 @@
+// ignore_for_file: camel_case_types, must_be_immutable
+
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
 
 class lineChart extends StatelessWidget {
   String data;
-  lineChart({required this.data});
+  lineChart({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -205,5 +207,3 @@ class lineChart extends StatelessWidget {
         ),
       ];
 }
-
-

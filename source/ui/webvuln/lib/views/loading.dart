@@ -1,21 +1,19 @@
-// ignore_for_file: file_names
+// ignore_for_file: avoid_print, library_private_types_in_public_api
 
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:webvuln/service/api.dart';
-import 'package:webvuln/views/resultScreen.dart';
 
-class loadingScreen extends StatefulWidget {
-  const loadingScreen({super.key});
+import 'package:flutter/material.dart';
+import 'package:webvuln/service/api.dart';
+import 'package:webvuln/views/result.dart';
+
+class LoadingScreen extends StatefulWidget {
+  const LoadingScreen({super.key});
 
   @override
-  _loadingScreenState createState() => _loadingScreenState();
+  _LoadingScreenState createState() => _LoadingScreenState();
 }
 
-class _loadingScreenState extends State<loadingScreen> {
+class _LoadingScreenState extends State<LoadingScreen> {
   late Future<String?> serverResponse;
   late WebVulnSocket socket;
 
@@ -77,7 +75,7 @@ class _loadingScreenState extends State<loadingScreen> {
               return Text('Error: ${snapshot.error ?? "Unknown error"}');
             } else {
               String? snapData = snapshot.data;
-              return resultScreen(data: extractJson(snapData!));
+              return ResultScreen(data: extractJson(snapData!));
             }
           },
         ),

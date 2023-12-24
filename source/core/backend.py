@@ -690,7 +690,6 @@ class WebVuln:
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
-                print(listResult[0])
                 return json.dumps(listResult, default=str)
             else:
                 utils.log(

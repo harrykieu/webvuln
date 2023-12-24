@@ -13,9 +13,9 @@ Options _options = Options(
     headers: {'Content-Type': 'application/json', 'Origin': 'frontend'});
 
 var shell = Shell();
-Future<void> runShell({required String command_line}) async {
-    var resultRun = await shell.run(command_line);
-    print(resultRun);
+Future<void> runShell({required String commandLine}) async {
+  var resultRun = await shell.run(commandLine);
+  print(resultRun);
 }
 
 class WebVulnSocket {

@@ -1,15 +1,12 @@
 // ignore_for_file: camel_case_types, depend_on_referenced_packages
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import 'package:webvuln/views/historyScreen.dart';
-import 'package:webvuln/views/resourcesScreen.dart';
-import 'package:webvuln/views/scanScreen.dart';
-import 'package:webvuln/views/settingScreen.dart';
+import 'package:webvuln/views/history.dart';
+import 'package:webvuln/views/resources.dart';
+import 'package:webvuln/views/scan.dart';
+import 'package:webvuln/views/setting.dart';
 
 void main() async {
   //TestWidgetsFlutterBinding.ensureInitialized();
@@ -38,16 +35,15 @@ class _mainScreenState extends State<mainScreen> {
   String scanResult = '';
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _selectedIndex = 0;
   }
 
   final List _selectedItem = [
-    const scanScreen(),
-    const historyScreen(),
-    const resourceScreen(),
-    const settingScreen()
+    const ScanScreen(),
+    const HistoryScreen(),
+    const ResourceScreen(),
+    const SettingScreen()
   ];
 
   @override
@@ -155,8 +151,8 @@ class _mainScreenState extends State<mainScreen> {
         ));
   }
 
-  Stream<int> get _selectedIndexStream =>
+/*   Stream<int> get _selectedIndexStream =>
       Stream.fromFuture(Future.delayed(const Duration(milliseconds: 500), () {
         return _selectedIndex;
-      }));
+      })); */
 }
