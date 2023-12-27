@@ -27,6 +27,8 @@ class _ResultScreenState extends State<ResultScreen> {
   String state = 'All';
   String exportState = dotenv.env['DEFAULT_EXPORT_TYPE']!;
   List<HistoryTableData> jsonDecoded = [];
+  double dialogWidth = MediaQuery.of(Get.context!).size.width / 1.5;
+  double dialogHeight = MediaQuery.of(Get.context!).size.height / 2;
 
   @override
   void initState() {
@@ -68,11 +70,105 @@ class _ResultScreenState extends State<ResultScreen> {
       newData = data;
     }
     List<DataRow> dataRows = newData
-        .map((e) => DataRow(cells: [
-              DataCell(warnLevel(e.severity)),
-              DataCell(Text(e.type)),
-              DataCell(Text(e.payload.toString())),
-            ]))
+        .map((e) => DataRow2(
+                cells: [
+                  DataCell(warnLevel(e.severity)),
+                  DataCell(Text(e.type)),
+                  DataCell(Text(e.payload.toString())),
+                ],
+                onTap: () async {
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: Row(
+                              children: [
+                                const Icon(Icons.warning_amber_sharp),
+                                const SizedBox(width: 10),
+                                Text('VULNERABILITY DETAILS',
+                                    style: GoogleFonts.montserrat(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold))
+                              ],
+                            ),
+                            content: SizedBox(
+                                width: dialogWidth,
+                                height: dialogHeight,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text("Type: ",
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold)),
+                                        Text(e.type,
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500))
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text("Severity: ",
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold)),
+                                        Text(e.severity,
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500))
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text("Payload used: ",
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold)),
+                                        Text(e.payload.toString(),
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500))
+                                      ],
+                                    ),
+                                    Text("Scanner module logs: ",
+                                        style: GoogleFonts.montserrat(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold)),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey[350],
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            border: Border.all(
+                                                color: Colors.black)),
+                                        child: SingleChildScrollView(
+                                          child: Text(e.logs,
+                                              style: GoogleFonts.montserrat(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500)),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('OK'))
+                            ],
+                          ));
+                }))
         .toList();
     return dataRows;
   }
@@ -275,7 +371,7 @@ class _ResultScreenState extends State<ResultScreen> {
                                       'lib/assets/Folders_light.png')),
                               const SizedBox(width: 10),
                               Text(
-                                'VULNERABILITIES DETAILS',
+                                'VULNERABILITIES DEFINITIONS',
                                 style: GoogleFonts.montserrat(
                                     fontSize: 22, fontWeight: FontWeight.bold),
                               ),
@@ -293,8 +389,7 @@ class _ResultScreenState extends State<ResultScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
-                      margin: const EdgeInsetsDirectional.symmetric(
-                          horizontal: 0, vertical: 10),
+                      margin: const EdgeInsetsDirectional.only(top: 20),
                       width: 200,
                       child: DropdownButtonFormField<String>(
                           decoration: const InputDecoration(
@@ -337,20 +432,24 @@ class _ResultScreenState extends State<ResultScreen> {
                             });
                           }),
                     ),
-                    GradientButton(
-                      horizontalMargin: 40,
-                      verticalMargin: 10,
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      onPressed: () {
-                        // TODO: implement export function
-                        print("Exporting data to $exportState");
-                      },
-                      child: const Text(
-                        'Export',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: GradientButton(
+                        horizontalMargin: 40,
+                        verticalMargin: 10,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                        onPressed: () {
+                          // TODO: implement export function
+                          print("Exporting data to $exportState");
+                        },
+                        child: const Text(
+                          'Export',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],
