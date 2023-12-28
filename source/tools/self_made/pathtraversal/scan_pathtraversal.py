@@ -58,6 +58,43 @@ class PathTraversal:
                     self.result = True
                     stopChecking = True
                     break
+            if self.result is False:
+                parsedUrl = urllib.parse.urlparse(self.url)
+                parsedUrl = parsedUrl._replace(query='')
+                self.url = urllib.parse.urlunparse(parsedUrl)
+                for paramInfo in self.parameterList:
+                    param = paramInfo["value"]
+
+                    if stopChecking is True:
+                        break
+                    
+                    if not self.isParamRelevant(param):
+                        print(f"[!] Skipping irrelevant parameter: {param}")
+                        continue
+                    else:
+                        for payload in self.resources:
+                            encodedPayload = urllib.parse.quote(payload["value"])
+                            newUrl = f"{self.url}?{param}={encodedPayload}"
+                            print("[!] Trying", newUrl)
+                            try:
+                                res = requests.get(newUrl)
+                                if re.search(rb"root:x:0:0", res.content):
+                                    print(
+                                        "[+] Path Traversal vulnerability detected, link:", newUrl
+                                    )
+                                    utils.log(
+                                        f"[PathTraversal] Path Traversal vulnerability detected, link: {newUrl}",
+                                        "INFO",
+                                        "pathTraversal.txt",
+                                    )
+                                    self.payloads.append(payload["value"])
+                                    self.result = True
+                                    stopChecking = True
+                                    break
+                            except requests.exceptions.RequestException as e:
+                                error_msg = f"Error connecting to {newUrl}: {e}"
+                                print(error_msg)
+                                utils.log(error_msg, "ERROR", "pathTraversal.txt")
         else:
             for paramInfo in self.parameterList:
                 param = paramInfo["value"]
