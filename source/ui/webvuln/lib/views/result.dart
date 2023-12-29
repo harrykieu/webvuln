@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/gradient_button.dart';
 import 'package:webvuln/model/model.dart';
+import 'package:webvuln/service/api.dart';
 import 'package:webvuln/variable.dart';
 
 class ResultScreen extends StatefulWidget {
@@ -439,9 +440,37 @@ class _ResultScreenState extends State<ResultScreen> {
                         verticalMargin: 10,
                         borderRadius:
                             const BorderRadius.all(Radius.circular(20)),
-                        onPressed: () {
+                        onPressed: () async {
                           // TODO: implement export function
-                          print("Exporting data to $exportState");
+                          String result = await createReport(
+                              result: jsonDecoded, type: exportState);
+                          // ignore: use_build_context_synchronously
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: Row(
+                                      children: [
+                                        const Icon(Icons.error),
+                                        const SizedBox(width: 5),
+                                        Text('Export status',
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold))
+                                      ],
+                                    ),
+                                    content: Text('$result',
+                                        style: GoogleFonts.montserrat(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.normal)),
+                                    alignment: Alignment.center,
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('OK'))
+                                    ],
+                                  ));
                         },
                         child: const Text(
                           'Export',

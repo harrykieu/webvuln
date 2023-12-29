@@ -81,7 +81,6 @@ class WebVulnSocket {
 }
 
 //POST api/scan
-//Post url and number module to scan in screen scan
 Future<String> postURL(
     {required List<String> nameURL, required List<String> moduleNumber}) async {
   final data = jsonEncode(URL(url: nameURL, modules: moduleNumber).toJson());
@@ -208,5 +207,24 @@ Future<String> getResourcesFile({required String description}) async {
   } catch (e) {
     print('Error get resources: $e');
     return 'Error get resources';
+  }
+}
+
+Future<String> createReport(
+    {required List<dynamic> result, required String type}) async {
+  final data = jsonEncode(Report(result: result, type: type));
+  final url = '$baseUrl/api/report';
+  try {
+    final response = await dio.post(url, data: data, options: _options);
+    if (response.statusCode == 200 && response.data != {}) {
+      print('Create report successfully');
+      return response.toString();
+    } else {
+      print('Failed to create report');
+      return 'Failed to create report';
+    }
+  } catch (e) {
+    print('Error create report: $e');
+    return 'Error create report';
   }
 }
