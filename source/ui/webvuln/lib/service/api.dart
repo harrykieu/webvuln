@@ -4,12 +4,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'dart:io';
+import 'package:process_run/process_run.dart';
 import '../model/model.dart';
 
 Dio dio = Dio();
 String baseUrl = 'http://127.0.0.1:5000';
 Options _options = Options(
     headers: {'Content-Type': 'application/json', 'Origin': 'frontend'});
+
+var shell = Shell();
+Future<void> runShell({required String commandLine}) async {
+  var resultRun = await shell.run(commandLine);
+  print(resultRun);
+}
 
 class WebVulnSocket {
   final String url;
@@ -74,18 +81,21 @@ class WebVulnSocket {
 }
 
 //POST api/scan
-//Post url and number module to scan in screen scan
 Future<String> postURL(
     {required List<String> nameURL, required List<String> moduleNumber}) async {
   final data = jsonEncode(URL(url: nameURL, modules: moduleNumber).toJson());
   final url = '$baseUrl/api/scan';
   try {
     final response = await dio.post(url, data: data, options: _options);
-    if (response.statusCode == 200) {
-      print('Sucessfully post data');
-      return "Data posted successfull";
-    } else {
-      return "Failed post data";
+    switch (response.statusCode) {
+      case 200:
+        return "post data success";
+      case 400:
+        return "Not found data";
+      case 500:
+        return "Connection crasshed";
+      default:
+        return 'None';
     }
   } catch (e) {
     print(ContentType.json);
@@ -197,5 +207,24 @@ Future<String> getResourcesFile({required String description}) async {
   } catch (e) {
     print('Error get resources: $e');
     return 'Error get resources';
+  }
+}
+
+Future<String> createReport(
+    {required List<dynamic> result, required String type}) async {
+  final data = jsonEncode(Report(result: result, type: type));
+  final url = '$baseUrl/api/report';
+  try {
+    final response = await dio.post(url, data: data, options: _options);
+    if (response.statusCode == 200 && response.data != {}) {
+      print('Create report successfully');
+      return response.toString();
+    } else {
+      print('Failed to create report');
+      return 'Failed to create report';
+    }
+  } catch (e) {
+    print('Error create report: $e');
+    return 'Error create report';
   }
 }

@@ -20,6 +20,7 @@ backend.setDebug(True)
 # - `result`: result of the scan
 # - `type`: type of the report (e.g. html, pdf, etc.)
 
+
 @app.post("/api/report")
 def report():
     """Create report.
@@ -46,7 +47,7 @@ def report():
             utils.log("/api/report: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if "result" in keys and "reportType" in keys and len(keys) == 2:
+    if "result" in keys and "type" in keys and len(keys) == 2:
         try:
             if app.debug:
                 utils.log(f"/api/report: Successfully received data: {data}", "INFO")
@@ -80,8 +81,7 @@ def scan():
     contHeader = request.headers.get("Content-Type")
     if contHeader != "application/json":
         if app.debug:
-            utils.log(
-                "/api/scan: Missing or invalid Content-Type header", "DEBUG")
+            utils.log("/api/scan: Missing or invalid Content-Type header", "DEBUG")
         return "Bad request", 400
     data = request.get_json()
     if not data:
@@ -91,8 +91,7 @@ def scan():
     keys = data.keys()
     if "urls" in keys and "modules" in keys and len(keys) == 2:
         if app.debug:
-            utils.log(
-                f"/api/scan: Successfully received data: {data}", "DEBUG")
+            utils.log(f"/api/scan: Successfully received data: {data}", "DEBUG")
         backend.recvFlask("/api/scan", "POST", data)
         return "Success", 200
     else:
@@ -119,8 +118,7 @@ def history():
     contHeader = request.headers.get("Content-Type")
     if contHeader != "application/json":
         if app.debug:
-            utils.log(
-                "/api/history: Missing or invalid Content-Type header", "DEBUG")
+            utils.log("/api/history: Missing or invalid Content-Type header", "DEBUG")
         return "Bad request", 400
     data = request.get_json()
     if not data:
@@ -130,8 +128,7 @@ def history():
     keys = data.keys()
     if "domain" in keys and "scanDate" in keys and len(keys) == 2:
         if app.debug:
-            utils.log(
-                f"/api/history: Successfully received data: {data}", "DEBUG")
+            utils.log(f"/api/history: Successfully received data: {data}", "DEBUG")
         result = backend.recvFlask("/api/history", "GET", data)
         if result == "Failed":
             utils.log("/api/history: Failed to get scan history", "ERROR")
@@ -159,8 +156,7 @@ def postResources():
     orgHeader = request.headers.get("Origin")
     if orgHeader != "frontend":
         if app.debug:
-            utils.log(
-                "/api/resourcesnormal: Missing or invalid Origin header", "DEBUG")
+            utils.log("/api/resourcesnormal: Missing or invalid Origin header", "DEBUG")
         return "Forbidden", 403
     contHeader = request.headers.get("Content-Type")
     if contHeader != "application/json":
@@ -172,8 +168,7 @@ def postResources():
     data = request.get_json()
     if not data:
         if app.debug:
-            utils.log(
-                "/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
+            utils.log("/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
     if (
@@ -194,8 +189,7 @@ def postResources():
         return "Success", 200
     else:
         if app.debug:
-            utils.log(
-                "/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
+            utils.log("/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
 
 
@@ -212,8 +206,7 @@ def getResources():
     orgHeader = request.headers.get("Origin")
     if orgHeader != "frontend":
         if app.debug:
-            utils.log(
-                "/api/resourcesnormal: Missing or invalid Origin header", "DEBUG")
+            utils.log("/api/resourcesnormal: Missing or invalid Origin header", "DEBUG")
         return "Forbidden", 403
     contHeader = request.headers.get("Content-Type")
     if contHeader != "application/json":
@@ -225,8 +218,7 @@ def getResources():
     data = request.get_json()
     if not data:
         if app.debug:
-            utils.log(
-                "/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
+            utils.log("/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
     if "vulnType" in keys and "resType" in keys and len(keys) == 2:
@@ -242,8 +234,7 @@ def getResources():
             return result, 200
     else:
         if app.debug:
-            utils.log(
-                "/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
+            utils.log("/api/resourcesnormal: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
 
 
@@ -259,8 +250,7 @@ def getResourcesFile():
     orgHeader = request.headers.get("Origin")
     if orgHeader != "frontend":
         if app.debug:
-            utils.log(
-                "/api/resourcesfile: Missing or invalid Origin header", "DEBUG")
+            utils.log("/api/resourcesfile: Missing or invalid Origin header", "DEBUG")
         return "Forbidden", 403
     contHeader = request.headers.get("Content-Type")
     if contHeader != "application/json":
@@ -307,8 +297,7 @@ def postResourcesFile():
     orgHeader = request.headers.get("Origin")
     if orgHeader != "frontend":
         if app.debug:
-            utils.log(
-                "/api/resourcesfile: Missing or invalid Origin header", "DEBUG")
+            utils.log("/api/resourcesfile: Missing or invalid Origin header", "DEBUG")
         return "Forbidden", 403
     contHeader = request.headers.get("Content-Type")
     if contHeader != "application/json":
@@ -359,8 +348,7 @@ def postResult():
     contHeader = request.headers.get("Content-Type")
     if contHeader != "application/json":
         if app.debug:
-            utils.log(
-                "/api/result: Missing or invalid Content-Type header", "DEBUG")
+            utils.log("/api/result: Missing or invalid Content-Type header", "DEBUG")
         return "Bad request", 400
     data = request.get_json()
     if not data:
@@ -370,8 +358,7 @@ def postResult():
     keys = data.keys()
     if "result" in keys and len(keys) == 1:
         if app.debug:
-            utils.log(
-                f"/api/result: Successfully received data: {data}", "DEBUG")
+            utils.log(f"/api/result: Successfully received data: {data}", "DEBUG")
         try:
             req = requests.post(url="http://127.0.0.1:5001", json=data)
             if req.status_code == 200:

@@ -1,16 +1,16 @@
+// ignore_for_file: file_names, must_be_immutable, camel_case_types
+
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-// import 'package:syncfusion_flutter_gauges/gauges.dart';
-// import 'package:fl_chart/fl_chart.dart';
-// import 'package:pie_chart/pie_chart.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'indicators.dart';
+
 import 'app_colors.dart';
+import 'indicators.dart';
 
 class containerPieChart extends StatefulWidget {
-  String data = '';
+  String data;
   containerPieChart({super.key, required this.data});
 
   @override
@@ -74,36 +74,17 @@ class PieChartSample1State extends State<PieChartSample1> {
   double sqli = 16;
   double rce = 16;
   double xxe = 16;
-  //dataMap is json data vulnerabilities 
+  //dataMap is json data vulnerabilities
   //data is json data vulnerabilities
-  void check_vuln(dataMap,data) {
-    
-  }
-  /* data: 
-    dataMap: 
-   */
-  void modify(data, dataMap, visible) {
-    Map<String, dynamic> data_vuln = jsonDecode(dataMap);
-    switch (data["numVuln"]) {
-      case 0:
-        setState(() {
-          visible = false;
-        });
-        break;
-      case 1:
-        setState(() {
-          visible = true;
-          check_vuln(dataMap,data_vuln);
-        });
-      default:
-    }
-  }
+  void modify_data(mapData, listData) {}
 
   @override
   Widget build(BuildContext context) {
-    String data_example =
-        '''[{"type": "SQLi","logs": "2023-12-04 [INFO] Log file1, "vulnerabilities":created\n2ø23-12-ø4 [INFO] [SQLi] Checking SQLi for http://[INFO] [SQLi] SQL Injection detected in form, link: http://192.168.16ø.128:2Q01/\n2023-12-04 [INFO] [SQLi] Check, "payload": [ ] , "severity": "High"} l, "resultPoint":SQLi done\n"løø.ø, "resultseverity":• , •_id": "656dabd66c184db3941cbaf1"}]}''';
     Map<String, dynamic> mapData = jsonDecode(widget.data);
+    List listVuln = mapData["vulnerabilities"];
+    if (listVuln.isEmpty) {
+      return Text('No data');
+    }
     return Visibility(
         visible: isVisibled,
         child: AspectRatio(
@@ -173,6 +154,7 @@ class PieChartSample1State extends State<PieChartSample1> {
                     PieChartData(
                       pieTouchData: PieTouchData(
                         touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                          print(mapData);
                           setState(() {
                             if (!event.isInterestedForInteractions ||
                                 pieTouchResponse == null ||
