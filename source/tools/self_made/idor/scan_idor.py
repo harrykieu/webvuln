@@ -73,11 +73,11 @@ class IDOR:
             for parameter in self.idorParams:
                 for payload in self.resources:
                     
-                    if re.search(rf"{parameter["value"]}=(\d+)", url):
-                        originalId = re.search(rf"{parameter["value"]}=(\d+)", url).group(1)  
+                    if re.search(rf"{parameter['value']}=(\d+)", url):
+                        originalId = re.search(rf"{parameter['value']}=(\d+)", url).group(1)  
                         originalUrl = url 
                     
-                        testUrl = re.sub(rf"{parameter["value"]}=\d+", f"{parameter["value"]}={payload["value"]}", url)
+                        testUrl = re.sub(rf"{parameter['value']}=\d+", f"{parameter['value']}={payload['value']}", url)
                         print("[+] Testing IDOR on URL:", testUrl)
                         testResp = self.session.get(testUrl)
                         originalResp = self.session.get(originalUrl)

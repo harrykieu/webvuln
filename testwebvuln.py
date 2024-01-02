@@ -16,8 +16,10 @@ for a in lista:
 # NOTE: dvwa url must have / at the end
 # print(a.scanURL(['http://localhost/dvwa/vulnerabilities/upload'], ['fileupload']))
 #a.scanURL(["http://localhost:12001"], ["fileupload"])
-# a.scanURL(["http://google.com/"], ["fileupload"])
-a.scanURL(["http://localhost/DVWA/vulnerabilities/fi"], ["pathtraversal"])
+#a._WebVuln__scanURL(["http://google.com/"], ["fileupload"])
+#a._WebVuln__scanURL(["http://academicgate.usth.edu.vn/"], ["sqli"])
+#a._WebVuln__scanURL(["http://testphp.vulnweb.com/artists.php"], ["pathtraversal"])
+a._WebVuln__scanURL(["http://localhost/DVWA/vulnerabilities/fi/?page=include.php"], ["pathtraversal"])
 """ scan_results = a.scanURL(
     ["http://localhost:8091/loadImage.php", "http://localhost:12001"],
     # ["http://localhost:8091/loadImage.php"],
