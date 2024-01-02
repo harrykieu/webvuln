@@ -1,22 +1,23 @@
-// ignore_for_file: file_names, camel_case_types, use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:webvuln/items/newSubmitButton.dart';
+import 'package:webvuln/items/gradient_button.dart';
 import 'package:webvuln/model/model.dart';
 import 'package:webvuln/service/api.dart';
 import 'package:data_table_2/data_table_2.dart';
+import 'package:webvuln/views/result.dart';
 import '../items/input.dart';
 
-class historyScreen extends StatefulWidget {
-  const historyScreen({super.key});
+class HistoryScreen extends StatefulWidget {
+  const HistoryScreen({super.key});
 
   @override
-  State<historyScreen> createState() => _historyScreenState();
+  State<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-class _historyScreenState extends State<historyScreen> {
+class _HistoryScreenState extends State<HistoryScreen> {
   final TextEditingController _historyURLController = TextEditingController();
   final TextEditingController _dateScanController = TextEditingController();
   List<HistoryTableData> historyTableData = [];
@@ -33,11 +34,16 @@ class _historyScreenState extends State<historyScreen> {
       dataRowList = historyTableData
           .map((tableData) => DataRow2(
                 cells: [
-                  DataCell(Text(tableData.domain)),
-                  DataCell(Text(tableData.scanDate)),
-                  DataCell(Text(tableData.numVuln.toString())),
-                  DataCell(Text(tableData.resultSeverity)),
-                  DataCell(Text(tableData.resultPoint.toString())),
+                  DataCell(Text(tableData.domain,
+                      style: GoogleFonts.montserrat(fontSize: 16))),
+                  DataCell(Text(tableData.scanDate,
+                      style: GoogleFonts.montserrat(fontSize: 16))),
+                  DataCell(Text(tableData.numVuln.toString(),
+                      style: GoogleFonts.montserrat(fontSize: 16))),
+                  DataCell(Text(tableData.resultSeverity,
+                      style: GoogleFonts.montserrat(fontSize: 16))),
+                  DataCell(Text(tableData.resultPoint.toString(),
+                      style: GoogleFonts.montserrat(fontSize: 16))),
                 ],
                 onTap: () async {
                   String resp = await getHistory(
@@ -45,72 +51,12 @@ class _historyScreenState extends State<historyScreen> {
                     // for compatibility with backend
                     datetime: '${tableData.scanDate.replaceAll(' ', 'T')}Z',
                   );
-                  List<dynamic> jsonD = jsonDecode(resp);
-                  // TODO: show result screen with jsonD
-                  showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                            title: Row(
-                              children: [
-                                const Icon(Icons.history),
-                                const SizedBox(width: 5),
-                                Text('History',
-                                    style: GoogleFonts.montserrat(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold))
-                              ],
-                            ),
-                            content: SizedBox(
-                              width: 500,
-                              height: 500,
-                              child: ListView.builder(
-                                itemCount: jsonD.length,
-                                itemBuilder: (context, index) {
-                                  return Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 10),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Scan date: ${jsonD[index]['scanDate']}',
-                                          style: GoogleFonts.montserrat(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          'Number of vulnerabilities: ${jsonD[index]['numVuln']}',
-                                          style: GoogleFonts.montserrat(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          'Result severity: ${jsonD[index]['resultSeverity']}',
-                                          style: GoogleFonts.montserrat(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          'Result point: ${jsonD[index]['resultPoint']}',
-                                          style: GoogleFonts.montserrat(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('OK'))
-                            ],
-                          ));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ResultScreen(
+                                data: resp,
+                              )));
                 },
               ))
           .toList();
@@ -121,33 +67,26 @@ class _historyScreenState extends State<historyScreen> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width * (1 - 0.13);
-
     return Scaffold(
       backgroundColor: const Color(0xFFF0F0F0),
+      appBar: AppBar(
+          title: ListTile(
+        leading: const Icon(Icons.history),
+        title: Text(
+          "HISTORY",
+          style:
+              GoogleFonts.montserrat(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+      )),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            margin: const EdgeInsetsDirectional.only(start: 40, top: 10),
-            child: Text(
-              "HISTORY",
-              style: GoogleFonts.montserrat(
-                  fontSize: 24, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.start,
-            ),
-          ),
-          const Divider(
-            color: Colors.black,
-            thickness: 0.2,
-            indent: 40,
-            endIndent: 40,
-          ),
           // search bar
           Container(
             width: screenWidth,
             height: 75,
-            margin: const EdgeInsets.symmetric(horizontal: 40),
+            margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: Colors.white,
@@ -161,13 +100,11 @@ class _historyScreenState extends State<historyScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Container(
-                  child: Text("Search criteria: ",
-                      style: GoogleFonts.montserrat(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black)),
-                ),
+                Text("Search criteria: ",
+                    style: GoogleFonts.montserrat(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black)),
                 getBoxInput(
                     controller: _historyURLController,
                     content: "URL",
@@ -234,8 +171,8 @@ class _historyScreenState extends State<historyScreen> {
           // history table
           Container(
               width: screenWidth,
-              height: screenHeight - 200,
-              margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+              height: screenHeight - 220,
+              margin: const EdgeInsets.only(left: 40, right: 40, bottom: 20),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: Colors.white,
@@ -248,15 +185,48 @@ class _historyScreenState extends State<historyScreen> {
                   ]),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
-                child: DataTable2(columns: const [
-                  DataColumn2(label: Text('Domain'), size: ColumnSize.M),
-                  DataColumn2(label: Text('Scan Date'), size: ColumnSize.M),
-                  DataColumn2(
-                      label: Text('Number of Vulnerabilities'),
-                      size: ColumnSize.M),
-                  DataColumn2(label: Text('Severity'), size: ColumnSize.S),
-                  DataColumn2(label: Text('Safety Rating'), size: ColumnSize.S),
-                ], rows: dataRowList),
+                child: DataTable2(
+                  columns: [
+                    DataColumn2(
+                        label: Text(
+                          'Domain',
+                          style: GoogleFonts.montserrat(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        size: ColumnSize.M),
+                    DataColumn2(
+                      label: Text(
+                        'Scan Date',
+                        style: GoogleFonts.montserrat(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      size: ColumnSize.M,
+                      // TODO: sort by date
+                    ),
+                    DataColumn2(
+                        label: Text(
+                          'Number of Vulnerabilities',
+                          style: GoogleFonts.montserrat(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        size: ColumnSize.M),
+                    DataColumn2(
+                        label: Text(
+                          'Severity',
+                          style: GoogleFonts.montserrat(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        size: ColumnSize.S),
+                    DataColumn2(
+                        label: Text(
+                          'Safety Rating',
+                          style: GoogleFonts.montserrat(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        size: ColumnSize.S),
+                  ],
+                  rows: dataRowList,
+                ),
               ))
         ],
       ),

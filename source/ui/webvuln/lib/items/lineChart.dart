@@ -1,11 +1,14 @@
+// ignore_for_file: camel_case_types, must_be_immutable
+
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
 
 class lineChart extends StatelessWidget {
-  const lineChart();
+  String data;
+  lineChart({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -201,23 +204,6 @@ class lineChart extends StatelessWidget {
             )
           ],
           showingTooltipIndicators: [0],
-        ),        
+        ),
       ];
-}
-
-class BarChartSample3 extends StatefulWidget {
-  const BarChartSample3({super.key});
-
-  @override
-  State<StatefulWidget> createState() => BarChartSample3State();
-}
-
-class BarChartSample3State extends State<BarChartSample3> {
-  @override
-  Widget build(BuildContext context) {
-    return const AspectRatio(
-      aspectRatio: 1.6,
-      child: lineChart(),
-    );
-  }
 }

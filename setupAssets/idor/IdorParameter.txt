@@ -3,6 +3,7 @@ id_user
 user_page
 userid
 iduser
+artist
 userpage
 IdUse
 UserId
@@ -14,7 +15,6 @@ id
 ID
 Id
 root
-admin
 test
 guest
 info

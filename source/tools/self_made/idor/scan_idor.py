@@ -17,33 +17,33 @@ class IDOR:
         self.idorParams = json.loads(idorParams)
         self.result = False
         self.payloads = []
-    
+
     def extract_urls(self):
         response = self.session.get(self.url)
-        soup = BeautifulSoup(response.content, 'html.parser')
+        soup = BeautifulSoup(response.content, "html.parser")
         urls = []
-        for a_tag in soup.find_all('a', href=True):
-            url = urljoin(self.url, a_tag['href'])
+        for a_tag in soup.find_all("a", href=True):
+            url = urljoin(self.url, a_tag["href"])
             urls.append(url)
         return urls
-        
+
     # Code for compare two responses HTML
     def compare_responses(self, resp1, resp2):
-    # Compare the content of 2 responses
-    # If different => probably IDOR
+        # Compare the content of 2 responses
+        # If different => probably IDOR
         html1 = resp1.content
         html2 = resp2.content
 
         if html1 != html2:
             return True
         return False
-    
+
     def check_unauthorized_access(self, response):
         # Check status code
         if response.status_code == 401 or response.status_code == 403:
             return True
-        
-        # Check HTML for error messages 
+
+        # Check HTML for error messages
         errors = ["Access denied", "Unauthorized", "Permission denied"]
 
         for error in errors:
@@ -54,30 +54,29 @@ class IDOR:
 
     def check_idor(self, url):
         print("\n[+] Checking IDOR for", self.url)
-        utils.log(
-            f"[IDOR] Checking IDOR for {self.url}",
-            "INFO", "idor.txt"
-        )
+        utils.log(f"[IDOR] Checking IDOR for {self.url}", "INFO", "idor.txt")
 
-        #log if no resources are found
+        # log if no resources are found
         if not self.resources:
             print("[!] No resources found")
-            utils.log(
-                "[IDOR] No resources found",
-                "INFO", "idor.txt"
-            )
+            utils.log("[IDOR] No resources found", "INFO", "idor.txt")
             return self.result
 
         urls = self.extract_urls()
         for url in urls:
             for parameter in self.idorParams:
                 for payload in self.resources:
-                    
-                    if re.search(rf"{parameter["value"]}=(\d+)", url):
-                        originalId = re.search(rf"{parameter["value"]}=(\d+)", url).group(1)  
-                        originalUrl = url 
-                    
-                        testUrl = re.sub(rf"{parameter["value"]}=\d+", f"{parameter["value"]}={payload["value"]}", url)
+                    if re.search(rf"{parameter['value']}=(\d+)", url):
+                        originalId = re.search(
+                            rf"{parameter['value']}=(\d+)", url
+                        ).group(1)
+                        originalUrl = url
+
+                        testUrl = re.sub(
+                            rf"{parameter['value']}=\d+",
+                            f"{parameter['value']}={payload['value']}",
+                            url,
+                        )
                         print("[+] Testing IDOR on URL:", testUrl)
                         testResp = self.session.get(testUrl)
                         originalResp = self.session.get(originalUrl)
@@ -85,14 +84,14 @@ class IDOR:
                         if self.compare_responses(originalResp, testResp):
                             print("[!] IDOR detected on url:", testUrl)
                             utils.log(
-                            f"[IDOR] IDOR vulnerability detected, link: {testUrl}",
-                            "INFO",
-                            "idor.txt",
-                        )
+                                f"[IDOR] IDOR vulnerability detected, link: {testUrl}",
+                                "INFO",
+                                "idor.txt",
+                            )
                             self.result = True
                             self.payloads.append(payload["value"])
                             break
-                        
+
                         if self.check_unauthorized_access(testResp):
                             print("[!] IDOR detected on url:", testUrl)
                             utils.log(
@@ -107,12 +106,11 @@ class IDOR:
                     break
             if self.result:
                 break
-            
-        print("[+] IDOR scan finished")                
+
+        print("[+] IDOR scan finished")
         utils.log(
             "[IDOR] IDOR scan finished",
             "INFO",
             "idor.txt",
         )
         return self.result, self.payloads
-        

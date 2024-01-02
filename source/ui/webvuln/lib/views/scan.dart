@@ -1,23 +1,23 @@
-// ignore_for_file: file_names, camel_case_types
+// ignore_for_file: avoid_print
 
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:webvuln/items/newSubmitButton.dart';
+import 'package:webvuln/items/gradient_button.dart';
 import 'package:webvuln/service/api.dart';
-import 'package:webvuln/views/loadingScreen.dart';
-import 'package:webvuln/views/variable.dart';
+import 'package:webvuln/views/loading.dart';
+import 'package:webvuln/variable.dart';
+
 import '../items/input.dart';
 
-class scanScreen extends StatefulWidget {
-  const scanScreen({super.key});
+class ScanScreen extends StatefulWidget {
+  const ScanScreen({super.key});
 
   @override
-  State<scanScreen> createState() => _scanScreenState();
+  State<ScanScreen> createState() => _ScanScreenState();
 }
 
-class _scanScreenState extends State<scanScreen> {
+class _ScanScreenState extends State<ScanScreen> {
   @override
   void initState() {
     setState(() {
@@ -26,6 +26,7 @@ class _scanScreenState extends State<scanScreen> {
     });
     super.initState();
   }
+  // Future
 
   final TextEditingController urlController = TextEditingController();
   Widget contentChild = Text(
@@ -55,7 +56,7 @@ class _scanScreenState extends State<scanScreen> {
             decoration: const BoxDecoration(color: Colors.transparent),
             child: ListTile(
               title: Text(
-                'SCAN URL',
+                'WEBVULN',
                 style: GoogleFonts.montserrat(
                     fontSize: 100,
                     color: Colors.white,
@@ -71,10 +72,13 @@ class _scanScreenState extends State<scanScreen> {
             decoration: const BoxDecoration(color: Colors.transparent),
             child: inputUser(
               controller: urlController,
-              hintName: 'Paste URL here...',
+              hintName: 'Paste URL here to scan ...',
               underIcon: const Padding(
                   padding: EdgeInsets.all(10),
-                  child: Image(image: AssetImage('lib/assets/suffixIcon.png'))),
+                  child: SizedBox(
+                    width: 10,
+                    height: 10,
+                  )),
             )),
 
         //Box Module scan
@@ -95,11 +99,12 @@ class _scanScreenState extends State<scanScreen> {
         const SizedBox(
           height: 30,
         ),
-
         //Button Scan URL
         GradientButton(
             onPressed: () async {
-              Get.to(const loadingScreen());
+              Get.to(const LoadingScreen());
+              // var path = await ExternalPath.getExternalStorageDirectories();
+              // print(path);
               List<String> listURL = [];
               listURL.add(urlController.text);
               postURL(
@@ -114,18 +119,16 @@ class _scanScreenState extends State<scanScreen> {
                     );
                   });
                 } else {
-                  Get.to(const loadingScreen());
+                  Get.to(const LoadingScreen());
                 }
               }).catchError((error) {
                 print(error);
               });
             },
-            child: Text(
-              'Scan',
-              style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+            child: const Icon(
+              Icons.search_rounded,
+              size: 45,
+              color: Colors.white,
             ))
       ],
     );
@@ -163,7 +166,7 @@ class _scanScreenState extends State<scanScreen> {
                                 Constants.valueSelected
                                     .remove(Constants.nameModule[index]);
                               }
-                              if (Constants.valueSelected.length == 0) {
+                              if (Constants.valueSelected.isEmpty) {
                                 _isVisibled = false;
                               } else {
                                 _isVisibled = true;
@@ -203,8 +206,8 @@ class _scanScreenState extends State<scanScreen> {
                       color: Color(0xFF1A35C3),
                     ),
                     title: Text(
-                      'Description',
-                      style: GoogleFonts.montserrat(
+                      'MODULE DESCRIPTION',
+                      style: GoogleFonts.cabin(
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -223,4 +226,4 @@ class _scanScreenState extends State<scanScreen> {
 }
 // viet them ham nhan data tu backend de setState cho widget trong contentChild
 
-// viết hàm truyền giá trị của 1 biến từ màn scanScreen sang màn main để màn main nhận định được _selectedIndex của nó chuyển thành 1
+// viết hàm truyền giá trị của 1 biến từ màn ScanScreen sang màn main để màn main nhận định được _selectedIndex của nó chuyển thành 1
