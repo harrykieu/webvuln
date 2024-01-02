@@ -47,7 +47,7 @@ class FileUpload:
         payload = {"username": "admin", "password": "password", "Login": "Login"}
         with self.session as c:
             r = c.get("http://localhost/dvwa/login.php")
-            token = re.search("user_token'\s*value='(.*?)'", r.text).group(1)
+            token = self.getCSRFToken()
             payload["user_token"] = token
             c.post("http://localhost/dvwa/login.php", data=payload)
             self.cookies = c.cookies
