@@ -309,10 +309,10 @@ class WebVuln:
                             )
                     elif module == "idor":
                         print("[+] Checking IDOR vulnerability...")
-                        idorParams = self.resourceHandler(
+                        idorParams = self.__resourceHandler(
                             "GET", {"vulnType": "idor", "resType": "parameter"}
                         )
-                        resources = self.resourceHandler(
+                        resources = self.__resourceHandler(
                             "GET", {"vulnType": "idor", "resType": "payload"}
                         )
                         idorResult, idorPayload = IDOR(

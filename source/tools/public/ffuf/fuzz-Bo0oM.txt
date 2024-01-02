@@ -1,3 +1,4 @@
+FUZZ
 !.gitignore
 !.htaccess
 !.htpasswd
