@@ -1,53 +1,48 @@
+import urllib.parse
+from urllib.parse import urljoin
+
 import requests
 from bs4 import BeautifulSoup as bs
-from urllib.parse import urlparse, urljoin
-import urllib.parse
-import source.core.utils as utils
 
-# 06/09/2023 : CODE Can cai thien them tinh nang check submit selection
-# maker : RBKING
+import source.core.utils as utils
+import json
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
 
 s = requests.Session()
-s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.5938.92"
+s.headers[
+    "User-Agent"
+] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.5938.92"
 
 
 class XSS:
-
     def __init__(self, url, xss_resources):
         self.url = url
-        self.xss_resources = xss_resources
+        self.xss_resources = json.loads(xss_resources)
         self.payloads = []
         self.result = False
 
-# login_payload = {
-#     "username": "admin",
-#     "password": "password",
-#     "Login": "Login",
-# }
-# # change URL to the login page of your DVWA login URL
-# login_url = "http://192.168.168.105/dvwa/login.php"
+    # login_payload = {
+    #     "username": "admin",
+    #     "password": "password",
+    #     "Login": "Login",
+    # }
+    # # change URL to the login page of your DVWA login URL
+    # login_url = "http://192.168.168.105/dvwa/login.php"
 
-# # login
-# r = s.get(login_url)
-# token = re.search("user_token'\s*value='(.*?)'", r.text).group(1)
-# login_payload['user_token'] = token
-# s.post(login_url, data=login_payload)
+    # # login
+    # r = s.get(login_url)
+    # token = re.search("user_token'\s*value='(.*?)'", r.text).group(1)
+    # login_payload['user_token'] = token
+    # s.post(login_url, data=login_payload)
 
     # ---------------------------------------------------------------
 
     forms = []
-
-    def scan_website(self, url):
-        soup = bs(s.get(url).content, "html.parser")
-        global forms
-        forms = bs(s.get(url).content, "html.parser").find_all("form")
-
-        # Scan XSS
-        if self.check_xss(url):
-            return True
-        return False
-
-    # ---------------------------------
 
     def get_all_forms(self, url):
         soup = bs(s.get(url).content, "html.parser")
@@ -68,7 +63,8 @@ class XSS:
             input_name = input_tag.attrs.get("name")
             input_value = input_tag.attrs.get("value", "")
             inputs.append(
-                {"type": input_type, "name": input_name, "value": input_value})
+                {"type": input_type, "name": input_name, "value": input_value}
+            )
 
         details["action"] = action
         details["method"] = method
@@ -78,7 +74,6 @@ class XSS:
     # ---------------------------------------------------------------------
 
     def check_xss(self):
-
         utils.log(
             f"[XSS] Checking XSS for {self.url}",
             "INFO",
@@ -87,64 +82,141 @@ class XSS:
 
         print("\n[+] Checking XSS")
 
-        for payload in self.xss_resources:
-            payload_str = payload["value"]
-            encoded_payload = urllib.parse.quote(payload_str.encode('utf-8'))
-            new_url = f"{self.url}?q={encoded_payload}"
+        if not self.xss_resources:
+            print("\n[-] Resources not found!")
+            utils.log(
+                "[XSS] Resources not found!",
+                "ERROR",
+                "xss_log.txt",
+            )
+            return self.result
 
-            print("[!] Trying", new_url)
-            res = s.get(new_url)
-
-            if payload in res.text:
-                print("[+] XSS vulnerability detected, link:", new_url)
-                utils.log(
-                            f"[XSS] XSS vulnerability detected, link: {new_url}",
-                            "INFO",
-                            "xss_log.txt",
-                        )
-                self.payloads.append(payload["value"])
-                self.result = True
-                break
-
-        forms = self.get_all_forms(self.url)
-        print(
-            f"[+] Detected {len(forms)} forms on {self.url}, form found: {forms}\n")
-
-        for form in forms:
-            form_details = self.get_form_details(form)
-
+        driver = webdriver.Chrome()
+        try:
             for payload in self.xss_resources:
-                data = {}
+                payload_str = payload["value"]
+                encoded_payload = urllib.parse.quote(payload_str.encode("utf-8"))
+                new_url = f"{self.url}?q={encoded_payload}"
 
-                for input_tag in form_details["inputs"]:
-                    if input_tag["value"] or input_tag["type"] == "hidden":
-                        try:
-                            data[input_tag["name"]] = input_tag["value"] + payload
-                        except:
-                            pass
-                    elif input_tag["type"] != "submit":
-                        data[input_tag["name"]] = payload
+                print("[!] Trying", new_url)
+                driver.get(new_url)
 
-                self.url = urljoin(self.url, form_details["action"])
-                if form_details["method"] == "post":
-                    res = s.post(self.url, data=data)
-                elif form_details["method"] == "get":
-                    res = s.get(self.url, params=data)
+                try:
+                    alert = WebDriverWait(driver, 1).until(EC.alert_is_present())
+                    alert_text = alert.text
+                    alert.accept()
 
-                if payload in res.text:
-                    print("[+] XSS vulnerability detected, link:", self.url)
+                    print("[+] XSS vulnerability detected, link:", new_url)
                     utils.log(
-                            f"[XSS] XSS detected in form, link: {self.url}",
-                            "INFO",
-                            "xss_log.txt",
-                        )
+                        f"[XSS] XSS vulnerability detected, link: {new_url}, \nPayload: {payload['value']}, \nAlert Text: {alert_text}",
+                        "INFO",
+                        "xss_log.txt",
+                    )
                     self.payloads.append(payload["value"])
                     self.result = True
                     break
+                except:
+                    pass
+
+            forms = self.get_all_forms(self.url)
+            print(
+                f"[+] Detected {len(forms)} forms on {self.url}, form found: {forms}\n"
+            )
+
+            for form in forms:
+                form_details = self.get_form_details(form)
+
+                for payload in self.xss_resources:
+                    data = {}
+                    print("Test form with payload: ", {payload["value"]})
+                    for input_tag in form_details["inputs"]:
+                        if input_tag["value"] or input_tag["type"] == "hidden":
+                            try:
+                                data[input_tag["name"]] = payload["value"]
+                            except:
+                                pass
+                        elif input_tag["type"] != "submit":
+                            data[input_tag["name"]] = payload["value"]
+
+                    form_action_url = urljoin(self.url, form_details["action"])
+                    if form_details["method"] == "post":
+                        driver.get(form_action_url)
+                        for key, value in data.items():
+                            element_name = key
+                            element = WebDriverWait(driver, 1).until(
+                                EC.presence_of_element_located((By.NAME, element_name))
+                            )
+                            driver.execute_script(
+                                "arguments[0].value = arguments[1];", element, value
+                            )
+                        driver.execute_script("document.forms[0].submit();")
+                    elif form_details["method"] == "get":
+                        driver.get(f"{form_action_url}?{urllib.parse.urlencode(data)}")
+
+                    try:
+                        WebDriverWait(driver, 5).until(EC.alert_is_present())
+                        alert = driver.switch_to.alert
+                        alert_text = alert.text
+                        alert.accept()
+
+                        print(
+                            "[+] XSS vulnerability detected in form, link:",
+                            form_action_url,
+                        )
+                        utils.log(
+                            f"[XSS] XSS detected in form, link: {form_action_url}, \nPayload: {payload['value']}, \nAlert Text: {alert_text}",
+                            "INFO",
+                            "xss_log.txt",
+                        )
+                        self.payloads.append(payload["value"])
+                        self.result = True
+                        break
+                    except TimeoutException:
+                        # This exception is raised if the alert is not present within the specified timeout
+                        pass
+                    except Exception as e:
+                        # Handle other exceptions
+                        if "unexpected alert open" in str(e):
+                            print("[!] Unexpected alert: ", e)
+                            alert = driver.switch_to.alert
+                            alert_text = alert.text
+                            alert.accept()
+                            print(
+                                "[+] XSS vulnerability detected in form, link:",
+                                form_action_url,
+                            )
+                            utils.log(
+                                f"[XSS] XSS detected in form, link: {form_action_url}, \nPayload: {payload['value']}, \nAlert Text: {alert_text}",
+                                "INFO",
+                                "xss_log.txt",
+                            )
+                            self.payloads.append(payload["value"])
+                            self.result = True
+                            break
+                        # FIXME: Bug at finding javascript error
+                        # elif isinstance(e, js_error):
+                        #    print(f"[-] JavaScript error: {js_error}")
+                        else:
+                            print(f"[-] An error occurred: {e}")
+                            utils.log(
+                                f"[XSS] An error occurred while testing form, link: {form_action_url}, \nError: {e}",
+                                "ERROR",
+                                "xss_log.txt",
+                            )
+
+        except Exception as e:
+            print(f"[-] An error occurred: {e}")
+            utils.log(
+                f"[XSS] An error occurred while testing form, link: {form_action_url}, \nError: {e}",
+                "ERROR",
+                "xss_log.txt",
+            )
+
+        finally:
+            # Close the WebDriver
+            driver.quit()
 
         print("[+] Check XSS done")
-        utils.log(
-            "[XSS] Check XSS done", "INFO", "xss_log.txt"
-        )
+        utils.log("[XSS] Check XSS done", "INFO", "xss_log.txt")
 
-        return False
+        return self.result, self.payloads

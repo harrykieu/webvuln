@@ -1,11 +1,14 @@
+import urllib.parse
+from urllib.parse import urljoin
+import re
 import requests
 from bs4 import BeautifulSoup as bs
-from urllib.parse import urlparse, urljoin
-import urllib.parse
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import source.core.utils as utils
-
-# 06/09/2023 : Code check sqli thi duoc nhung chua goi la hoan hao, dang nghien cuu de cai tien
-# maker : RBKING
+import json
 
 s = requests.Session()
 s.headers[
@@ -16,7 +19,7 @@ s.headers[
 class SQLi:
     def __init__(self, url, sqli_resources):
         self.url = url
-        self.sqli_resources = sqli_resources
+        self.sqli_resources = json.loads(sqli_resources)
         self.payloads = []
         self.result = False
 
@@ -37,17 +40,6 @@ class SQLi:
 
     # ---------------------------------------------------------------
 
-    forms = []
-
-    def scan_website(self, url):
-        global forms
-        forms = bs(s.get(url).content, "html.parser").find_all("form")
-        if self.check_sqli(url):
-            return True
-        return False
-
-    # -----------------------------------------------------
-
     def is_vulnerable_sqli(self, response):
         errors = {
             "you have an error in your sql syntax;",
@@ -61,12 +53,14 @@ class SQLi:
             print("[!] Slow response time detected")
             return True
 
+        # Trying dump complex payload
         complex_payload = "1' AND (SELECT * FROM information_schema.tables)='"
         if complex_payload in response.content.decode().lower():
             print("[!] Complex payload was successful")
             return True
 
-        dump_payload = "1' UNION SELECT NULL, NULL, @@version;--"
+        # Try dump normal payload
+        dump_payload = f"1' UNION SELECT NULL, NULL, @@version;--"
         if dump_payload in response.content.decode().lower():
             print("[!] Data dump was successful")
             return True
@@ -76,6 +70,51 @@ class SQLi:
                 return True
 
         return False
+
+    def is_form_vulnerable_sqli(self, original_response, modified_response):
+        errors = {
+            "you have an error in your sql syntax;",
+            "warning: mysql",
+            "unclosed quotation mark after the character string",
+            "quoted string not properly terminated",
+        }
+
+        original_content = original_response.content.decode().lower()
+        modified_content = modified_response.content.decode().lower()
+
+        original_tables = set(re.findall(r"\bfrom\s+(\w+)", original_content))
+        modified_tables = set(re.findall(r"\bfrom\s+(\w+)", modified_content))
+
+        new_tables = modified_tables - original_tables
+        if new_tables:
+            print(f"[!] New tables detected: {new_tables}")
+            return True
+
+        for error in errors:
+            if error in original_content:
+                print(f"[!] SQL Injection error detected: {error}")
+                return True
+            elif error in modified_content:
+                print(f"[!] SQL Injection error detected: {error}")
+                return True
+
+        return False
+
+    # ---------------------------------
+    def interact_with_form(self, driver, form_url, form_details, payload):
+        data = {}
+        for input_tag in form_details["inputs"]:
+            if input_tag["value"] or input_tag["type"] == "hidden":
+                try:
+                    data[input_tag["name"]] = input_tag["value"] + payload
+                except:
+                    pass
+            elif input_tag["type"] != "submit":
+                data[input_tag["name"]] = f"test{payload}"
+
+        modified_response = s.post(form_url, data=data)
+
+        return modified_response
 
     # ---------------------------------
 
@@ -109,75 +148,92 @@ class SQLi:
     # -------------------------------------------------------------
 
     def check_sqli(self):
-
         utils.log(
             f"[SQLi] Checking SQLi for {self.url}",
             "INFO",
             "sqli_log.txt",
-        )        
+        )
 
         print("\n[+] Checking SQLi")
 
+        if not self.sqli_resources:
+            print("\n[-] Resources not found!")
+            utils.log(
+                "[SQLi] Resources not found!",
+                "ERROR",
+                "sqli_log.txt",
+            )
+            return self.result
+
         for payload in self.sqli_resources:
             payload_str = payload["value"]
-            encoded_payload = urllib.parse.quote(payload_str.encode('utf-8'))
+            encoded_payload = urllib.parse.quote(payload_str.encode("utf-8"))
             new_url = f"{self.url}?id={encoded_payload}"
+
             print("[!] Trying", new_url)
 
             res = s.get(new_url)
             if self.is_vulnerable_sqli(res):
                 print("[+] SQL Injection vulnerability detected, link:", new_url)
                 utils.log(
-                            f"[SQLi] SQL Injection vulnerability detected, link: {new_url}",
-                            "INFO",
-                            "sqli_log.txt",
-                        )
+                    f"[SQLi] SQL Injection vulnerability detected, link: {new_url}, \nPayload: {encoded_payload}",
+                    "INFO",
+                    "sqli_log.txt",
+                )
                 self.payloads.append(payload["value"])
                 self.result = True
                 break
 
+        results = {"sqli": []}
         forms = self.get_all_forms(self.url)
         print(f"[+] Detected {len(forms)} forms on {self.url} and form found: {forms}")
 
-        for form in forms:
-            form_details = self.get_form_details(form)
-            for payload in self.sqli_resources:
-                data = {}
+        driver = webdriver.Chrome()
+        original_response = s.get(self.url)
+        try:
+            driver.get(self.url)
 
-                for input_tag in form_details["inputs"]:
-                    if input_tag["value"] or input_tag["type"] == "hidden":
-                        try:
-                            data[input_tag["name"]] = input_tag["value"] + payload
-                        except:
-                            pass
-                    elif input_tag["type"] != "submit":
-                        data[input_tag["name"]] = f"test{payload}"
+            for form in forms:
+                form_details = self.get_form_details(form)
+                for payload in self.sqli_resources:
+                    payload_str = payload["value"]
+                    current_url = urljoin(self.url, form_details["action"])
 
-                self.url = urljoin(self.url, form_details["action"])
-                if form_details["method"] == "post":
-                    res = s.post(self.url, data=data)
-                elif form_details["method"] == "get":
-                    res = s.get(self.url, params=data)
-
-                curr_url = self.url
-                results = {"sqli": []}
-
-                if self.is_vulnerable_sqli(res):
-                    results["sqli"].append(
-                        {"url": curr_url, "details": "[+] SQLi vulnerability detected"}
+                    # Interact with the form using the payload
+                    modified_response = self.interact_with_form(
+                        driver, current_url, form_details, payload["value"]
                     )
 
-                    utils.log(
-                            f"[SQL] SQL Injection detected in form, link: {self.url}",
+                    # Compare responses to check for SQL injection vulnerability
+                    if self.is_form_vulnerable_sqli(
+                        original_response, modified_response
+                    ):
+                        results["sqli"].append(
+                            {
+                                "url": current_url,
+                                "details": "[+] SQLi vulnerability detected",
+                            }
+                        )
+
+                        utils.log(
+                            f"[SQLi] SQL Injection detected in form with Payload: {payload_str}",
                             "INFO",
                             "sqli_log.txt",
                         )
-                    self.payloads.append(payload["value"])
-                    self.result = True
-                    break
+                        self.payloads.append(payload["value"])
+                        self.result = True
+                        break
+        except Exception as e:
+            print(f"[-] An error occurred: {e}")
+            utils.log(
+                f"[SQLi] An error occurred while testing form, link: {current_url}, \nError: {e}",
+                "ERROR",
+                "sqli_log.txt",
+            )
+        finally:
+            # Close the WebDriver
+            driver.quit()
 
         print("[+] Check SQLi done")
-        utils.log(
-            "[SQLi] Check SQLi done", "INFO", "sqli_log.txt"
-        )
+        utils.log("[SQLi] Check SQLi done", "INFO", "sqli_log.txt")
         return self.result, self.payloads

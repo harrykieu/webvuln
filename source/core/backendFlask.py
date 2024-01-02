@@ -1,16 +1,66 @@
-from flask import Flask
-from flask import request
-from source.core.backend import WebVuln
-import source.core.utils as utils
+from flask import Flask, request
+from flask_cors import CORS
+import requests
 
+import source.core.utils as utils
+from source.core.backend import WebVuln
 
 app = Flask(__name__)
+CORS(app)
 backend = WebVuln()
 # Debug
 backend.setDebug(True)
 
 # Note: the Content-Type header must be set to `application/json` for the request to be parsed correctly.f
 # Note: the Origin header must be set to match the sender's origin ('backend' or 'frontend').
+
+# API to request create report
+# requirement: origin header = frontend
+# request body: json object with the following properties:
+# - `result`: result of the scan
+# - `type`: type of the report (e.g. html, pdf, etc.)
+
+
+@app.post("/api/report")
+def report():
+    """Create report.
+
+    This function is used for frontend to create report using `/api/report` endpoint with `POST`.
+
+    The request body should contain a JSON object with the following properties:
+    - `result`: Result of the scan.
+    - `type`: Type of the report (e.g. html, pdf, etc.)
+    """
+    orgHeader = request.headers.get("Origin")
+    if orgHeader != "frontend":
+        if app.debug:
+            utils.log("/api/report: Missing or invalid Origin header", "DEBUG")
+        return "Forbidden", 403
+    contHeader = request.headers.get("Content-Type")
+    if contHeader != "application/json":
+        if app.debug:
+            utils.log("/api/report: Missing or invalid Content-Type header", "DEBUG")
+        return "Bad request", 400
+    data = request.get_json()
+    if not data:
+        if app.debug:
+            utils.log("/api/report: Missing or invalid JSON data", "DEBUG")
+        return "Bad request", 400
+    keys = data.keys()
+    if "result" in keys and "type" in keys and len(keys) == 2:
+        try:
+            if app.debug:
+                utils.log(f"/api/report: Successfully received data: {data}", "INFO")
+            backend.recvFlask("/api/report", "POST", data)
+            return "Success", 200
+        except Exception as e:
+            if app.debug:
+                utils.log(f"/api/report: Error generating report - {str(e)}", "ERROR")
+            return "Failed", 400
+    else:
+        if app.debug:
+            utils.log("/api/report: Missing or invalid JSON data", "DEBUG")
+        return "Bad request", 400
 
 
 @app.post("/api/scan")
@@ -132,7 +182,10 @@ def postResources():
             utils.log(
                 f"/api/resourcesnormal: Successfully received data: {data}", "DEBUG"
             )
-        backend.recvFlask("/api/resourcesnormal", "POST", data)
+        value = backend.recvFlask("/api/resourcesnormal", "POST", data)
+        if value == "Failed":
+            utils.log("/api/resourcesnormal: Failed to create resource", "ERROR")
+            return "Failed", 400
         return "Success", 200
     else:
         if app.debug:
@@ -185,9 +238,6 @@ def getResources():
         return "Bad request", 400
 
 
-# FIX
-
-
 @app.get("/api/resourcesfile")
 def getResourcesFile():
     """Get files for file upload module.
@@ -230,9 +280,6 @@ def getResourcesFile():
         if app.debug:
             utils.log("/api/resourcesfile: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
-
-
-# Fix
 
 
 @app.post("/api/resourcesfile")
@@ -286,9 +333,9 @@ def postResourcesFile():
 
 @app.post("/api/result")
 def postResult():
-    """Create/Update/Remove a result.
+    """Send scan result to frontend.
 
-    This function is used for backend to create, update, or remove a result using `/api/result` endpoint with `POST`.
+    This function is used for backend to send result to frontend using `/api/result` endpoint with `POST`.
 
     The request body should contain a JSON object with the following properties:
     - `result`: Result of the scan.
@@ -309,11 +356,22 @@ def postResult():
             utils.log("/api/result: Missing or invalid JSON data", "DEBUG")
         return "Bad request", 400
     keys = data.keys()
-    if "result" in keys and len(keys) == 1:  # FIX LATER
+    if "result" in keys and len(keys) == 1:
         if app.debug:
             utils.log(f"/api/result: Successfully received data: {data}", "DEBUG")
-        # frontend.recvFlask('/api/result', 'POST', data)
-        return "Success", 200
+        try:
+            req = requests.post(url="http://127.0.0.1:5001", json=data)
+            if req.status_code == 200:
+                return "Success", 200
+            else:
+                print(req.status_code, req.text)
+                print("/api/result: Failed to send result to frontend")
+                return "Failed", 400
+        except Exception as e:
+            if app.debug:
+                utils.log(f"/api/result: {e}", "ERROR")
+            print(e)
+            return "Failed", 400
     else:
         if app.debug:
             utils.log("/api/result: Missing or invalid JSON data", "DEBUG")

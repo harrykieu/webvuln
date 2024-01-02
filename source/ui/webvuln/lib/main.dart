@@ -1,24 +1,26 @@
-// ignore_for_file: camel_case_types
+// ignore_for_file: camel_case_types, depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
-import 'package:webvuln/items/drawer_bar.dart';
-import 'package:webvuln/views/historyScreen.dart';
-import 'package:webvuln/views/resourcesScreen.dart';
-import 'package:webvuln/views/resultScreen.dart';
-import 'package:webvuln/views/scan_screen.dart';
-import 'package:webvuln/views/settingScreen.dart';
-
-// import '../views/scanScreen2.dart';
-// import 'views/draft.dart';
+import 'package:webvuln/views/history.dart';
+import 'package:webvuln/views/resources.dart';
+import 'package:webvuln/views/scan.dart';
+import 'package:webvuln/views/setting.dart';
 
 void main() async {
-  // Size size = await DesktopWindow.getWindowSize();
-  // await DesktopWindow.setMinWindowSize(Size(1920, 1080));
-  // await DesktopWindow.setMaxWindowSize(Size(1920, 1080));
-  runApp(mainScreen(
-      // changeScreen: 0,
-      ));
+  //TestWidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  runApp(const mainScreen());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
 }
 
 class mainScreen extends StatefulWidget {
@@ -30,38 +32,26 @@ class mainScreen extends StatefulWidget {
 
 class _mainScreenState extends State<mainScreen> {
   int _selectedIndex = 0;
+  String scanResult = '';
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _selectedIndex = 0;
   }
 
   final List _selectedItem = [
-    const scan_screen(),
-    const resultScreen(),
-    const historyScreen(),
-    const resourceScreen(),
-    const settingScreen()
+    const ScanScreen(),
+    const HistoryScreen(),
+    const ResourceScreen(),
+    const SettingScreen()
   ];
-
-  // void returnWidget() {
-  //   if (widget.changeScreen == 1) {
-  //     setState(() {
-  //       _selectedIndex = 1;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       _selectedIndex = 0;
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     Get.testMode = true;
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         drawerEnableOpenDragGesture: false,
         backgroundColor: const Color(0xFF03112e),
@@ -77,7 +67,8 @@ class _mainScreenState extends State<mainScreen> {
                       width: double.infinity,
                       height: 200,
                       margin: const EdgeInsets.symmetric(vertical: 30),
-                      child: const Image(image: AssetImage('lib/assets/logo.png')),
+                      child:
+                          const Image(image: AssetImage('lib/assets/logo.png')),
                     ),
                     button(
                         onPressed: () {
@@ -85,38 +76,44 @@ class _mainScreenState extends State<mainScreen> {
                             _selectedIndex = 0;
                           });
                         },
-                        icon:'lib/assets/scanner.png',
+                        icon: 'lib/assets/scanner.png',
                         name: 'Scan'),
-                    const SizedBox(height: 20,),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     button(
                         onPressed: () {
                           setState(() {
                             _selectedIndex = 1;
                           });
                         },
-                        icon: 'lib/assets/result.png',
-                        name: 'Result'),
-                    const SizedBox(height: 20,),
+                        icon: 'lib/assets/history.png',
+                        name: 'History'),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     button(
                         onPressed: () {
                           setState(() {
                             _selectedIndex = 2;
                           });
                         },
-                        icon: 'lib/assets/history.png',
-                        name: 'History'),
-                    const SizedBox(height: 20,),
-                    button(onPressed: (){
-                      setState(() {
-                        _selectedIndex = 3;
-                      });
-                    }, icon: 'lib/assets/resources.png', name: 'Resources'),
-                    const SizedBox(height: 20,),
-                    button(onPressed: (){
-                      setState(() {
-                        _selectedIndex = 4;
-                      });
-                    }, icon: 'lib/assets/settings.png', name: 'Settings')
+                        icon: 'lib/assets/resources.png',
+                        name: 'Resources'),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    button(
+                        onPressed: () {
+                          setState(() {
+                            _selectedIndex = 3;
+                          });
+                        },
+                        icon: 'lib/assets/settings.png',
+                        name: 'Settings'),
+                    const SizedBox(
+                      height: 20,
+                    ),
                   ],
                 )),
             // Gradient background
@@ -151,12 +148,11 @@ class _mainScreenState extends State<mainScreen> {
             foregroundColor: Colors.white),
         child: Column(
           children: [Image(image: AssetImage(icon)), Text(name)],
-        )
-    );
+        ));
   }
 
-  Stream<int> get _selectedIndexStream =>
+/*   Stream<int> get _selectedIndexStream =>
       Stream.fromFuture(Future.delayed(const Duration(milliseconds: 500), () {
         return _selectedIndex;
-      }));
+      })); */
 }

@@ -36,7 +36,9 @@ A website vulnerability scanner for coders without any knowledge of web security
 [Here](https://www.figma.com/file/GaYOiOhGOmMFxXdlmdPTDr/Project-Scanner-website?type=design&node-id=0-1&mode=design)
 
 ## Install for pdfkit-generate report as PDF
-https://wkhtmltopdf.org/downloads.html
+https://github.com/JazzCore/python-pdfkit/wiki/Installing-wkhtmltopdf                                      
+- Guide: https://www.youtube.com/watch?v=XX9nhxVF8Z4
+
 
 ## How to run
 - Install Docker
@@ -44,3 +46,6 @@ https://wkhtmltopdf.org/downloads.html
 - Add mongoURI to the `.env_example` file at the root directory and rename it to `.env`
 - Run `setup.py` file to add all resources to the database
 - Run `webvuln.py` file to start the API server and backend
+
+## Note
+When retriving resources, the return value is a string, so you need to convert it to json format before using it.

@@ -15,8 +15,11 @@ for a in lista:
     print(lista.index(a)) """
 # NOTE: dvwa url must have / at the end
 # print(a.scanURL(['http://localhost/dvwa/vulnerabilities/upload'], ['fileupload']))
-a.scanURL(["http://localhost:12001"], ["fileupload"])
-# a.scanURL(["http://google.com/"], ["fileupload"])
+#a.scanURL(["http://localhost:12001"], ["fileupload"])
+#a._WebVuln__scanURL(["http://google.com/"], ["fileupload"])
+#a._WebVuln__scanURL(["http://academicgate.usth.edu.vn/"], ["sqli"])
+#a._WebVuln__scanURL(["http://testphp.vulnweb.com/artists.php"], ["pathtraversal"])
+a._WebVuln__scanURL(["http://localhost/DVWA/vulnerabilities/fi/?page=include.php"], ["pathtraversal"])
 """ scan_results = a.scanURL(
     ["http://localhost:8091/loadImage.php", "http://localhost:12001"],
     # ["http://localhost:8091/loadImage.php"],
@@ -26,7 +29,6 @@ print(scan_results) """
 """ results = loads(scan_results)["result"]
 a.generateJSONReport(results)
  """
-
 # Push resource to db
 """ with open(f'{ROOTPATH}/source/core/database/data_resources.json', 'r') as f:
     data = f.read()
@@ -97,9 +99,10 @@ for item in data:
 dateFind = datetime.strptime(
     '2023-09-23T09:31:41.274Z', "%Y-%m-%dT%H:%M:%S.%fZ") """
 # Get scan result
-data = {"domain": "", "scanDate": ""}
+""" data = {"domain": "", "scanDate": ""}
 jsondata = dumps(data)
 b = loads(jsondata)
 result = a.getScanResult("GET", b)
 with open(f"{ROOTPATH}/data_scanResult.json", "w") as f:
     f.write(dumps(result, default=str))
+ """

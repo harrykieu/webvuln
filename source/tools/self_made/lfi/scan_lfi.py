@@ -1,12 +1,12 @@
+import json
 import requests
 from bs4 import BeautifulSoup as bs
 from urllib.parse import urljoin
 import re
 import urllib.parse
 import source.core.utils as utils
+import json
 
-# 06/09/2023 : CODE Can cai thien them mot so phuong dien de chen tim ra dia file (can cai tien tu dong 110 tro di)
-# maker : RBKING
 
 s = requests.Session()
 s.headers[
@@ -17,7 +17,7 @@ s.headers[
 class LFI:
     def __init__(self, url, lfi_resources):
         self.url = url
-        self.lfi_resources = lfi_resources
+        self.lfi_resources = json.loads(lfi_resources)
         self.payloads = []
         self.result = False
 
@@ -43,6 +43,7 @@ class LFI:
         try:
             action = form.attrs.get("action").lower()
         except:
+            # TODO: fix all bare except statements
             action = None
 
         method = form.attrs.get("method", "get").lower()
@@ -64,7 +65,7 @@ class LFI:
     # --------------------------------------------------
 
     def check_lfi(self):
-
+        # TODO: add payload to log, add log to utils
         utils.log(
             f"[LFI] Checking LFI for {self.url}",
             "INFO",
@@ -73,10 +74,19 @@ class LFI:
 
         print("\n[+] Checking LFI")
 
+        if not self.lfi_resources:
+            print("\n[-] Resources not found!")
+            utils.log(
+                "[LFI] Resources not found!",
+                "ERROR",
+                "lfi_log.txt",
+            )
+            return self.result
+
         for payload in self.lfi_resources:
             payload_str = payload["value"]
-            encoded_payload = urllib.parse.quote(payload_str.encode('utf-8'))
-            new_url = f"{self.url}?page={encoded_payload}"
+            encoded_payload = urllib.parse.quote(payload_str.encode("utf-8"))
+            new_url = re.sub(r'=.*?(&|$)', '=' + encoded_payload + '\\1', self.url)
 
             print("[!] Trying", new_url)
             res = s.get(new_url)
@@ -84,10 +94,10 @@ class LFI:
             if re.search(rb"root:x:0:0", res.content):
                 print("[+] LFI vulnerability detected, link:", new_url)
                 utils.log(
-                            f"[LFI] Local File Injection vulnerability detected, link: {new_url}",
-                            "INFO",
-                            "lfi_log.txt",
-                        )
+                    f"[LFI] Local File Injection vulnerability detected, link: {new_url}, \nPayload: {payload_str}",
+                    "INFO",
+                    "lfi_log.txt",
+                )
                 self.payloads.append(payload["value"])
                 self.result = True
                 break
@@ -122,18 +132,15 @@ class LFI:
                 if re.search(rb"root:x:0:0", res.content):
                     print("[+] Local File Injection detected, link:", self.url)
                     utils.log(
-                            f"[LFI] Local File Injection detected in form, link: {self.url}",
-                            "INFO",
-                            "lfi_log.txt",
-                        )
+                        f"[LFI] Local File Injection detected in form, with Payload: {payload}",
+                        "INFO",
+                        "lfi_log.txt",
+                    )
                     self.payloads.append(payload["value"])
                     self.result = True
                     break
-                    
 
         print("[+] Check LFI done")
-        utils.log(
-            "[LFI] Check LFI done", "INFO", "lfi_log.txt"
-        )
+        utils.log("[LFI] Check LFI done", "INFO", "lfi_log.txt")
 
         return self.result, self.payloads
