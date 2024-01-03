@@ -3,15 +3,14 @@ import os
 import platform
 from datetime import datetime
 from pathlib import Path
-from source.core.export import ReportGenerator
 
 import pymongo
 import requests
-import pytz
 
 import source.core.utils as utils
 from source.core.calSeverity import calculateWebsiteSafetyRate
 from source.core.database.dbutils import DatabaseUtils
+from source.core.export import ReportGenerator
 from source.tools.self_made.fileupload.scan_fileupload import FileUpload
 from source.tools.self_made.idor.scan_idor import IDOR
 from source.tools.self_made.lfi.scan_lfi import LFI
@@ -290,7 +289,7 @@ class WebVuln:
                     elif module == "fileupload":
                         print("[+] Checking file upload vulnerability...")
                         resources = self.__fileHandler("GET", {"description": ""})
-                        if "dvwa" in url:
+                        if "dvwa" in url.lower():
                             a = FileUpload(url, resources, isDVWA=True)
                         else:
                             a = FileUpload(url, resources)
