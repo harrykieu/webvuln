@@ -37,10 +37,10 @@ packages:
     dependency: transitive
     description:
       name: barcode
-      sha256: "789f898eef0bd88312470bdb2cc996f895ad7dd5f89e9adde84b204546a90b45"
+      sha256: "2a8b2ee065f419c2aeda141436cc556d91ae772d220fd80679f4d431d6c2ab43"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.4"
+    version: "2.2.5"
   bidi:
     dependency: transitive
     description:
@@ -157,10 +157,10 @@ packages:
     dependency: "direct main"
     description:
       name: dio
-      sha256: "01870acd87986f768e0c09cc4d7a19a59d814af7b34cbeb0b437d2c33bdfea4c"
+      sha256: "797e1e341c3dd2f69f2dad42564a6feff3bfb87187d05abb93b9609e6f1645c3"
       url: "https://pub.dev"
     source: hosted
-    version: "5.3.4"
+    version: "5.4.0"
   dropdown_button2:
     dependency: "direct main"
     description:
@@ -245,18 +245,18 @@ packages:
     dependency: "direct main"
     description:
       name: fl_chart
-      sha256: "6b9eb2b3017241d05c482c01f668dd05cc909ec9a0114fdd49acd958ff2432fa"
+      sha256: fe6fec7d85975a99c73b9515a69a6e291364accfa0e4a5b3ce6de814d74b9a1c
       url: "https://pub.dev"
     source: hosted
-    version: "0.64.0"
+    version: "0.66.0"
   fluentui_system_icons:
     dependency: "direct main"
     description:
       name: fluentui_system_icons
-      sha256: "3148313229de2f96c718c12ebaa8496ab5c84574133db728443e4286ac4654ef"
+      sha256: "0689f5e1f837ac6ca518323e5d7fd4702b528ecaa5e181d2014119595a6cb322"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.222"
+    version: "1.1.223"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -412,10 +412,10 @@ packages:
     dependency: transitive
     description:
       name: http
-      sha256: "759d1a329847dd0f39226c688d3e06a6b8679668e350e2891a6474f8b4bb8525"
+      sha256: d4872660c46d929f6b8a9ef4e7a7eff7e49bbf0c4ec3f385ee32df5119175139
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.2"
   http_parser:
     dependency: transitive
     description:
@@ -428,10 +428,10 @@ packages:
     dependency: "direct main"
     description:
       name: icons_plus
-      sha256: b613ec1deac96e9ef5c8065f2d7325967818bc3f4e118a375e50292761849ea6
+      sha256: "8e2f601b8605d45dd55b106a0da084a1809125077a49574ca22e8bcd5b6e86f0"
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.0"
+    version: "5.0.0"
   image:
     dependency: transitive
     description:
@@ -580,10 +580,10 @@ packages:
     dependency: transitive
     description:
       name: path_provider_android
-      sha256: e595b98692943b4881b219f0a9e3945118d3c16bd7e2813f98ec6e532d905f72
+      sha256: "477184d672607c0a3bf68fbbf601805f92ef79c82b64b4d6eb318cbca4c48668"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.1"
+    version: "2.2.2"
   path_provider_foundation:
     dependency: transitive
     description:
@@ -732,10 +732,10 @@ packages:
     dependency: "direct main"
     description:
       name: process_run
-      sha256: "94413ec6bbd05dfe7c3002c379724f75f185ff7f0a5dfb1851a42473d84c956e"
+      sha256: "3d5335d17003a7c2fd5148be2d313f5b84244ab2e625162fdd44b4aaa48bea66"
       url: "https://pub.dev"
     source: hosted
-    version: "0.13.3"
+    version: "0.13.3+1"
   provider:
     dependency: transitive
     description:
@@ -809,26 +809,26 @@ packages:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_charts
-      sha256: "719af736c2fa189a0d6574e0bf23bc32df8ee9589980d456bcf391a8bd55aa1b"
+      sha256: d720751869540bc0b18e063414e9c8d41c924cca01e3aad3538d404c31d00e2d
       url: "https://pub.dev"
     source: hosted
-    version: "23.2.4"
+    version: "24.1.43+1"
   syncfusion_flutter_core:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "8a1220f978491f56431c66dacf1bb97bf2abcd1458b542fe0dfbf1a630c67260"
+      sha256: "1b40729aa10a727150a6cc56e532c770f4baded83846fca8700efd908d0f4d0a"
       url: "https://pub.dev"
     source: hosted
-    version: "23.2.4"
+    version: "24.1.43"
   syncfusion_flutter_gauges:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_gauges
-      sha256: "0ac8a518ffe630c33c61c1576b40ddad080fe85a007de4f0b1be48bcdddb5fd0"
+      sha256: fc837dbcd215d100cf56ffd0cf3eeb0e8ebbb4d009839fa997531822b6a97625
       url: "https://pub.dev"
     source: hosted
-    version: "23.2.4"
+    version: "24.1.43"
   synchronized:
     dependency: transitive
     description:
@@ -921,10 +921,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: "7c99c0e1e2fa190b48d25c81ca5e42036d5cac81430ef249027d97b0935c553f"
+      sha256: b0f37db61ba2f2e9b7a78a1caece0052564d1bc70668156cf3a29d676fe4e574
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.0"
+    version: "5.1.1"
   xdg_directories:
     dependency: transitive
     description:
@@ -937,10 +937,10 @@ packages:
     dependency: transitive
     description:
       name: xml
-      sha256: af5e77e9b83f2f4adc5d3f0a4ece1c7f45a2467b695c2540381bac793e34e556
+      sha256: b015a8ad1c488f66851d762d3090a21c600e479dc75e68328c52774040cf9226
       url: "https://pub.dev"
     source: hosted
-    version: "6.4.2"
+    version: "6.5.0"
   yaml:
     dependency: transitive
     description:
@@ -951,4 +951,4 @@ packages:
     version: "3.1.2"
 sdks:
   dart: ">=3.2.0 <4.0.0"
-  flutter: ">=3.13.0"
+  flutter: ">=3.16.0"

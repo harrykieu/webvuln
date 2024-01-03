@@ -14,7 +14,7 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   line_icons: ^2.0.3
-  icons_plus: ^4.0.0
+  icons_plus: ^5.0.0
   fluentui_system_icons: ^1.1.218
   dio: ^5.3.3
   get: ^4.6.6
@@ -28,9 +28,9 @@ dependencies:
   group_button: ^5.3.3
   pluto_grid: ^7.0.2
   data_table_2: ^2.5.9
-  syncfusion_flutter_gauges: ^23.1.43
-  fl_chart: ^0.64.0
-  syncfusion_flutter_charts: ^23.1.43
+  syncfusion_flutter_gauges: ^24.1.43
+  fl_chart: ^0.66.0
+  syncfusion_flutter_charts: ^24.1.43+1
   pie_chart: ^5.3.2
   dropdown_button2: ^2.3.9
   lite_rolling_switch: ^1.0.1
@@ -66,9 +66,6 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - lib/assets/result.png
-    - lib/assets/scanner.png
-    - lib/assets/Analyze.png
     - lib/assets/
     - .env
   uses-material-design: true
