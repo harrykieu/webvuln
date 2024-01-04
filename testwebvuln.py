@@ -2,10 +2,12 @@ import base64
 from json import dumps, loads
 from source.core.backend import WebVuln
 from pathlib import Path
+import time 
+from datetime import datetime
 
 ROOTPATH = Path(__file__).parent
 
-
+start = datetime.now() 
 a = WebVuln()
 """ lista = a.resourceHandler(
     'GET', data={'vulnType': 'File Upload', 'resType': 'File'})
@@ -14,10 +16,18 @@ print(lista[0])
 for a in lista:
     print(lista.index(a)) """
 # NOTE: dvwa url must have / at the end
-# print(a.scanURL(['http://localhost/dvwa/vulnerabilities/upload'], ['fileupload']))
-#a.scanURL(["http://localhost:12001"], ["fileupload"])
-# a.scanURL(["http://google.com/"], ["fileupload"])
-a.scanURL(["http://localhost/DVWA/vulnerabilities/fi"], ["pathtraversal"])
+#a._WebVuln__scanURL(['http://testphp.vulnweb.com/artist.php'], ['fileupload'])
+#a.scanURL(["http://testphp.vulnweb.com/artist.php"], ["fileupload"])
+a._WebVuln__scanURL(["http://testphp.vulnweb.com/artist.php"], ["fileupload"])
+a._WebVuln__scanURL(["http://testphp.vulnweb.com/artist.php"], ["sqli"])
+#a._WebVuln__scanURL(["http://testphp.vulnweb.com/artist.php"], ["pathtraversal"])
+a._WebVuln__scanURL(["http://testphp.vulnweb.com/artist.php"], ["pathtraversal"])
+a._WebVuln__scanURL(["http://testphp.vulnweb.com/artist.php"], ["xss"])
+a._WebVuln__scanURL(["http://testphp.vulnweb.com/artist.php"], ["idor"])
+end = datetime.now()
+difference = end - start
+seconds = difference.total_seconds()
+print('Time to execute the code is:', round(seconds, 2))
 """ scan_results = a.scanURL(
     ["http://localhost:8091/loadImage.php", "http://localhost:12001"],
     # ["http://localhost:8091/loadImage.php"],
