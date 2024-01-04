@@ -14,21 +14,9 @@ class inputUser extends StatelessWidget {
   final Widget underIcon;
   // final Function() validator;
 
-  String? validateName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'This field must be filled!!';
-    }
-    final regexURL = RegExp(
-        r'(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})(\.[a-zA-Z0-9]{2,})?');
-    if (!regexURL.hasMatch(value)) {
-      return "Invalid URL";
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      validator: validateName,
       decoration: InputDecoration(
         fillColor: Colors.white,
         filled: true,
@@ -36,7 +24,7 @@ class inputUser extends StatelessWidget {
         contentPadding:
             const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         border: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(40.0)),
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
           borderSide: BorderSide(color: Colors.black, width: 1.0),
         ),
         suffixIcon: underIcon,

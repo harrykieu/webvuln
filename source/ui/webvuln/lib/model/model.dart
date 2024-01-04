@@ -99,7 +99,6 @@ class HistoryTableData {
     try {
       resultListJson = List<Map<String, dynamic>>.from(json['result']);
     } catch (e) {
-      // TODO: handle properly
       throw Exception('No result found or invalid result in database');
     }
     Map<String, dynamic> resultData =
@@ -258,4 +257,19 @@ class ChartData {
   final num y1;
 
   ChartData(this.x, this.y, this.y1);
+}
+
+class Report {
+  final List<dynamic> result;
+  final String type;
+
+  Report({
+    required this.result,
+    required this.type,
+  });
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {'result': result, 'type': type};
+    return json;
+  }
 }

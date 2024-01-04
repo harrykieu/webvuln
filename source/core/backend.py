@@ -3,15 +3,14 @@ import os
 import platform
 from datetime import datetime
 from pathlib import Path
-from source.core.export import ReportGenerator
 
 import pymongo
 import requests
-import pytz
 
 import source.core.utils as utils
 from source.core.calSeverity import calculateWebsiteSafetyRate
 from source.core.database.dbutils import DatabaseUtils
+from source.core.export import ReportGenerator
 from source.tools.self_made.fileupload.scan_fileupload import FileUpload
 from source.tools.self_made.idor.scan_idor import IDOR
 from source.tools.self_made.lfi.scan_lfi import LFI
@@ -290,7 +289,7 @@ class WebVuln:
                     elif module == "fileupload":
                         print("[+] Checking file upload vulnerability...")
                         resources = self.__fileHandler("GET", {"description": ""})
-                        if "dvwa" in url:
+                        if "dvwa" in url.lower():
                             a = FileUpload(url, resources, isDVWA=True)
                         else:
                             a = FileUpload(url, resources)
@@ -300,9 +299,9 @@ class WebVuln:
                             resultURL["vulnerabilities"].append(
                                 {
                                     "type": "File Upload",
-                                    "logs": open(
-                                        f"{ROOTPATH}/logs/fileupload.txt", "r"
-                                    ).read(),
+                                    "logs": open(f"{ROOTPATH}/logs/fileupload.txt", "r")
+                                    .read()
+                                    .rstrip("\n"),
                                     "payload": FUPayload,
                                     "severity": "High",
                                 }
@@ -315,13 +314,17 @@ class WebVuln:
                         resources = self.__resourceHandler(
                             "GET", {"vulnType": "idor", "resType": "payload"}
                         )
-                        idorResult, idorPayload = IDOR(url, resources, idorParams).check_idor(url)
+                        idorResult, idorPayload = IDOR(
+                            url, resources, idorParams
+                        ).check_idor(url)
                         if idorResult is True:
                             resultURL["numVuln"] += 1
                             resultURL["vulnerabilities"].append(
                                 {
                                     "type": "IDOR",
-                                    "logs": open(f"{ROOTPATH}/logs/idor.txt", "r").read(),
+                                    "logs": open(
+                                        f"{ROOTPATH}/logs/idor.txt", "r"
+                                    ).read(),
                                     "payload": idorPayload,
                                     "severity": "Medium",
                                 }
@@ -700,7 +703,6 @@ class WebVuln:
                 listResult = []
                 for item in cursor:
                     listResult.append(item)
-                print(listResult[0])
                 return json.dumps(listResult, default=str)
             else:
                 utils.log(
@@ -711,51 +713,68 @@ class WebVuln:
                 return "Failed"
 
     def __handleReportGeneration(self, data):
-        #generate reports
+        # generate reports
         try:
             scanResult = data["result"]
-            reportType = data["reportType"]
+            reportType = data["type"]
             if reportType not in ["json", "xml", "pdf"]:
-                utils.log("[backend.py-handleReportGeneration] Error: Invalid report type", "ERROR")
+                utils.log(
+                    "[backend.py-handleReportGeneration] Error: Invalid report type",
+                    "ERROR",
+                )
                 return "Failed"
             if scanResult == "":
-                utils.log("[backend.py-handleReportGeneration] Error: Empty scan result", "ERROR")
+                utils.log(
+                    "[backend.py-handleReportGeneration] Error: Empty scan result",
+                    "ERROR",
+                )
                 return "Failed"
-            
             if platform.system() == "Windows":
                 reportFolder = "\\reports"
             else:
                 reportFolder = "/reports"
             if not os.path.exists(f"{ROOTPATH}{reportFolder}"):
                 os.mkdir(f"{ROOTPATH}{reportFolder}")
-            
-            
-            generateReport = ReportGenerator(scanResult, f"{ROOTPATH}\\reports") 
+            generateReport = ReportGenerator(scanResult, f"{ROOTPATH}\\reports")
             if reportType == "json":
-                generateReport.generateJson()
                 if generateReport.generateJson():
-                    utils.log("[backend.py-handleReportGeneration] Success: Report generated", "INFO")
+                    utils.log(
+                        "[backend.py-handleReportGeneration] Success: Report generated",
+                        "INFO",
+                    )
                     return "Success"
                 else:
-                    utils.log("[backend.py-handleReportGeneration] Error: Failed to generate report", "ERROR")
+                    utils.log(
+                        "[backend.py-handleReportGeneration] Error: Failed to generate report",
+                        "ERROR",
+                    )
                     return "Failed"
             elif reportType == "xml":
                 if generateReport.generateXml():
-                    utils.log("[backend.py-handleReportGeneration] Success: Report generated", "INFO")
+                    utils.log(
+                        "[backend.py-handleReportGeneration] Success: Report generated",
+                        "INFO",
+                    )
                     return "Success"
                 else:
-                    utils.log("[backend.py-handleReportGeneration] Error: Failed to generate report", "ERROR")
+                    utils.log(
+                        "[backend.py-handleReportGeneration] Error: Failed to generate report",
+                        "ERROR",
+                    )
                     return "Failed"
             elif reportType == "pdf":
-                generateReport.generatePdf()
                 if generateReport.generatePdf():
-                    utils.log("[backend.py-handleReportGeneration] Success: Report generated", "INFO")
+                    utils.log(
+                        "[backend.py-handleReportGeneration] Success: Report generated",
+                        "INFO",
+                    )
                     return "Success"
                 else:
-                    utils.log("[backend.py-handleReportGeneration] Error: Failed to generate report", "ERROR")
+                    utils.log(
+                        "[backend.py-handleReportGeneration] Error: Failed to generate report",
+                        "ERROR",
+                    )
                     return "Failed"
-
         except Exception as e:
             utils.log(f"[backend.py-handleReportGeneration] Error: {str(e)}", "ERROR")
-            return "Failed"   
-
+            return "Failed"
