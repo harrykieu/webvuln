@@ -25,13 +25,14 @@ class _ResultScreenState extends State<ResultScreen> {
   bool isVisibled = true;
   bool isAppeared = true;
   String state = 'All';
-  String exportState = dotenv.env['DEFAULT_EXPORT_TYPE']!;
+  // String exportState = dotenv.env['DEFAULT_EXPORT_TYPE']!;
+  String exportState = 'pdf';
   List<HistoryTableData> jsonDecoded = [];
 
   @override
+  // bool isVisibled = true;
   void initState() {
     super.initState();
-    isVisibled = true;
     isAppeared = true;
   }
 
@@ -249,43 +250,53 @@ class _ResultScreenState extends State<ResultScreen> {
                 ),
               ),
               Container(
-                  width: screenWidth,
-                  height: screenHeight / 2 - 200,
-                  margin: const EdgeInsetsDirectional.only(
-                      start: 40, end: 40, top: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: 15,
-                        spreadRadius: -7,
-                      )
-                    ],
-                  ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: Row(
-                            children: [
-                              const Image(
-                                  image: AssetImage(
-                                      'lib/assets/Folders_light.png')),
-                              const SizedBox(width: 10),
-                              Text(
-                                'VULNERABILITIES DETAILS',
-                                style: GoogleFonts.montserrat(
-                                    fontSize: 22, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Constants.vulnDesc,
-                      ],
-                    ),
-                  )),
+  width: screenWidth,
+  height: screenHeight / 2 - 200,
+  margin: const EdgeInsetsDirectional.only(
+    start: 40,
+    end: 40,
+    top: 20,
+  ),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(20),
+    boxShadow: const [
+      BoxShadow(
+        color: Colors.black38,
+        blurRadius: 15,
+        spreadRadius: -7,
+      ),
+    ],
+  ),
+  child: Column(
+    children: [
+      ListTile(
+        title: Row(
+          children: [
+            const Image(
+              image: AssetImage('lib/assets/Folders_light.png'),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'VULNERABILITIES DETAILS',
+              style: GoogleFonts.montserrat(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+      Expanded(
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Constants.vulnDesc,
+        ),
+      ),
+    ],
+  ),
+),
+
               SizedBox(
                 width: screenWidth,
                 height: 70,

@@ -1,17 +1,54 @@
 // ignore_for_file: camel_case_types, depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import 'package:webvuln/themes/app_themes.dart';
 import 'package:webvuln/views/history.dart';
 import 'package:webvuln/views/resources.dart';
+import 'dart:io';
 import 'package:webvuln/views/scan.dart';
 import 'package:webvuln/views/setting.dart';
 
-void main() async {
-  //TestWidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
-  runApp(const mainScreen());
+import 'dart:io';
+
+execute() async {
+  try {
+    var result = await Process.run('webvuln.exe', [],
+        runInShell: true, workingDirectory: 'F:/webvuln/dist');
+    print(
+        'Exit code: ${result.exitCode}\nstdout: ${result.stdout}\nstderr: ${result.stderr}');
+  } catch (error) {
+    print('Error: $error');
+  }
+}
+
+changeTheme(change) {
+  if (change == true) {
+    return AppTheme.darkTheme;
+  } else {
+    return AppTheme.lightTheme;
+  }
+}
+
+main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => SettingProvider(),
+      child: const MyApp(),
+    ),
+  );
+}
+
+class MyAppProvider extends ChangeNotifier {
+  /// Toggle for dark mode
+  bool _isDarkMode = false;
+
+  change() {
+    /// Toggle dark mode value
+    _isDarkMode = !_isDarkMode;
+    notifyListeners();
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -19,7 +56,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    ThemeData changeMode = AppTheme.lightTheme;
+    return MaterialApp(
+      // themeMode: ThemeMode.system,
+      theme: changeMode,
+      home: const mainScreen(),
+    );
   }
 }
 
@@ -145,14 +187,16 @@ class _mainScreenState extends State<mainScreen> {
         style: ElevatedButton.styleFrom(
             minimumSize: const Size(200, 80),
             backgroundColor: Colors.transparent,
-            foregroundColor: Colors.white),
+            foregroundColor:
+                Theme.of(context as BuildContext).colorScheme.secondary),
         child: Column(
-          children: [Image(image: AssetImage(icon)), Text(name)],
+          children: [
+            Image(image: AssetImage(icon)),
+            Text(
+              name,
+              style: Theme.of(context as BuildContext).textTheme.bodyLarge,
+            )
+          ],
         ));
   }
-
-/*   Stream<int> get _selectedIndexStream =>
-      Stream.fromFuture(Future.delayed(const Duration(milliseconds: 500), () {
-        return _selectedIndex;
-      })); */
 }

@@ -43,10 +43,14 @@ class _ResourceScreenState extends State<ResourceScreen> {
     super.initState();
   }
 
+  void limitDataFromServer(int page,int limit){
+    
+  }
+
   void updateTableNormal(List<ResourceNormalTableData> newData,
       TextEditingController valueEditController, BuildContext context) {
     // BUG: Data rendering too slow
-    setState(() {
+    setState(() { 
       normalTableDataList = newData;
       dataRowList = normalTableDataList
           .map((tableData) => DataRow(cells: [
