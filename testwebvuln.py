@@ -16,14 +16,7 @@ print(lista[0])
 for a in lista:
     print(lista.index(a)) """
 # NOTE: dvwa url must have / at the end
-#a._WebVuln__scanURL(['http://testphp.vulnweb.com/artist.php'], ['fileupload'])
-#a.scanURL(["http://testphp.vulnweb.com/artist.php"], ["fileupload"])
-a._WebVuln__scanURL(["http://testphp.vulnweb.com/artist.php"], ["fileupload"])
-a._WebVuln__scanURL(["http://testphp.vulnweb.com/artist.php"], ["sqli"])
-#a._WebVuln__scanURL(["http://testphp.vulnweb.com/artist.php"], ["pathtraversal"])
-a._WebVuln__scanURL(["http://testphp.vulnweb.com/artist.php"], ["pathtraversal"])
-a._WebVuln__scanURL(["http://testphp.vulnweb.com/artist.php"], ["xss"])
-a._WebVuln__scanURL(["http://testphp.vulnweb.com/artist.php"], ["idor"])
+a._WebVuln__scanURL(['http://pmu-usth.edu.vn/'], ["ffuf","idor","sqli","xss","fileupload","pathtraversal"])
 end = datetime.now()
 difference = end - start
 seconds = difference.total_seconds()

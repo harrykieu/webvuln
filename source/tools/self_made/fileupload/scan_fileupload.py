@@ -13,7 +13,7 @@ import source.core.utils as utils
 class FileUpload:
     def __init__(self, url, resources, isDVWA=False):
         self.url = url
-        self.session = None
+        self.session = requests.Session()
         self.cookies = None
         self.csrfExist = False
         self.isDVWA = isDVWA
