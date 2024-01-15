@@ -64,7 +64,6 @@ adiana
 adie
 adina
 aditya
-admin
 adnan
 adon
 adonis
@@ -853,7 +852,6 @@ hbv7
 kisadmin
 su
 sa
-test
 users
 vice
 wwo

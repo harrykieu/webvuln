@@ -72,7 +72,7 @@ flutter:
     - lib/assets/scanner.png
     - lib/assets/Analyze.png
     - lib/assets/
-    # - .env
+    # - /.env
   uses-material-design: true
 
 window_size:

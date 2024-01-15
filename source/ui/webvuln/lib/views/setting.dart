@@ -1,7 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/gradient_button.dart';
@@ -15,6 +14,10 @@ class SettingProvider extends ChangeNotifier {
     _change = !_change;
     notifyListeners();
   }
+}
+void loadEnv() async {
+  await DotEnv().load(fileName: 'source/ui/webvuln/lib/assets/.env');
+  print('sucess load env');
 }
 
 class SettingScreen extends StatefulWidget {
@@ -188,6 +191,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       ),
                       GradientButton(
                           onPressed: () {
+                            loadEnv();
                             setState(() {
                               _databaseController.text =
                                   DotEnv().env['DATABASE_URI'].toString();

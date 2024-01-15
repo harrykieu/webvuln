@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/gradient_button.dart';
 import 'package:webvuln/model/model.dart';
+import 'package:webvuln/service/api.dart';
 import 'package:webvuln/variable.dart';
 
 class ResultScreen extends StatefulWidget {
@@ -28,6 +29,8 @@ class _ResultScreenState extends State<ResultScreen> {
   // String exportState = dotenv.env['DEFAULT_EXPORT_TYPE']!;
   String exportState = 'pdf';
   List<HistoryTableData> jsonDecoded = [];
+  double dialogWidth = MediaQuery.of(Get.context!).size.width / 1.5;
+  double dialogHeight = MediaQuery.of(Get.context!).size.height / 2;
 
   @override
   // bool isVisibled = true;
@@ -69,11 +72,105 @@ class _ResultScreenState extends State<ResultScreen> {
       newData = data;
     }
     List<DataRow> dataRows = newData
-        .map((e) => DataRow(cells: [
-              DataCell(warnLevel(e.severity)),
-              DataCell(Text(e.type)),
-              DataCell(Text(e.payload.toString())),
-            ]))
+        .map((e) => DataRow2(
+                cells: [
+                  DataCell(warnLevel(e.severity)),
+                  DataCell(Text(e.type)),
+                  DataCell(Text(e.payload.toString())),
+                ],
+                onTap: () async {
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: Row(
+                              children: [
+                                const Icon(Icons.warning_amber_sharp),
+                                const SizedBox(width: 10),
+                                Text('VULNERABILITY DETAILS',
+                                    style: GoogleFonts.montserrat(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold))
+                              ],
+                            ),
+                            content: SizedBox(
+                                width: dialogWidth,
+                                height: dialogHeight,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text("Type: ",
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold)),
+                                        Text(e.type,
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500))
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text("Severity: ",
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold)),
+                                        Text(e.severity,
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500))
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text("Payload used: ",
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold)),
+                                        Text(e.payload.toString(),
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500))
+                                      ],
+                                    ),
+                                    Text("Scanner module logs: ",
+                                        style: GoogleFonts.montserrat(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold)),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey[350],
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            border: Border.all(
+                                                color: Colors.black)),
+                                        child: SingleChildScrollView(
+                                          child: Text(e.logs,
+                                              style: GoogleFonts.montserrat(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500)),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('OK'))
+                            ],
+                          ));
+                }))
         .toList();
     return dataRows;
   }
@@ -250,53 +347,43 @@ class _ResultScreenState extends State<ResultScreen> {
                 ),
               ),
               Container(
-  width: screenWidth,
-  height: screenHeight / 2 - 200,
-  margin: const EdgeInsetsDirectional.only(
-    start: 40,
-    end: 40,
-    top: 20,
-  ),
-  decoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(20),
-    boxShadow: const [
-      BoxShadow(
-        color: Colors.black38,
-        blurRadius: 15,
-        spreadRadius: -7,
-      ),
-    ],
-  ),
-  child: Column(
-    children: [
-      ListTile(
-        title: Row(
-          children: [
-            const Image(
-              image: AssetImage('lib/assets/Folders_light.png'),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'VULNERABILITIES DETAILS',
-              style: GoogleFonts.montserrat(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-      Expanded(
-        child: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Constants.vulnDesc,
-        ),
-      ),
-    ],
-  ),
-),
-
+                  width: screenWidth,
+                  height: screenHeight / 2 - 200,
+                  margin: const EdgeInsetsDirectional.only(
+                      start: 40, end: 40, top: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 15,
+                        spreadRadius: -7,
+                      )
+                    ],
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: Row(
+                            children: [
+                              const Image(
+                                  image: AssetImage(
+                                      'lib/assets/Folders_light.png')),
+                              const SizedBox(width: 10),
+                              Text(
+                                'VULNERABILITIES DEFINITIONS',
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 22, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Constants.vulnDesc,
+                      ],
+                    ),
+                  )),
               SizedBox(
                 width: screenWidth,
                 height: 70,
@@ -304,8 +391,7 @@ class _ResultScreenState extends State<ResultScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
-                      margin: const EdgeInsetsDirectional.symmetric(
-                          horizontal: 0, vertical: 10),
+                      margin: const EdgeInsetsDirectional.only(top: 20),
                       width: 200,
                       child: DropdownButtonFormField<String>(
                           decoration: const InputDecoration(
@@ -348,20 +434,52 @@ class _ResultScreenState extends State<ResultScreen> {
                             });
                           }),
                     ),
-                    GradientButton(
-                      horizontalMargin: 40,
-                      verticalMargin: 10,
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      onPressed: () {
-                        // TODO: implement export function
-                        print("Exporting data to $exportState");
-                      },
-                      child: const Text(
-                        'Export',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: GradientButton(
+                        horizontalMargin: 40,
+                        verticalMargin: 10,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                        onPressed: () async {
+                          // TODO: implement export function
+                          String result = await createReport(
+                              result: jsonDecoded, type: exportState);
+                          // ignore: use_build_context_synchronously
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: Row(
+                                      children: [
+                                        const Icon(Icons.error),
+                                        const SizedBox(width: 5),
+                                        Text('Export status',
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold))
+                                      ],
+                                    ),
+                                    content: Text('$result',
+                                        style: GoogleFonts.montserrat(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.normal)),
+                                    alignment: Alignment.center,
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('OK'))
+                                    ],
+                                  ));
+                        },
+                        child: const Text(
+                          'Export',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],

@@ -31,6 +31,10 @@ class _ResourceScreenState extends State<ResourceScreen> {
   late ResourceFile resourceFile;
   // For file information
   late String fileInfo;
+  late String dataLocal;
+  int startIndexData = 0;
+  int endIndexData = 10;
+  int indexPage = 1;
   @override
   void initState() {
     state = '/normalPost';
@@ -43,15 +47,33 @@ class _ResourceScreenState extends State<ResourceScreen> {
     super.initState();
   }
 
-  void limitDataFromServer(int page,int limit){
-    
+  loadLessData() {
+    setState(() {
+      startIndexData -= 11;
+      endIndexData -= 11;
+      if (indexPage < 1) {
+        indexPage = 1;
+      } else {
+        indexPage--;
+      }
+    });
+  }
+
+  loadMoreData() {
+    setState(() {
+      startIndexData += 11;
+      endIndexData += 11;
+      indexPage++;
+    });
+    print(startIndexData);
+    print(endIndexData);
   }
 
   void updateTableNormal(List<ResourceNormalTableData> newData,
       TextEditingController valueEditController, BuildContext context) {
     // BUG: Data rendering too slow
-    setState(() { 
-      normalTableDataList = newData;
+    setState(() {
+      normalTableDataList = newData.sublist(startIndexData, endIndexData);
       dataRowList = normalTableDataList
           .map((tableData) => DataRow(cells: [
                 DataCell(Text(tableData.vulnType)),
@@ -84,6 +106,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
     setState(() {
       fileTableDataList = newData;
       dataRowList = fileTableDataList
+          .take(10)
           .map((tableData) => DataRow(cells: [
                 DataCell(Text(tableData.fileName,
                     style: GoogleFonts.montserrat(fontSize: 16))),
@@ -151,6 +174,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
         (1 - 0.13); // 0.13 is width of sidebar
     Widget inputWidget;
     Widget tableWidget;
+    Widget backPageButton;
     if (state == '/filePost') {
       inputWidget = filePost(
         screenHeight: screenHeight,
@@ -236,7 +260,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
           //table
           tableWidget,
           // search box
-          inputWidget
+          inputWidget,
         ],
       ),
     );
@@ -252,7 +276,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
   }) {
     return Container(
       width: screenWidth,
-      height: screenHeight / 2 + 50,
+      height: screenHeight / 2 + 90,
       margin: const EdgeInsetsDirectional.only(start: 40, end: 40, top: 10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -266,7 +290,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
           ]),
       child: Column(children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
               margin: const EdgeInsetsDirectional.only(start: 40),
@@ -283,11 +307,13 @@ class _ResourceScreenState extends State<ResourceScreen> {
                 controller: typeSearchController,
                 content: "Type"),
             GradientButton(
-                horizontalMargin: 50,
+                // horizontalMargin: 50,
                 onPressed: () async {
+                  // loadMoreData();
                   String response = await getResourcesNormal(
                       vulnType: vulnTypeSearchController.text,
                       resType: typeSearchController.text);
+                  setState(() => dataLocal = response);
                   if (response == '[]') {
                     showDialog(
                         context: context,
@@ -317,7 +343,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
                               ],
                             ));
                   }
-                  List<dynamic> jsonD = jsonDecode(response);
+                  List<dynamic> jsonD = jsonDecode(dataLocal);
                   List<ResourceNormalTableData> newData = jsonD
                       .map((json) => ResourceNormalTableData.fromJson(json))
                       .toList();
@@ -327,11 +353,11 @@ class _ResourceScreenState extends State<ResourceScreen> {
                 child: const Text(
                   'Find',
                   style: TextStyle(color: Colors.white),
-                ))
+                )),
           ],
         ),
         Container(
-            height: screenHeight / 2 - 70,
+            height: screenHeight / 2 - 60,
             width: screenWidth,
             margin: const EdgeInsetsDirectional.only(
                 start: 40, end: 40, bottom: 10),
@@ -394,6 +420,47 @@ class _ResourceScreenState extends State<ResourceScreen> {
                 rows: dataRowList,
               ),
             )),
+        Container(
+          height: 50,
+          width: screenWidth,
+          // margin: EdgeInsets.only(bottom: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(onPressed: (){
+                List<dynamic> jsonD = jsonDecode(dataLocal);
+                    List<ResourceNormalTableData> newData = jsonD
+                        .map((json) => ResourceNormalTableData.fromJson(json))
+                        .toList();
+                    loadLessData();
+                    updateTableNormal(newData, valueEditController, context);
+              }, icon: startIndexData == 0 ? Icon(Icons.delete,color: Colors.white,):Icon(Icons.arrow_back_ios_new_rounded)),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                // decoration: BoxDecoration(
+                //   borderRadius: BorderRadius.circular(50),
+                //   color: const Color.fromARGB(231, 158, 158, 158),
+                // ),
+                child: Text(
+                  'Page $indexPage',
+                  style: GoogleFonts.montserrat(
+                      fontSize: 16, fontWeight: FontWeight.normal),
+                ),
+              ),
+              IconButton(
+                  onPressed: () {
+                    List<dynamic> jsonD = jsonDecode(dataLocal);
+                    List<ResourceNormalTableData> newData = jsonD
+                        .map((json) => ResourceNormalTableData.fromJson(json))
+                        .toList();
+                    loadMoreData();
+                    updateTableNormal(newData, valueEditController, context);
+                    print(jsonD.sublist(startIndexData, endIndexData));
+                  },
+                  icon: const Icon(Icons.arrow_forward_ios_sharp))
+            ],
+          ),
+        )
       ]),
     );
   }
@@ -580,7 +647,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
       required TextEditingController valueController}) {
     return Container(
       width: screenWidth,
-      height: screenHeight / 2 - 100 - 50,
+      height: screenHeight / 2 - 100 - 80,
       margin:
           const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 10),
       decoration: BoxDecoration(
@@ -667,7 +734,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
     String fileState = 'valid';
     return Container(
       width: screenWidth,
-      height: screenHeight / 2 - 100 - 50,
+      height: screenHeight / 2 - 100,
       margin:
           const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 10),
       decoration: BoxDecoration(

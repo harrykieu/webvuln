@@ -258,3 +258,18 @@ class ChartData {
 
   ChartData(this.x, this.y, this.y1);
 }
+
+class Report {
+  final List<dynamic> result;
+  final String type;
+
+  Report({
+    required this.result,
+    required this.type,
+  });
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {'result': result, 'type': type};
+    return json;
+  }
+}

@@ -10,8 +10,6 @@ import 'dart:io';
 import 'package:webvuln/views/scan.dart';
 import 'package:webvuln/views/setting.dart';
 
-import 'dart:io';
-
 execute() async {
   try {
     var result = await Process.run('webvuln.exe', [],
@@ -32,6 +30,7 @@ changeTheme(change) {
 }
 
 main() {
+  execute();
   runApp(
     ChangeNotifierProvider(
       create: (context) => SettingProvider(),
