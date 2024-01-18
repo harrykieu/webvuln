@@ -71,7 +71,6 @@ class _ResourceScreenState extends State<ResourceScreen> {
 
   void updateTableNormal(List<ResourceNormalTableData> newData,
       TextEditingController valueEditController, BuildContext context) {
-    // BUG: Data rendering too slow
     setState(() {
       normalTableDataList = newData.sublist(startIndexData, endIndexData);
       dataRowList = normalTableDataList

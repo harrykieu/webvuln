@@ -2,6 +2,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/gradient_button.dart';
 import 'package:webvuln/variable.dart';
@@ -14,10 +16,6 @@ class SettingProvider extends ChangeNotifier {
     _change = !_change;
     notifyListeners();
   }
-}
-void loadEnv() async {
-  await DotEnv().load(fileName: 'source/ui/webvuln/lib/assets/.env');
-  print('sucess load env');
 }
 
 class SettingScreen extends StatefulWidget {
@@ -32,6 +30,19 @@ class _SettingScreenState extends State<SettingScreen> {
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _fuff_location_Controller =
       TextEditingController();
+
+  Future<String> _read() async {
+    String text = '';
+    try {
+      final Directory directory = await getApplicationDocumentsDirectory();
+      final File file = File('F:/webvuln/.env');
+      text = await file.readAsString();
+      print(directory);
+    } catch (e) {
+      print("Couldn't read file");
+    }
+    return text;
+  }
 
   Future<void> _pickFolder({required TextEditingController controller}) async {
     String? directory = (await FilePicker.platform.getDirectoryPath());
@@ -191,7 +202,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       ),
                       GradientButton(
                           onPressed: () {
-                            loadEnv();
+                            _read();
                             setState(() {
                               _databaseController.text =
                                   DotEnv().env['DATABASE_URI'].toString();

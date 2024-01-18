@@ -49,11 +49,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   String extractJson(String response) {
-    // Find the index of '{"result":'
     int startIndex = response.indexOf('[', response.indexOf('"result"'));
     int endIndex = response.lastIndexOf(']');
-    // TODO: Handle properly the case where more than 1 result is returned
-    // Extract the substring starting from '{"result":'
     String resultData = response.substring(startIndex, endIndex + 1);
     return resultData;
   }

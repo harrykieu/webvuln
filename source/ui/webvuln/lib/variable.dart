@@ -20,7 +20,7 @@ class Constants {
     "FFUF: Fast web fuzzer written in Go",
     "Dirsearch: Web path scanner with file fuzzing capabilities",
     "LFI: Module to scan Local File Inclusion",
-    "SQLi: Module to scan SQL Injection",
+    "SQLi: Module to scan SQL aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa Injection",
     "XSS: Module to scan Cross-Site Scripting",
     "File Upload: Module to scan File Upload",
     "IDOR: Module to scan Insecure Direct Object References",

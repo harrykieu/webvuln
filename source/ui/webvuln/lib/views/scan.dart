@@ -1,13 +1,14 @@
 // ignore_for_file: avoid_print
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/gradient_button.dart';
 import 'package:webvuln/service/api.dart';
 import 'package:webvuln/views/loading.dart';
 import 'package:webvuln/variable.dart';
-
 import '../items/input.dart';
 
 class ScanScreen extends StatefulWidget {
@@ -18,25 +19,20 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanScreenState extends State<ScanScreen> {
-  @override
-  void initState() {
-    setState(() {
-      _numberModule = 0;
-      // _isVisibled = true;
-    });
-    super.initState();
-  }
-  // Future
-
+  //TODO: Get all variable to class enum
   final TextEditingController urlController = TextEditingController();
-  Widget contentChild = Text(
-    'Scan',
-    style: GoogleFonts.montserrat(
-        color: Colors.white, fontWeight: FontWeight.normal),
-  );
   bool _isVisibled = false;
   int _numberModule = 0;
-  String dataReceive = '';
+  Widget modelBox = Container(
+    width: double.infinity,
+    margin: const EdgeInsets.only(left: 200, right: 200),
+    height:double.infinity ,);
+
+  @override
+  initState() {
+    setState(() => _numberModule = 0);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +44,7 @@ class _ScanScreenState extends State<ScanScreen> {
           height: 100,
         ),
 
-        //Textbox SCAN URL
+  //TextBox title
         Container(
             margin: const EdgeInsets.only(left: 200, right: 200),
             width: double.infinity,
@@ -57,6 +53,9 @@ class _ScanScreenState extends State<ScanScreen> {
             child: ListTile(
               title: Text(
                 'WEBVULN',
+                overflow: TextOverflow.fade,
+                maxLines: 1,
+                softWrap: false,
                 style: GoogleFonts.montserrat(
                     fontSize: 100,
                     color: Colors.white,
@@ -64,7 +63,7 @@ class _ScanScreenState extends State<ScanScreen> {
               ),
             )),
 
-        // TextField Input url
+  // TextField input url
         Container(
             margin: const EdgeInsets.only(left: 200, right: 200),
             width: double.infinity,
@@ -81,7 +80,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   )),
             )),
 
-        //Box Module scan
+  //Box button scan module & description
         Container(
             margin: const EdgeInsets.only(left: 50, right: 50),
             width: double.infinity,
@@ -99,12 +98,10 @@ class _ScanScreenState extends State<ScanScreen> {
         const SizedBox(
           height: 30,
         ),
-        //Button Scan URL
+  //Button Scan URL
         GradientButton(
             onPressed: () async {
               Get.to(const LoadingScreen());
-              // var path = await ExternalPath.getExternalStorageDirectories();
-              // print(path);
               List<String> listURL = [];
               listURL.add(urlController.text);
               postURL(
@@ -138,51 +135,51 @@ class _ScanScreenState extends State<ScanScreen> {
     return Row(
       children: [
         // group checkbox module button
-        Container(
-            width: screenWidth / 8,
-            height: double.infinity,
-            margin: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.all(Radius.circular(20))),
-            child: SingleChildScrollView(
-              child: Column(
-                children: List.generate(
-                  Constants.nameModule.length,
-                  (index) {
-                    return Row(
-                      children: [
-                        Checkbox(
-                          activeColor: const Color.fromARGB(255, 11, 58, 96),
-                          value: Constants.valueCheckbox[index],
-                          onChanged: (value) {
-                            setState(() {
-                              Constants.valueCheckbox[index] = value!;
-                              _numberModule = index;
-                              if (value) {
-                                Constants.valueSelected
-                                    .add(Constants.nameModule[index]);
-                              } else {
-                                Constants.valueSelected
-                                    .remove(Constants.nameModule[index]);
-                              }
-                              if (Constants.valueSelected.isEmpty) {
-                                _isVisibled = false;
-                              } else {
-                                _isVisibled = true;
-                              }
-                              print(_numberModule);
-                              print(Constants.valueSelected);
-                            });
-                          },
-                        ),
-                        Text(Constants.nameModule[index]),
-                      ],
-                    );
-                  },
+         Container(
+              width: 150,
+              height: double.infinity,
+              margin: const EdgeInsets.all(40),
+              decoration: const BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: List.generate(
+                    Constants.nameModule.length,
+                    (index) {
+                      return Row(
+                        children: [
+                          Checkbox(
+                            activeColor: const Color.fromARGB(255, 11, 58, 96),
+                            value: Constants.valueCheckbox[index],
+                            onChanged: (value) {
+                              setState(() {
+                                Constants.valueCheckbox[index] = value!;
+                                _numberModule = index;
+                                if (value) {
+                                  Constants.valueSelected
+                                      .add(Constants.nameModule[index]);
+                                } else {
+                                  Constants.valueSelected
+                                      .remove(Constants.nameModule[index]);
+                                }
+                                if (Constants.valueSelected.isEmpty) {
+                                  _isVisibled = false;
+                                } else {
+                                  _isVisibled = true;
+                                }
+                                print(_numberModule);
+                                print(Constants.valueSelected);
+                              });
+                            },
+                          ),
+                          Text(Constants.nameModule[index],overflow: TextOverflow.ellipsis,maxLines: 1,softWrap: false,),
+                        ],
+                      );  
+                    },
+                  ),
                 ),
-              ),
-            )),
+              )),
         // divide line between the button and description
         const VerticalDivider(
           indent: 40,
@@ -191,35 +188,37 @@ class _ScanScreenState extends State<ScanScreen> {
           thickness: 2,
         ),
         // description
-        Container(
-            margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-            width: screenWidth - (screenWidth / 2),
-            height: screenHeight / 2.7,
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.transparent, width: 1)),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(
-                      Icons.document_scanner_rounded,
-                      color: Color(0xFF1A35C3),
+        Flexible(
+          child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              width: screenWidth ,
+              height: screenHeight / 2.7,
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.transparent, width: 1)),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(
+                        Icons.document_scanner_rounded,
+                        color: Color(0xFF1A35C3),
+                      ),
+                      title: Text(
+                        'MODULE DESCRIPTION',
+                        style: GoogleFonts.cabin(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
                     ),
-                    title: Text(
-                      'MODULE DESCRIPTION',
-                      style: GoogleFonts.cabin(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Visibility(
-                    visible: _isVisibled,
-                    child: ListTile(
-                      title: Text(Constants.content[_numberModule]),
-                    ),
-                  )
-                ],
-              ),
-            ))
+                    Visibility(
+                      visible: _isVisibled,
+                      child: ListTile(
+                        title: Text(Constants.content[_numberModule],overflow: TextOverflow.fade,maxLines: 2,softWrap: false,),
+                      ),
+                    )
+                  ],
+                ),
+              )),
+        )
       ],
     );
   }
