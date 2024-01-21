@@ -1,11 +1,22 @@
-import 'package:flutter/cupertino.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/gradient_button.dart';
 import 'package:webvuln/variable.dart';
+
+class SettingProvider extends ChangeNotifier {
+  bool _change = false;
+  // bool get change => _change;
+
+  changeTheme() {
+    _change = !_change;
+    notifyListeners();
+  }
+}
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -15,14 +26,26 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  @override
-  TextEditingController _databaseController = TextEditingController();
-  TextEditingController _formatController = TextEditingController();
-  TextEditingController _locationController = TextEditingController();
-  TextEditingController _fuff_location_Controller = TextEditingController();
+  final TextEditingController _databaseController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _fuff_location_Controller =
+      TextEditingController();
+
+  Future<String> _read() async {
+    String text = '';
+    try {
+      final Directory directory = await getApplicationDocumentsDirectory();
+      final File file = File('F:/webvuln/.env');
+      text = await file.readAsString();
+      print(directory);
+    } catch (e) {
+      print("Couldn't read file");
+    }
+    return text;
+  }
+
   Future<void> _pickFolder({required TextEditingController controller}) async {
     String? directory = (await FilePicker.platform.getDirectoryPath());
-
     if (directory != null) {
       setState(() {
         controller.text = directory;
@@ -30,8 +53,9 @@ class _SettingScreenState extends State<SettingScreen> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
-    bool _switchValue = false;
+    final setting = Provider.of<SettingProvider>(context, listen: false);
     String state = 'PDF';
     List<DropdownMenuItem<String>> dropdownValue = [
       const DropdownMenuItem(value: 'PDF', child: Text('PDF')),
@@ -78,35 +102,27 @@ class _SettingScreenState extends State<SettingScreen> {
                           ],
                         ),
                         child: ListTile(
-                          leading: const Icon(
-                            Icons.data_array,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          title: Text(
-                            "Theme",
-                            style: GoogleFonts.montserrat(
-                                fontSize: 20, color: Colors.white),
-                          ),
-                          subtitle: Text(
-                            "Change application theme",
-                            style: GoogleFonts.montserrat(
-                                fontSize: 16, color: Colors.white),
-                          ),
-                          trailing: Switch(
-                            // thumb color (round icon)
-                            activeColor: Colors.amber,
-                            activeTrackColor: Colors.cyan,
-                            inactiveThumbColor: Colors.blueGrey.shade600,
-                            inactiveTrackColor: Colors.grey.shade400,
-                            splashRadius: 50.0,
-                            // boolean variable value
-                            value: _switchValue,
-                            // changes the state of the switch
-                            onChanged: (value) =>
-                                setState(() => _switchValue = value),
-                          ),
-                        ),
+                            leading: const Icon(
+                              Icons.data_array,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            title: Text(
+                              "Theme",
+                              style: GoogleFonts.montserrat(
+                                  fontSize: 20, color: Colors.white),
+                            ),
+                            subtitle: Text(
+                              "Change application theme",
+                              style: GoogleFonts.montserrat(
+                                  fontSize: 16, color: Colors.white),
+                            ),
+                            trailing: ElevatedButton(
+                                onPressed: () {
+                                  setting.changeTheme();
+                                  print(setting._change.toString());
+                                },
+                                child: const Text('change'))),
                       ),
                       Container(
                         width: double.infinity,
@@ -186,6 +202,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       ),
                       GradientButton(
                           onPressed: () {
+                            _read();
                             setState(() {
                               _databaseController.text =
                                   DotEnv().env['DATABASE_URI'].toString();

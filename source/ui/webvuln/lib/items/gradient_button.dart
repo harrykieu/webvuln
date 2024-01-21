@@ -7,6 +7,7 @@ class GradientButton extends StatelessWidget {
   final Gradient gradient;
   final VoidCallback? onPressed;
   final Widget child;
+  final double? margin;
   final double? horizontalMargin;
   final double? verticalMargin;
 
@@ -14,6 +15,7 @@ class GradientButton extends StatelessWidget {
       {super.key,
       required this.onPressed,
       required this.child,
+      this.margin,
       this.borderRadius,
       this.width,
       this.height = 40.0,

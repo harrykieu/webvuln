@@ -4,7 +4,6 @@ import 'dart:convert';
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/gradient_button.dart';
@@ -26,15 +25,16 @@ class _ResultScreenState extends State<ResultScreen> {
   bool isVisibled = true;
   bool isAppeared = true;
   String state = 'All';
-  String exportState = dotenv.env['DEFAULT_EXPORT_TYPE']!;
+  // String exportState = dotenv.env['DEFAULT_EXPORT_TYPE']!;
+  String exportState = 'pdf';
   List<HistoryTableData> jsonDecoded = [];
   double dialogWidth = MediaQuery.of(Get.context!).size.width / 1.5;
   double dialogHeight = MediaQuery.of(Get.context!).size.height / 2;
 
   @override
+  // bool isVisibled = true;
   void initState() {
     super.initState();
-    isVisibled = true;
     isAppeared = true;
   }
 

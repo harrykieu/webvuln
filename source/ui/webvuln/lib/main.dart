@@ -1,25 +1,62 @@
 // ignore_for_file: camel_case_types, depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import 'package:webvuln/themes/app_themes.dart';
 import 'package:webvuln/views/history.dart';
 import 'package:webvuln/views/resources.dart';
+import 'dart:io';
 import 'package:webvuln/views/scan.dart';
 import 'package:webvuln/views/setting.dart';
 
-void main() async {
-  //TestWidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
-  runApp(const mainScreen());
+
+///TODO: get all function to a class (enum)
+execute() async {
+  try {
+    var result = await Process.run('webvuln.exe', [], runInShell: true, workingDirectory: 'F:/webvuln/dist');
+    print('Exit code: ${result.exitCode}\nstdout: ${result.stdout}\nstderr: ${result.stderr}');
+  } catch (error) {
+    print('Error: $error');
+  }
 }
+
+
+changeTheme(change) =>
+    change == true ? AppTheme.darkTheme : AppTheme.lightTheme;
+
+main() {
+  execute();
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => SettingProvider(),
+      child: const MyApp(),
+    ),
+  );
+}
+
+// class MyAppProvider extends ChangeNotifier {
+//   /// Toggle for dark mode
+//   bool _isDarkMode = false;
+
+//   change() {
+//     /// Change state of darkmode 
+//     _isDarkMode = !_isDarkMode;
+//     notifyListeners();
+//   }
+// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    ThemeData changeMode = AppTheme.lightTheme;
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: changeMode,
+      home: const mainScreen(),
+    );
   }
 }
 
@@ -33,12 +70,10 @@ class mainScreen extends StatefulWidget {
 class _mainScreenState extends State<mainScreen> {
   int _selectedIndex = 0;
   String scanResult = '';
-  @override
-  void initState() {
-    super.initState();
-    _selectedIndex = 0;
-  }
-
+  Widget empty = const SizedBox(
+    height: 20,
+  );
+  final List<String> _listButton = ['Scan', 'History', 'Resources', 'Settings'];
   final List _selectedItem = [
     const ScanScreen(),
     const HistoryScreen(),
@@ -47,86 +82,71 @@ class _mainScreenState extends State<mainScreen> {
   ];
 
   @override
+  initState() {
+    super.initState();
+    _selectedIndex = 0;
+  }
+
+  @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     Get.testMode = true;
-    return GetMaterialApp(
+    
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        drawerEnableOpenDragGesture: false,
         backgroundColor: const Color(0xFF03112e),
         body: Row(
           children: [
             //Drawer Bar
-            Drawer(
+            Container(
                 width: screenWidth * 0.13,
-                backgroundColor: Colors.transparent,
+                height:double.infinity,
+                // backgroundColor: Colors.transparent,
                 child: ListView(
                   children: [
-                    Container(
-                      width: double.infinity,
-                      height: 200,
-                      margin: const EdgeInsets.symmetric(vertical: 30),
-                      child:
-                          const Image(image: AssetImage('lib/assets/logo.png')),
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Image.asset('lib/assets/logo.png', fit: BoxFit.scaleDown),
                     ),
                     button(
                         onPressed: () {
-                          setState(() {
-                            _selectedIndex = 0;
-                          });
+                          setState(() => _selectedIndex = 0);
                         },
                         icon: 'lib/assets/scanner.png',
-                        name: 'Scan'),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                        name: _listButton[0]),
+                    empty,
                     button(
                         onPressed: () {
-                          setState(() {
-                            _selectedIndex = 1;
-                          });
+                          setState(() => _selectedIndex = 1);
                         },
                         icon: 'lib/assets/history.png',
-                        name: 'History'),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                        name: _listButton[1]),
+                    empty,
                     button(
                         onPressed: () {
-                          setState(() {
-                            _selectedIndex = 2;
-                          });
+                          setState(() => _selectedIndex = 2);
                         },
                         icon: 'lib/assets/resources.png',
-                        name: 'Resources'),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                        name: _listButton[2]),
+                    empty,
                     button(
                         onPressed: () {
-                          setState(() {
-                            _selectedIndex = 3;
-                          });
+                          setState(() => _selectedIndex = 3);
                         },
                         icon: 'lib/assets/settings.png',
-                        name: 'Settings'),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                        name: _listButton[3]),
                   ],
                 )),
             // Gradient background
+            //TODO: fix error background screen can't cover all screen 
             Container(
               width: screenWidth - (screenWidth * 0.13),
               // bug: failure in cropping background image
               height: double.infinity,
               decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      bottomLeft: Radius.circular(30)),
                   image: DecorationImage(
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fitWidth,
                       image: AssetImage('lib/assets/background.png'))),
               child: _selectedItem[_selectedIndex],
             )
@@ -145,14 +165,24 @@ class _mainScreenState extends State<mainScreen> {
         style: ElevatedButton.styleFrom(
             minimumSize: const Size(200, 80),
             backgroundColor: Colors.transparent,
-            foregroundColor: Colors.white),
+            foregroundColor: Theme.of(context).colorScheme.secondary),
         child: Column(
-          children: [Image(image: AssetImage(icon)), Text(name)],
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Image.asset(icon),
+            ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 10),
+              child: Text(
+                name,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                softWrap: false,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            )
+          ],
         ));
   }
-
-/*   Stream<int> get _selectedIndexStream =>
-      Stream.fromFuture(Future.delayed(const Duration(milliseconds: 500), () {
-        return _selectedIndex;
-      })); */
 }
