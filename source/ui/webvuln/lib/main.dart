@@ -1,7 +1,6 @@
 // ignore_for_file: camel_case_types, depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:webvuln/themes/app_themes.dart';
 import 'package:webvuln/views/history.dart';
@@ -9,7 +8,6 @@ import 'package:webvuln/views/resources.dart';
 import 'dart:io';
 import 'package:webvuln/views/scan.dart';
 import 'package:webvuln/views/setting.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 ///TODO: get all function to a class (enum)
 execute() async {
