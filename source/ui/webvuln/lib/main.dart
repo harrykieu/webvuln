@@ -29,7 +29,6 @@ changeTheme(change) =>
 
 Future main() async {
   //execute();
-  await dotenv.load(fileName: ".env");
   runApp(
     ChangeNotifierProvider(
       create: (context) => SettingProvider(),
@@ -56,7 +55,6 @@ class MyApp extends StatelessWidget {
 
 class mainScreen extends StatefulWidget {
   const mainScreen({super.key});
-
   @override
   State<mainScreen> createState() => _mainScreenState();
 }
@@ -91,7 +89,7 @@ class _mainScreenState extends State<mainScreen> {
         body: Row(
           children: [
             //Drawer Bar
-            Container(
+            SizedBox(
                 width: screenWidth * 0.13,
                 height: double.infinity,
                 child: ListView(

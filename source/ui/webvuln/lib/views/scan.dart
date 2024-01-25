@@ -39,7 +39,6 @@ class _ScanScreenState extends State<ScanScreen> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width - 200;
-    Get.testMode = true;
     return Column(
       children: [
         const SizedBox(
@@ -103,7 +102,10 @@ class _ScanScreenState extends State<ScanScreen> {
         //Button Scan URL
         GradientButton(
             onPressed: () async {
-              Get.to(const LoadingScreen());
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const LoadingScreen()));
               List<String> listURL = [];
               listURL.add(urlController.text);
               postURL(
@@ -111,14 +113,28 @@ class _ScanScreenState extends State<ScanScreen> {
                 moduleNumber: Constants.valueSelected,
               ).then((result) {
                 if (result == "Failed post data") {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Error'),
+                          content: const Text('Failed post data'),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('OK'))
+                          ],
+                        );
+                      });
+                } else {
                   setState(() {
                     Constants.contentChild =
                         const CircularProgressIndicator.adaptive(
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     );
                   });
-                } else {
-                  Get.to(const LoadingScreen());
                 }
               }).catchError((error) {
                 print(error);
