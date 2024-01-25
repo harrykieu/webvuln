@@ -59,6 +59,7 @@ dependencies:
   external_path: ^1.0.3
   flex_color_scheme: ^7.3.1
   provider: ^6.1.1
+  ini: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -69,7 +70,7 @@ dev_dependencies:
 flutter:
   assets:
     - lib/assets/
-    # - /.env
+    - .env
   uses-material-design: true
 
 window_size:

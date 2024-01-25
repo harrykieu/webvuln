@@ -26,7 +26,8 @@ class _ScanScreenState extends State<ScanScreen> {
   Widget modelBox = Container(
     width: double.infinity,
     margin: const EdgeInsets.only(left: 200, right: 200),
-    height:double.infinity ,);
+    height: double.infinity,
+  );
 
   @override
   initState() {
@@ -38,13 +39,14 @@ class _ScanScreenState extends State<ScanScreen> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width - 200;
+    Get.testMode = true;
     return Column(
       children: [
         const SizedBox(
           height: 100,
         ),
 
-  //TextBox title
+        //TextBox title
         Container(
             margin: const EdgeInsets.only(left: 200, right: 200),
             width: double.infinity,
@@ -63,7 +65,7 @@ class _ScanScreenState extends State<ScanScreen> {
               ),
             )),
 
-  // TextField input url
+        // TextField input url
         Container(
             margin: const EdgeInsets.only(left: 200, right: 200),
             width: double.infinity,
@@ -80,7 +82,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   )),
             )),
 
-  //Box button scan module & description
+        //Box button scan module & description
         Container(
             margin: const EdgeInsets.only(left: 50, right: 50),
             width: double.infinity,
@@ -98,7 +100,7 @@ class _ScanScreenState extends State<ScanScreen> {
         const SizedBox(
           height: 30,
         ),
-  //Button Scan URL
+        //Button Scan URL
         GradientButton(
             onPressed: () async {
               Get.to(const LoadingScreen());
@@ -135,51 +137,56 @@ class _ScanScreenState extends State<ScanScreen> {
     return Row(
       children: [
         // group checkbox module button
-         Container(
-              width: 150,
-              height: double.infinity,
-              margin: const EdgeInsets.all(40),
-              decoration: const BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.all(Radius.circular(20))),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: List.generate(
-                    Constants.nameModule.length,
-                    (index) {
-                      return Row(
-                        children: [
-                          Checkbox(
-                            activeColor: const Color.fromARGB(255, 11, 58, 96),
-                            value: Constants.valueCheckbox[index],
-                            onChanged: (value) {
-                              setState(() {
-                                Constants.valueCheckbox[index] = value!;
-                                _numberModule = index;
-                                if (value) {
-                                  Constants.valueSelected
-                                      .add(Constants.nameModule[index]);
-                                } else {
-                                  Constants.valueSelected
-                                      .remove(Constants.nameModule[index]);
-                                }
-                                if (Constants.valueSelected.isEmpty) {
-                                  _isVisibled = false;
-                                } else {
-                                  _isVisibled = true;
-                                }
-                                print(_numberModule);
-                                print(Constants.valueSelected);
-                              });
-                            },
-                          ),
-                          Text(Constants.nameModule[index],overflow: TextOverflow.ellipsis,maxLines: 1,softWrap: false,),
-                        ],
-                      );  
-                    },
-                  ),
+        Container(
+            width: 150,
+            height: double.infinity,
+            margin: const EdgeInsets.all(40),
+            decoration: const BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            child: SingleChildScrollView(
+              child: Column(
+                children: List.generate(
+                  Constants.nameModule.length,
+                  (index) {
+                    return Row(
+                      children: [
+                        Checkbox(
+                          activeColor: const Color.fromARGB(255, 11, 58, 96),
+                          value: Constants.valueCheckbox[index],
+                          onChanged: (value) {
+                            setState(() {
+                              Constants.valueCheckbox[index] = value!;
+                              _numberModule = index;
+                              if (value) {
+                                Constants.valueSelected
+                                    .add(Constants.nameModule[index]);
+                              } else {
+                                Constants.valueSelected
+                                    .remove(Constants.nameModule[index]);
+                              }
+                              if (Constants.valueSelected.isEmpty) {
+                                _isVisibled = false;
+                              } else {
+                                _isVisibled = true;
+                              }
+                              print(_numberModule);
+                              print(Constants.valueSelected);
+                            });
+                          },
+                        ),
+                        Text(
+                          Constants.nameModule[index],
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          softWrap: false,
+                        ),
+                      ],
+                    );
+                  },
                 ),
-              )),
+              ),
+            )),
         // divide line between the button and description
         const VerticalDivider(
           indent: 40,
@@ -191,7 +198,7 @@ class _ScanScreenState extends State<ScanScreen> {
         Flexible(
           child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-              width: screenWidth ,
+              width: screenWidth,
               height: screenHeight / 2.7,
               decoration: BoxDecoration(
                   border: Border.all(color: Colors.transparent, width: 1)),
@@ -212,7 +219,12 @@ class _ScanScreenState extends State<ScanScreen> {
                     Visibility(
                       visible: _isVisibled,
                       child: ListTile(
-                        title: Text(Constants.content[_numberModule],overflow: TextOverflow.fade,maxLines: 2,softWrap: false,),
+                        title: Text(
+                          Constants.content[_numberModule],
+                          overflow: TextOverflow.fade,
+                          maxLines: 2,
+                          softWrap: false,
+                        ),
                       ),
                     )
                   ],

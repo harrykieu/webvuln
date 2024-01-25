@@ -86,7 +86,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           Container(
             width: screenWidth,
             height: 75,
-            margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+            margin: const EdgeInsets.only(left: 40, right: 40, top: 10),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: Colors.white,
@@ -171,8 +171,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
           // history table
           Container(
               width: screenWidth,
-              height: screenHeight - 220,
-              margin: const EdgeInsets.only(left: 40, right: 40, bottom: 20),
+              height: screenHeight - 175,
+              margin: const EdgeInsets.only(left: 40, right: 40, bottom: 10),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: Colors.white,

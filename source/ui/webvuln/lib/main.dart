@@ -9,24 +9,27 @@ import 'package:webvuln/views/resources.dart';
 import 'dart:io';
 import 'package:webvuln/views/scan.dart';
 import 'package:webvuln/views/setting.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 ///TODO: get all function to a class (enum)
 execute() async {
+  // BUG: can't execute file
   try {
-    var result = await Process.run('webvuln.exe', [], runInShell: true, workingDirectory: 'F:/webvuln/dist');
-    print('Exit code: ${result.exitCode}\nstdout: ${result.stdout}\nstderr: ${result.stderr}');
+    var result = await Process.run('webvuln.exe', [],
+        runInShell: true, workingDirectory: 'F:/webvuln/dist');
+    print(
+        'Exit code: ${result.exitCode}\nstdout: ${result.stdout}\nstderr: ${result.stderr}');
   } catch (error) {
     print('Error: $error');
   }
 }
 
-
 changeTheme(change) =>
     change == true ? AppTheme.darkTheme : AppTheme.lightTheme;
 
-main() {
-  execute();
+Future main() async {
+  //execute();
+  await dotenv.load(fileName: ".env");
   runApp(
     ChangeNotifierProvider(
       create: (context) => SettingProvider(),
@@ -35,16 +38,7 @@ main() {
   );
 }
 
-// class MyAppProvider extends ChangeNotifier {
-//   /// Toggle for dark mode
-//   bool _isDarkMode = false;
-
-//   change() {
-//     /// Change state of darkmode 
-//     _isDarkMode = !_isDarkMode;
-//     notifyListeners();
-//   }
-// }
+// BUG: cant receive data from socket
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -90,8 +84,6 @@ class _mainScreenState extends State<mainScreen> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    Get.testMode = true;
-    
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -101,13 +93,13 @@ class _mainScreenState extends State<mainScreen> {
             //Drawer Bar
             Container(
                 width: screenWidth * 0.13,
-                height:double.infinity,
-                // backgroundColor: Colors.transparent,
+                height: double.infinity,
                 child: ListView(
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: Image.asset('lib/assets/logo.png', fit: BoxFit.scaleDown),
+                      child: Image.asset('lib/assets/logo.png',
+                          fit: BoxFit.scaleDown),
                     ),
                     button(
                         onPressed: () {
@@ -139,10 +131,8 @@ class _mainScreenState extends State<mainScreen> {
                   ],
                 )),
             // Gradient background
-            //TODO: fix error background screen can't cover all screen 
             Container(
               width: screenWidth - (screenWidth * 0.13),
-              // bug: failure in cropping background image
               height: double.infinity,
               decoration: const BoxDecoration(
                   image: DecorationImage(
@@ -173,7 +163,7 @@ class _mainScreenState extends State<mainScreen> {
               child: Image.asset(icon),
             ),
             Padding(
-              padding: EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: 10),
               child: Text(
                 name,
                 overflow: TextOverflow.ellipsis,
