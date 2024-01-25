@@ -4,7 +4,6 @@ import 'dart:convert';
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/gradient_button.dart';
@@ -26,15 +25,14 @@ class _ResultScreenState extends State<ResultScreen> {
   bool isVisibled = true;
   bool isAppeared = true;
   String state = 'All';
-  String exportState = dotenv.env['DEFAULT_EXPORT_TYPE']!;
+  // String exportState = dotenv.env['DEFAULT_EXPORT_TYPE']!;
+  String exportState = 'pdf';
   List<HistoryTableData> jsonDecoded = [];
-  double dialogWidth = MediaQuery.of(Get.context!).size.width / 1.5;
-  double dialogHeight = MediaQuery.of(Get.context!).size.height / 2;
 
   @override
+  // bool isVisibled = true;
   void initState() {
     super.initState();
-    isVisibled = true;
     isAppeared = true;
   }
 
@@ -59,7 +57,8 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   // function to parse data to table based on the selected module
-  List<DataRow> updateTable(String vulnType, List<Vulnerability> data) {
+  List<DataRow> updateTable(String vulnType, List<Vulnerability> data,
+      double dialogWidth, double dialogHeight) {
     List<Vulnerability> newData = [];
     if (vulnType != 'All') {
       for (var obj in data) {
@@ -178,6 +177,8 @@ class _ResultScreenState extends State<ResultScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    double dialogWidth = MediaQuery.of(context).size.width / 2;
+    double dialogHeight = MediaQuery.of(context).size.height / 2;
     Get.testMode = true;
     List<DropdownMenuItem<String>> dropdownValue = [
       const DropdownMenuItem(value: 'All', child: Text('All'))
@@ -314,33 +315,36 @@ class _ResultScreenState extends State<ResultScreen> {
                           )
                         ],
                       ),
-                      child: DataTable2(columns: [
-                        DataColumn2(
-                          label: Text(
-                            'Severity',
-                            style: GoogleFonts.montserrat(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          tooltip: 'Blue - Low, Yellow - Medium, Red - High',
-                        ),
-                        DataColumn2(
-                          label: Text(
-                            'Type',
-                            style: GoogleFonts.montserrat(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          tooltip: 'Type of vulnerability',
-                        ),
-                        DataColumn2(
-                          label: Text(
-                            'Payloads used',
-                            style: GoogleFonts.montserrat(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          tooltip: 'Payloads used to get the result',
-                        ),
-                      ], rows: updateTable(state, listVuln)),
-                      // TODO: make row clickable to show more info
+                      child: DataTable2(
+                          columns: [
+                            DataColumn2(
+                              label: Text(
+                                'Severity',
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              tooltip:
+                                  'Blue - Low, Yellow - Medium, Red - High',
+                            ),
+                            DataColumn2(
+                              label: Text(
+                                'Type',
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              tooltip: 'Type of vulnerability',
+                            ),
+                            DataColumn2(
+                              label: Text(
+                                'Payloads used',
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              tooltip: 'Payloads used to get the result',
+                            ),
+                          ],
+                          rows: updateTable(
+                              state, listVuln, dialogWidth, dialogHeight)),
                     ),
                   ],
                 ),
