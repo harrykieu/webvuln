@@ -462,7 +462,7 @@ class _ResultScreenState extends State<ResultScreen> {
                                                 fontWeight: FontWeight.bold))
                                       ],
                                     ),
-                                    content: Text('$result',
+                                    content: Text(result,
                                         style: GoogleFonts.montserrat(
                                             fontSize: 16,
                                             fontWeight: FontWeight.normal)),

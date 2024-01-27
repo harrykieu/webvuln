@@ -1,14 +1,12 @@
 // ignore_for_file: avoid_print
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/gradient_button.dart';
 import 'package:webvuln/service/api.dart';
-import 'package:webvuln/views/loading.dart';
 import 'package:webvuln/variable.dart';
+import 'package:webvuln/views/loading.dart';
+
 import '../items/input.dart';
 
 class ScanScreen extends StatefulWidget {
@@ -251,6 +249,3 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 }
-// viet them ham nhan data tu backend de setState cho widget trong contentChild
-
-// viết hàm truyền giá trị của 1 biến từ màn ScanScreen sang màn main để màn main nhận định được _selectedIndex của nó chuyển thành 1

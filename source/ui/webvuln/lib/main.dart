@@ -35,8 +35,6 @@ Future main() async {
   );
 }
 
-// BUG: cant receive data from socket
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
