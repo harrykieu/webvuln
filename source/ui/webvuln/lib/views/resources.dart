@@ -419,27 +419,30 @@ class _ResourceScreenState extends State<ResourceScreen> {
                 rows: dataRowList,
               ),
             )),
-        Container(
+        SizedBox(
           height: 50,
           width: screenWidth,
           // margin: EdgeInsets.only(bottom: 5),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              IconButton(onPressed: (){
-                List<dynamic> jsonD = jsonDecode(dataLocal);
+              IconButton(
+                  onPressed: () {
+                    List<dynamic> jsonD = jsonDecode(dataLocal);
                     List<ResourceNormalTableData> newData = jsonD
                         .map((json) => ResourceNormalTableData.fromJson(json))
                         .toList();
                     loadLessData();
                     updateTableNormal(newData, valueEditController, context);
-              }, icon: startIndexData == 0 ? Icon(Icons.delete,color: Colors.white,):Icon(Icons.arrow_back_ios_new_rounded)),
+                  },
+                  icon: startIndexData == 0
+                      ? const Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        )
+                      : const Icon(Icons.arrow_back_ios_new_rounded)),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                // decoration: BoxDecoration(
-                //   borderRadius: BorderRadius.circular(50),
-                //   color: const Color.fromARGB(231, 158, 158, 158),
-                // ),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
                   'Page $indexPage',
                   style: GoogleFonts.montserrat(
@@ -733,7 +736,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
     String fileState = 'valid';
     return Container(
       width: screenWidth,
-      height: screenHeight / 2 - 100,
+      height: screenHeight / 2 - 140,
       margin:
           const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 10),
       decoration: BoxDecoration(

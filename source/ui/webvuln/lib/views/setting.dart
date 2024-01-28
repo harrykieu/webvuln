@@ -8,15 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/gradient_button.dart';
 import 'package:webvuln/variable.dart';
 
-class SettingProvider extends ChangeNotifier {
-  bool _change = false;
-  // bool get change => _change;
-
-  changeTheme() {
-    _change = !_change;
-    notifyListeners();
-  }
-}
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -55,7 +46,7 @@ class _SettingScreenState extends State<SettingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final setting = Provider.of<SettingProvider>(context, listen: false);
+    
     String state = 'PDF';
     List<DropdownMenuItem<String>> dropdownValue = [
       const DropdownMenuItem(value: 'PDF', child: Text('PDF')),
@@ -81,54 +72,12 @@ class _SettingScreenState extends State<SettingScreen> {
                 height: MediaQuery.of(context).size.height - 100,
                 child: SingleChildScrollView(
                   child: Column(
-                    children: [
+                    children:[
                       Container(
                         width: double.infinity,
                         height: 80,
+                        margin: const EdgeInsets.all(10),
                         padding: const EdgeInsets.all(10),
-                        margin: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF4B55B6),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 1,
-                              offset: const Offset(
-                                  0, 1), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                        child: ListTile(
-                            leading: const Icon(
-                              Icons.data_array,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                            title: Text(
-                              "Theme",
-                              style: GoogleFonts.montserrat(
-                                  fontSize: 20, color: Colors.white),
-                            ),
-                            subtitle: Text(
-                              "Change application theme",
-                              style: GoogleFonts.montserrat(
-                                  fontSize: 16, color: Colors.white),
-                            ),
-                            trailing: ElevatedButton(
-                                onPressed: () {
-                                  setting.changeTheme();
-                                  print(setting._change.toString());
-                                },
-                                child: const Text('change'))),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        height: 80,
-                        margin: EdgeInsets.all(10),
-                        padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4B55B6),
                           borderRadius:

@@ -6,7 +6,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
+  sdk: '>=3.1.0 <4.1.0'
 
 dependencies:
   flutter:
@@ -60,6 +60,8 @@ dependencies:
   flex_color_scheme: ^7.3.1
   provider: ^6.1.1
 
+  path: any
+  path_provider: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -68,9 +70,6 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - lib/assets/result.png
-    - lib/assets/scanner.png
-    - lib/assets/Analyze.png
     - lib/assets/
     # - /.env
   uses-material-design: true

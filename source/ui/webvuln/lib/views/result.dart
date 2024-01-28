@@ -22,7 +22,7 @@ class ResultScreen extends StatefulWidget {
 }
 
 class _ResultScreenState extends State<ResultScreen> {
-  bool isVisibled = true;
+
   bool isAppeared = true;
   String state = 'All';
   // String exportState = dotenv.env['DEFAULT_EXPORT_TYPE']!;
@@ -32,7 +32,6 @@ class _ResultScreenState extends State<ResultScreen> {
   double dialogHeight = MediaQuery.of(Get.context!).size.height / 2;
 
   @override
-  // bool isVisibled = true;
   void initState() {
     super.initState();
     isAppeared = true;
@@ -173,6 +172,8 @@ class _ResultScreenState extends State<ResultScreen> {
         .toList();
     return dataRows;
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -434,53 +435,39 @@ class _ResultScreenState extends State<ResultScreen> {
                           }),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 15),
-                      child: GradientButton(
-                        horizontalMargin: 40,
-                        verticalMargin: 10,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(20)),
-                        onPressed: () async {
-                          // TODO: implement export function
-                          String result = await createReport(
-                              result: jsonDecoded, type: exportState);
-                          // ignore: use_build_context_synchronously
-                          showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                    title: Row(
-                                      children: [
-                                        const Icon(Icons.error),
-                                        const SizedBox(width: 5),
-                                        Text('Export status',
-                                            style: GoogleFonts.montserrat(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold))
-                                      ],
-                                    ),
-                                    content: Text('$result',
-                                        style: GoogleFonts.montserrat(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.normal)),
-                                    alignment: Alignment.center,
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text('OK'))
-                                    ],
-                                  ));
-                        },
-                        child: const Text(
-                          'Export',
-                          style: TextStyle(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: GradientButton(
+                          horizontalMargin: 40,
+                          verticalMargin: 10,
+                          borderRadius: const BorderRadius.all(Radius.circular(20)),
+                          onPressed: () async {
+                            // TODO: implement export function
+                            String result = await createReport(
+                                result: jsonDecoded, type: exportState);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: result == 'Success' ? Colors.green : Colors.yellow,
+                                content: Row(
+                                  children: [
+                                    Icon(result == 'Success' ? Icons.done:Icons.warning),
+                                    Text('$result',style:GoogleFonts.montserrat(fontSize:20,color:Colors.black,fontWeight:FontWeight.bold))
+                                  ],
+                                ),
+                                duration: const Duration(seconds: 1), // Adjust the duration as needed
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'Export',
+                            style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
-                              fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
