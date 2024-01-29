@@ -72,6 +72,7 @@ dev_dependencies:
 flutter:
   assets:
     - lib/assets/
+    - config.ini
   uses-material-design: true
 
 window_size:
