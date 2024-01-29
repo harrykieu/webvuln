@@ -48,6 +48,12 @@ class SQLi:
             "quoted string not properly terminated",
         }
 
+        try:
+            response_content = response.content.decode(errors='ignore').lower()
+        except UnicodeDecodeError:
+            print("[-] Unable to decode response content. Skipping the URL.")
+            return False
+
         response_time = response.elapsed.total_seconds()
         if response_time > 10:
             print("[!] Slow response time detected")
@@ -55,18 +61,18 @@ class SQLi:
 
         # Trying dump complex payload
         complex_payload = "1' AND (SELECT * FROM information_schema.tables)='"
-        if complex_payload in response.content.decode().lower():
+        if complex_payload in response_content:
             print("[!] Complex payload was successful")
             return True
 
         # Try dump normal payload
         dump_payload = f"1' UNION SELECT NULL, NULL, @@version;--"
-        if dump_payload in response.content.decode().lower():
+        if dump_payload in response_content:
             print("[!] Data dump was successful")
             return True
 
         for error in errors:
-            if error in response.content.decode().lower():
+            if error in response_content:
                 return True
 
         return False
