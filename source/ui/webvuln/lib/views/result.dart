@@ -22,7 +22,7 @@ class ResultScreen extends StatefulWidget {
 }
 
 class _ResultScreenState extends State<ResultScreen> {
-  bool isVisibled = true;
+
   bool isAppeared = true;
   String state = 'All';
   // String exportState = dotenv.env['DEFAULT_EXPORT_TYPE']!;
@@ -30,7 +30,6 @@ class _ResultScreenState extends State<ResultScreen> {
   List<HistoryTableData> jsonDecoded = [];
 
   @override
-  // bool isVisibled = true;
   void initState() {
     super.initState();
     isAppeared = true;
@@ -172,6 +171,8 @@ class _ResultScreenState extends State<ResultScreen> {
         .toList();
     return dataRows;
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -442,49 +443,39 @@ class _ResultScreenState extends State<ResultScreen> {
                       child: GradientButton(
                         horizontalMargin: 40,
                         verticalMargin: 10,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(20)),
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
                         onPressed: () async {
                           // TODO: implement export function
                           String result = await createReport(
-                              result: jsonDecoded, type: exportState);
-                          // ignore: use_build_context_synchronously
-                          showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                    title: Row(
-                                      children: [
-                                        const Icon(Icons.error),
-                                        const SizedBox(width: 5),
-                                        Text('Export status',
-                                            style: GoogleFonts.montserrat(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold))
-                                      ],
-                                    ),
-                                    content: Text('$result',
-                                        style: GoogleFonts.montserrat(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.normal)),
-                                    alignment: Alignment.center,
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text('OK'))
-                                    ],
-                                  ));
+                            result: jsonDecoded,
+                            type: exportState,
+                          );
+                          // Replaced showDialog with ScaffoldMessenger to show Snackbar
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.green,
+                              content: Text(result, style: GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.normal,color:Colors.black)),
+                              action: SnackBarAction(
+                                label: 'OK',
+                                textColor: Colors.black,
+                                onPressed: () {
+                                  // Code to be executed when the user clicks on the action
+                                },
+                              ),
+                            ),
+                          );
                         },
                         child: const Text(
                           'Export',
                           style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
+
                   ],
                 ),
               ),

@@ -426,7 +426,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
         Container(
           height: 20,
           width: screenWidth,
-          margin: EdgeInsets.only(bottom: 10),
+          margin: const EdgeInsets.only(bottom: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -531,7 +531,6 @@ class _ResourceScreenState extends State<ResourceScreen> {
                   },
                   onChanged: (v) {
                     updateDropdownState(v!);
-                    print(v);
                   }),
             ),
             GradientButton(

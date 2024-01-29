@@ -6,7 +6,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
+  sdk: '>=3.1.0 <4.1.0'
 
 dependencies:
   flutter:
@@ -61,6 +61,8 @@ dependencies:
   provider: ^6.1.1
   ini: ^2.1.0
 
+  path: any
+  path_provider: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -70,7 +72,7 @@ dev_dependencies:
 flutter:
   assets:
     - lib/assets/
-    - .env
+    - config.ini
   uses-material-design: true
 
 window_size:

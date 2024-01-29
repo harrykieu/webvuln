@@ -1,27 +1,24 @@
 // ignore_for_file: avoid_print
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/items/gradient_button.dart';
 import 'package:webvuln/service/api.dart';
-import 'package:webvuln/views/loading.dart';
 import 'package:webvuln/variable.dart';
+import 'package:webvuln/views/loading.dart';
+
 import '../items/input.dart';
 
 class ScanScreen extends StatefulWidget {
-  const ScanScreen({super.key});
+  const ScanScreen({Key? key}) : super(key: key);
 
   @override
   State<ScanScreen> createState() => _ScanScreenState();
 }
 
 class _ScanScreenState extends State<ScanScreen> {
-  //TODO: Get all variable to class enum
   final TextEditingController urlController = TextEditingController();
-  bool _isVisibled = false;
+  bool _isVisible = false;
   int _numberModule = 0;
   Widget modelBox = Container(
     width: double.infinity,
@@ -30,15 +27,15 @@ class _ScanScreenState extends State<ScanScreen> {
   );
 
   @override
-  initState() {
-    setState(() => _numberModule = 0);
+  void initState() {
+    _numberModule = 0;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width - 200;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width - 200;
     return Column(
       children: [
         const SizedBox(
@@ -47,23 +44,23 @@ class _ScanScreenState extends State<ScanScreen> {
 
         //TextBox title
         Container(
-            margin: const EdgeInsets.only(left: 200, right: 200),
-            width: double.infinity,
-            height: 200,
-            decoration: const BoxDecoration(color: Colors.transparent),
-            child: ListTile(
-              title: Text(
-                'WEBVULN',
-                overflow: TextOverflow.fade,
-                maxLines: 1,
-                softWrap: false,
-                style: GoogleFonts.montserrat(
-                    fontSize: 100,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold),
+          margin: const EdgeInsets.only(left: 200, right: 200),
+          width: double.infinity,
+          height: 200,
+          decoration: const BoxDecoration(color: Colors.transparent),
+          child: ListTile(
+            title: Text(
+              'WEBVULN',
+              overflow: TextOverflow.fade,
+              maxLines: 1,
+              softWrap: false,
+              style: GoogleFonts.montserrat(
+                fontSize: 100,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
               ),
             )),
-
+        ),
         // TextField input url
         Container(
             margin: const EdgeInsets.only(left: 200, right: 200),
@@ -182,9 +179,9 @@ class _ScanScreenState extends State<ScanScreen> {
                                     .remove(Constants.nameModule[index]);
                               }
                               if (Constants.valueSelected.isEmpty) {
-                                _isVisibled = false;
+                                _isVisible = false;
                               } else {
-                                _isVisibled = true;
+                                _isVisible = true;
                               }
                               print(_numberModule);
                               print(Constants.valueSelected);
@@ -196,6 +193,7 @@ class _ScanScreenState extends State<ScanScreen> {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                           softWrap: false,
+                          style: GoogleFonts.montserrat(fontSize:16,fontWeight:FontWeight.bold),
                         ),
                       ],
                     );
@@ -210,7 +208,6 @@ class _ScanScreenState extends State<ScanScreen> {
           color: Color(0xFF021361),
           thickness: 2,
         ),
-        // description
         Flexible(
           child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
@@ -233,24 +230,23 @@ class _ScanScreenState extends State<ScanScreen> {
                       ),
                     ),
                     Visibility(
-                      visible: _isVisibled,
-                      child: ListTile(
-                        title: Text(
-                          Constants.content[_numberModule],
-                          overflow: TextOverflow.fade,
-                          maxLines: 2,
-                          softWrap: false,
-                        ),
-                      ),
-                    )
-                  ],
+                  visible: _isVisible,
+                  child: Column(
+                    children: Constants.valueSelected
+                        .map((selectedModule) => ListTile(
+                              title: Text(
+                                Constants.content[Constants.nameModule.indexOf(selectedModule)],
+                                overflow: TextOverflow.fade,
+                                maxLines: 2,
+                                softWrap: false,
+                              ),
+                            ))
+                        .toList(),
+                  ),)
+                  ]),
                 ),
               )),
-        )
       ],
     );
   }
 }
-// viet them ham nhan data tu backend de setState cho widget trong contentChild
-
-// viết hàm truyền giá trị của 1 biến từ màn ScanScreen sang màn main để màn main nhận định được _selectedIndex của nó chuyển thành 1

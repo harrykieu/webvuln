@@ -12,12 +12,6 @@ String baseUrl = 'http://127.0.0.1:5000';
 Options _options = Options(
     headers: {'Content-Type': 'application/json', 'Origin': 'frontend'});
 
-var shell = Shell();
-Future<void> runShell({required String commandLine}) async {
-  var resultRun = await shell.run(commandLine);
-  print(resultRun);
-}
-
 class WebVulnSocket {
   final String url;
   final int port;
@@ -218,6 +212,7 @@ Future<String> createReport(
     final response = await dio.post(url, data: data, options: _options);
     if (response.statusCode == 200 && response.data != {}) {
       print('Create report successfully');
+      print(response.toString());
       return response.toString();
     } else {
       print('Failed to create report');

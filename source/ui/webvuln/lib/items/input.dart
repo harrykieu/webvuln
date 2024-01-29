@@ -1,4 +1,7 @@
+// ignore_for_file: camel_case_types
+
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class inputUser extends StatelessWidget {
   const inputUser({
@@ -17,6 +20,7 @@ class inputUser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      style: GoogleFonts.courierPrime(fontSize:16,fontWeight:FontWeight.w700),
       decoration: InputDecoration(
         fillColor: Colors.white,
         filled: true,

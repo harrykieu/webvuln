@@ -37,9 +37,17 @@ class GradientButton extends StatelessWidget {
       height: height,
       margin: EdgeInsetsDirectional.symmetric(
           horizontal: horizontalMargin, vertical: verticalMargin),
+          padding: EdgeInsets.symmetric(horizontal: 5),
       decoration: BoxDecoration(
         gradient: gradient,
         borderRadius: borderRadius,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.1),
+            blurRadius: 8,
+            offset: Offset(4, 4),
+          )
+        ]
       ),
       child: ElevatedButton(
         onPressed: onPressed,

@@ -1,54 +1,27 @@
-// ignore_for_file: camel_case_types, depend_on_referenced_packages
-
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:provider/provider.dart';
-import 'package:webvuln/themes/app_themes.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/views/history.dart';
 import 'package:webvuln/views/resources.dart';
-import 'dart:io';
 import 'package:webvuln/views/scan.dart';
 import 'package:webvuln/views/setting.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-///TODO: get all function to a class (enum)
-execute() async {
-  // BUG: can't execute file
-  try {
-    var result = await Process.run('webvuln.exe', [],
-        runInShell: true, workingDirectory: 'F:/webvuln/dist');
-    print(
-        'Exit code: ${result.exitCode}\nstdout: ${result.stdout}\nstderr: ${result.stderr}');
-  } catch (error) {
-    print('Error: $error');
-  }
-}
 
-changeTheme(change) =>
-    change == true ? AppTheme.darkTheme : AppTheme.lightTheme;
 
 Future main() async {
   //execute();
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => SettingProvider(),
-      child: const MyApp(),
-    ),
+    const MyApp()
   );
 }
-
-// BUG: cant receive data from socket
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    ThemeData changeMode = AppTheme.lightTheme;
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: changeMode,
-      home: const mainScreen(),
+      home: mainScreen(),
     );
   }
 }
@@ -56,28 +29,19 @@ class MyApp extends StatelessWidget {
 class mainScreen extends StatefulWidget {
   const mainScreen({super.key});
   @override
-  State<mainScreen> createState() => _mainScreenState();
+  State<mainScreen> createState() => _MainScreenState();
 }
 
-class _mainScreenState extends State<mainScreen> {
+class _MainScreenState extends State<mainScreen> {
   int _selectedIndex = 0;
-  String scanResult = '';
-  Widget empty = const SizedBox(
-    height: 20,
-  );
+
   final List<String> _listButton = ['Scan', 'History', 'Resources', 'Settings'];
-  final List _selectedItem = [
+  final List<Widget> _selectedItem = [
     const ScanScreen(),
     const HistoryScreen(),
     const ResourceScreen(),
     const SettingScreen()
   ];
-
-  @override
-  initState() {
-    super.initState();
-    _selectedIndex = 0;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,33 +63,19 @@ class _mainScreenState extends State<mainScreen> {
                       child: Image.asset('lib/assets/logo.png',
                           fit: BoxFit.scaleDown),
                     ),
-                    button(
-                        onPressed: () {
-                          setState(() => _selectedIndex = 0);
-                        },
-                        icon: 'lib/assets/scanner.png',
-                        name: _listButton[0]),
-                    empty,
-                    button(
-                        onPressed: () {
-                          setState(() => _selectedIndex = 1);
-                        },
-                        icon: 'lib/assets/history.png',
-                        name: _listButton[1]),
-                    empty,
-                    button(
-                        onPressed: () {
-                          setState(() => _selectedIndex = 2);
-                        },
-                        icon: 'lib/assets/resources.png',
-                        name: _listButton[2]),
-                    empty,
-                    button(
-                        onPressed: () {
-                          setState(() => _selectedIndex = 3);
-                        },
-                        icon: 'lib/assets/settings.png',
-                        name: _listButton[3]),
+                    for (int i = 0; i < _listButton.length; i++)
+                    Column(
+                      children: [
+                        _buildButton(
+                          onPressed: () {
+                            setState(() => _selectedIndex = i);
+                          },
+                          icon: 'lib/assets/${_listButton[i].toLowerCase()}.png',
+                          name: _listButton[i],
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ],
                 )),
             // Gradient background
@@ -133,9 +83,11 @@ class _mainScreenState extends State<mainScreen> {
               width: screenWidth - (screenWidth * 0.13),
               height: double.infinity,
               decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      fit: BoxFit.fitWidth,
-                      image: AssetImage('lib/assets/background.png'))),
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: AssetImage('lib/assets/background.png'),
+                ),
+              ),
               child: _selectedItem[_selectedIndex],
             )
           ],
@@ -144,10 +96,8 @@ class _mainScreenState extends State<mainScreen> {
     );
   }
 
-  ElevatedButton button(
-      {required Function() onPressed,
-      required String icon,
-      required String name}) {
+  ElevatedButton _buildButton({required Function() onPressed,required String icon,required String name}) {
+
     return ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -167,7 +117,7 @@ class _mainScreenState extends State<mainScreen> {
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 softWrap: false,
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: GoogleFonts.montserrat(fontSize:16,fontWeight:FontWeight.w600,color:Colors.white),
               ),
             )
           ],

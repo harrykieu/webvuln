@@ -33,12 +33,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
       } else {
         // Handle the case where server initialization fails
         print('Error: Server not initialized');
-        return null;
+        return 'Error: Server not initialized ';
       }
     } catch (error) {
       // Handle errors during socket communication
       print('Error during socket communication: $error');
-      return null;
+      return 'Error during socket communiaction ';
     }
   }
 
@@ -55,28 +55,30 @@ class _LoadingScreenState extends State<LoadingScreen> {
     return resultData;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: FutureBuilder<String?>(
-          future: serverResponse,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox(
-                width: 200,
-                height: 200,
-                child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.hasError || snapshot.data == null) {
-              return Text('Error: ${snapshot.error ?? "Unknown error"}');
-            } else {
-              String? snapData = snapshot.data;
-              return ResultScreen(data: extractJson(snapData!));
-            }
-          },
-        ),
+
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Center(
+      child: FutureBuilder<String?>(
+        future: serverResponse,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else if (snapshot.data == null) {
+            // Handle the case where snapshot.data is null
+            return Text('Data is null');
+          } else {
+            // Data has been successfully loaded
+            String extractedData = extractJson(snapshot.data!);
+            return ResultScreen(data: extractedData);
+          }
+        },
       ),
-    );
-  }
+    ),
+  );
+}
 }
