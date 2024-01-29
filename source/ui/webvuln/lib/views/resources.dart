@@ -49,11 +49,13 @@ class _ResourceScreenState extends State<ResourceScreen> {
 
   loadLessData() {
     setState(() {
-      startIndexData -= 11;
-      endIndexData -= 11;
-      if (indexPage < 1) {
+      if (startIndexData < 11) {
+        startIndexData = 0;
+        endIndexData = 10;
         indexPage = 1;
       } else {
+        startIndexData -= 11;
+        endIndexData -= 11;
         indexPage--;
       }
     });
@@ -65,8 +67,6 @@ class _ResourceScreenState extends State<ResourceScreen> {
       endIndexData += 11;
       indexPage++;
     });
-    print(startIndexData);
-    print(endIndexData);
   }
 
   void updateTableNormal(List<ResourceNormalTableData> newData,
@@ -173,7 +173,6 @@ class _ResourceScreenState extends State<ResourceScreen> {
         (1 - 0.13); // 0.13 is width of sidebar
     Widget inputWidget;
     Widget tableWidget;
-    Widget backPageButton;
     if (state == '/filePost') {
       inputWidget = filePost(
         screenHeight: screenHeight,
@@ -181,6 +180,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
         actionController: actionController,
         fileInfo: fileInfo,
         resourceFile: resourceFile,
+        context: context,
       );
       tableWidget = fileSearch(
           screenHeight: screenHeight,
@@ -191,12 +191,12 @@ class _ResourceScreenState extends State<ResourceScreen> {
       //tableWidget =
     } else if (state == '/normalPost') {
       inputWidget = normalPost(
-        screenHeight: screenHeight,
-        screenWidth: screenWidth,
-        vulnTypePostController: vulnTypePostController,
-        typePostController: typePostController,
-        valueController: valueController,
-      );
+          screenHeight: screenHeight,
+          screenWidth: screenWidth,
+          vulnTypePostController: vulnTypePostController,
+          typePostController: typePostController,
+          valueController: valueController,
+          context: context);
       tableWidget = normalSearch(
         screenHeight: screenHeight,
         screenWidth: screenWidth,
@@ -275,8 +275,9 @@ class _ResourceScreenState extends State<ResourceScreen> {
   }) {
     return Container(
       width: screenWidth,
-      height: screenHeight / 2 + 90,
-      margin: const EdgeInsetsDirectional.only(start: 40, end: 40, top: 10),
+      height: screenHeight / 2 + 100,
+      margin: const EdgeInsetsDirectional.only(
+          start: 40, end: 40, top: 10, bottom: 10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: Colors.white,
@@ -289,7 +290,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
           ]),
       child: Column(children: [
         Row(
-          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
               margin: const EdgeInsetsDirectional.only(start: 40),
@@ -306,13 +307,16 @@ class _ResourceScreenState extends State<ResourceScreen> {
                 controller: typeSearchController,
                 content: "Type"),
             GradientButton(
-                // horizontalMargin: 50,
+                horizontalMargin: 40,
                 onPressed: () async {
                   // loadMoreData();
                   String response = await getResourcesNormal(
                       vulnType: vulnTypeSearchController.text,
                       resType: typeSearchController.text);
-                  setState(() => dataLocal = response);
+                  setState(() {
+                    dataLocal = response;
+                    startIndexData = 0;
+                  });
                   if (response == '[]') {
                     showDialog(
                         context: context,
@@ -356,7 +360,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
           ],
         ),
         Container(
-            height: screenHeight / 2 - 60,
+            height: screenHeight / 2 - 40,
             width: screenWidth,
             margin: const EdgeInsetsDirectional.only(
                 start: 40, end: 40, bottom: 10),
@@ -419,14 +423,15 @@ class _ResourceScreenState extends State<ResourceScreen> {
                 rows: dataRowList,
               ),
             )),
-        SizedBox(
-          height: 50,
+        Container(
+          height: 20,
           width: screenWidth,
-          // margin: EdgeInsets.only(bottom: 5),
+          margin: const EdgeInsets.only(bottom: 10),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
+                  padding: const EdgeInsetsDirectional.all(0),
                   onPressed: () {
                     List<dynamic> jsonD = jsonDecode(dataLocal);
                     List<ResourceNormalTableData> newData = jsonD
@@ -450,6 +455,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
                 ),
               ),
               IconButton(
+                  padding: const EdgeInsetsDirectional.all(0),
                   onPressed: () {
                     List<dynamic> jsonD = jsonDecode(dataLocal);
                     List<ResourceNormalTableData> newData = jsonD
@@ -474,7 +480,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
       required BuildContext context}) {
     return Container(
       width: screenWidth,
-      height: screenHeight / 2 + 50,
+      height: screenHeight / 2 + 120,
       margin: const EdgeInsetsDirectional.only(start: 40, end: 40, top: 10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -525,12 +531,14 @@ class _ResourceScreenState extends State<ResourceScreen> {
                   },
                   onChanged: (v) {
                     updateDropdownState(v!);
-                    print(v);
                   }),
             ),
             GradientButton(
                 horizontalMargin: 50,
                 onPressed: () async {
+                  setState(() {
+                    startIndexData = 0;
+                  });
                   String response =
                       await getResourcesFile(description: fileState);
                   if (response == '[]') {
@@ -576,7 +584,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
           ],
         ),
         Container(
-            height: screenHeight / 2 - 70,
+            height: screenHeight / 2,
             width: screenWidth,
             margin: const EdgeInsetsDirectional.symmetric(horizontal: 40),
             decoration: const BoxDecoration(
@@ -641,15 +649,17 @@ class _ResourceScreenState extends State<ResourceScreen> {
     );
   }
 
-  Container normalPost(
-      {required double screenHeight,
-      required double screenWidth,
-      required TextEditingController vulnTypePostController,
-      required TextEditingController typePostController,
-      required TextEditingController valueController}) {
+  Container normalPost({
+    required double screenHeight,
+    required double screenWidth,
+    required TextEditingController vulnTypePostController,
+    required TextEditingController typePostController,
+    required TextEditingController valueController,
+    required BuildContext context,
+  }) {
     return Container(
       width: screenWidth,
-      height: screenHeight / 2 - 100 - 80,
+      height: screenHeight / 2 - 200,
       margin:
           const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 10),
       decoration: BoxDecoration(
@@ -665,6 +675,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Container(
@@ -708,13 +719,62 @@ class _ResourceScreenState extends State<ResourceScreen> {
                       action: "add");
                   if (resp == 'Failed to Post Resources' ||
                       resp.contains('Error post resources')) {
-                    print("Failed to post file");
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                                title: Row(
+                                  children: [
+                                    const Icon(Icons.error),
+                                    const SizedBox(width: 5),
+                                    Text('Error',
+                                        style: GoogleFonts.montserrat(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold))
+                                  ],
+                                ),
+                                content: Text('Failed to post resource!',
+                                    style: GoogleFonts.montserrat(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal)),
+                                alignment: Alignment.center,
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('OK'))
+                                ]));
                   } else {
-                    print("Posted file successfully");
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                                title: Row(
+                                  children: [
+                                    const Icon(Icons.check),
+                                    const SizedBox(width: 5),
+                                    Text('Success',
+                                        style: GoogleFonts.montserrat(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold))
+                                  ],
+                                ),
+                                content: Text(
+                                    'Post resource successfully! Press Find again to see changes!',
+                                    style: GoogleFonts.montserrat(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal)),
+                                alignment: Alignment.center,
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('OK'))
+                                ]));
                   }
                 },
                 horizontalMargin: 40,
-                verticalMargin: 0,
+                verticalMargin: 5,
                 borderRadius: BorderRadius.circular(10),
                 child: const Text(
                   'Send',
@@ -732,11 +792,12 @@ class _ResourceScreenState extends State<ResourceScreen> {
     required TextEditingController actionController,
     required String fileInfo,
     required ResourceFile resourceFile,
+    required BuildContext context,
   }) {
     String fileState = 'valid';
     return Container(
       width: screenWidth,
-      height: screenHeight / 2 - 140,
+      height: screenHeight / 2 - 210,
       margin:
           const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 10),
       decoration: BoxDecoration(
@@ -844,7 +905,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
               children: [
                 Container(
                   width: screenWidth / 2 + 200,
-                  height: screenHeight / 4 - 100,
+                  height: screenHeight / 4 - 140,
                   margin: const EdgeInsetsDirectional.only(
                       start: 40, top: 10, bottom: 10),
                   decoration: BoxDecoration(
@@ -880,9 +941,58 @@ class _ResourceScreenState extends State<ResourceScreen> {
                           action: resourceFile.action!);
                       if (resp == 'Failed to Post Resources' ||
                           resp.contains('Error post resources')) {
-                        print("Failed to post file");
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                    title: Row(
+                                      children: [
+                                        const Icon(Icons.error),
+                                        const SizedBox(width: 5),
+                                        Text('Error',
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold))
+                                      ],
+                                    ),
+                                    content: Text('Failed to post resource!',
+                                        style: GoogleFonts.montserrat(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.normal)),
+                                    alignment: Alignment.center,
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('OK'))
+                                    ]));
                       } else {
-                        print("Posted file successfully");
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                    title: Row(
+                                      children: [
+                                        const Icon(Icons.check),
+                                        const SizedBox(width: 5),
+                                        Text('Success',
+                                            style: GoogleFonts.montserrat(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold))
+                                      ],
+                                    ),
+                                    content: Text(
+                                        'Post resource successfully! Press Find again to see changes!',
+                                        style: GoogleFonts.montserrat(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.normal)),
+                                    alignment: Alignment.center,
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('OK'))
+                                    ]));
                       }
                     },
                     horizontalMargin: 40,
@@ -1538,7 +1648,7 @@ Container postBoxInput(
   return Container(
     width: 350,
     height: 50,
-    margin: const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 20),
+    margin: const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 10),
     child: inputUser(
       controller: controller,
       hintName: content,

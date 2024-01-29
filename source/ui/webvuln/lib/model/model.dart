@@ -101,8 +101,7 @@ class HistoryTableData {
     } catch (e) {
       throw Exception('No result found or invalid result in database');
     }
-    Map<String, dynamic> resultData =
-        resultListJson.first; // TODO: fix this (why first?)
+    Map<String, dynamic> resultData = resultListJson.first;
 
     List<Map<String, dynamic>> vulnListJson =
         List<Map<String, dynamic>>.from(resultData['vulnerabilities']);

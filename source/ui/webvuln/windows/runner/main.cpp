@@ -27,7 +27,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   FlutterWindow window(project);
   Win32Window::Point origin(700, 700);
   Win32Window::Size size(1280, 1000);
-  if (!window.Create(L"Web Vuln scanner ", origin, size)) {
+  if (!window.Create(L"WebVuln 1.0.0", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);

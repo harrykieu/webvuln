@@ -2,6 +2,7 @@ import json
 import os
 import re
 from base64 import b64decode
+import time
 
 import requests
 from bs4 import BeautifulSoup
@@ -26,10 +27,10 @@ class FileUpload:
         self.green = "\033[32m"  # Green color code for text output
         self.blue = "\033[94m"  # Light blue color code for text output
 
-    def getCSRFToken(self) -> str:
+    def getCSRFToken(self, url) -> str:
         """Get CSRF token for the login page of the website."""
-        r = self.session.get(self.url, cookies=self.cookies)
-        soup = BeautifulSoup(r.text, "html.parser")
+        r = self.session.get(url, cookies=self.cookies, allow_redirects=True)
+        soup = BeautifulSoup(r.content, "html.parser")
         usrtkSoup = soup.find_all("input", attrs={"name": "user_token"})
         if usrtkSoup:
             self.csrfExist = True
@@ -45,9 +46,9 @@ class FileUpload:
         if not self.isDVWA:
             return
         payload = {"username": "admin", "password": "password", "Login": "Login"}
-        with self.session as c:
-            r = c.get("http://localhost/dvwa/login.php")
-            token = self.getCSRFToken()
+        self.session = requests.Session()
+        with self.session as c:  # TODO: get base url from provided url
+            token = self.getCSRFToken("http://localhost/dvwa/login.php")
             payload["user_token"] = token
             c.post("http://localhost/dvwa/login.php", data=payload)
             self.cookies = c.cookies
@@ -58,9 +59,11 @@ class FileUpload:
         """(For DVWA only) Change DVWA security level."""
         if not self.isDVWA:
             return
-        userToken = self.getCSRFToken()
+        userToken = self.getCSRFToken("http://localhost/dvwa/security.php")
         data = {"security": level, "seclev_submit": "Submit", "user_token": userToken}
-        r = self.session.post("http://localhost/dvwa/security.php", data=data)
+        r = self.session.post(
+            "http://localhost/dvwa/security.php", data=data, cookies=self.cookies
+        )
         if r.status_code == 200:
             print(f"{self.green}[+] Security level changed to {level}!{self.white}")
             utils.log(
@@ -71,7 +74,7 @@ class FileUpload:
         return r
 
     def getAllForms(self, url):
-        r = self.session.get(url, cookies=self.cookies)
+        r = self.session.get(url, cookies=self.cookies, allow_redirects=True)
         soup = BeautifulSoup(r.text, "html.parser")
         forms = soup.find_all("form", attrs={"enctype": "multipart/form-data"})
         if not forms:
@@ -183,8 +186,10 @@ class FileUpload:
                         }
                     )
             if self.csrfExist and self.isDVWA:
-                payload.update({"user_token": self.getCSRFToken()})
-            p = self.session.post(self.url, files=payload, cookies=self.cookies)
+                payload.update({"user_token": self.getCSRFToken(self.url)})
+            p = self.session.post(
+                self.url, files=payload, cookies=self.cookies, allow_redirects=True
+            )
             if p.history != []:
                 if p.history[0].status_code == 301 or p.history[0].status_code == 302:
                     print(
@@ -197,12 +202,16 @@ class FileUpload:
                     )
                     return self.isVuln
             if p.status_code != 200:
-                print(f"{self.red}[!] File upload failed!{self.white}")
-                utils.log("[FileUpload] File upload failed!", "ERROR", "fileUpload.txt")
+                print(f"{self.red}[!] Valid file upload failed!{self.white}")
+                utils.log(
+                    "[FileUpload] Valid file upload failed!", "ERROR", "fileUpload.txt"
+                )
                 self.isVuln = False
             elif self.checkSuccess(p.text) is False:
-                print(f"{self.red}[!] File upload failed!{self.white}")
-                utils.log("[FileUpload] File upload failed!", "ERROR", "fileUpload.txt")
+                print(f"{self.red}[!] Valid file upload failed!{self.white}")
+                utils.log(
+                    "[FileUpload] Valid file upload failed!", "ERROR", "fileUpload.txt"
+                )
                 self.isVuln = False
             else:
                 print(f"{self.green}[!] Valid file upload success!{self.white}")
@@ -243,8 +252,11 @@ class FileUpload:
                         }
                     )
             if self.csrfExist and self.isDVWA:
-                payload.update({"user_token": self.getCSRFToken()})
-            p = self.session.post(self.url, files=payload, cookies=self.cookies)
+                payload.update({"user_token": self.getCSRFToken(self.url)})
+            print(payload)
+            p = self.session.post(
+                self.url, files=payload, cookies=self.cookies, allow_redirects=True
+            )
             if p.status_code != 200:
                 print(f"{self.red}[!] File upload failed!{self.white}")
                 utils.log("[FileUpload] File upload failed!", "ERROR", "fileUpload.txt")
@@ -288,11 +300,8 @@ class FileUpload:
                             }
                         )
                 if self.csrfExist and self.isDVWA:
-                    payload.update({"user_token": self.getCSRFToken()})
-                p = self.session.post(
-                    self.url,
-                    files=payload,
-                )
+                    payload.update({"user_token": self.getCSRFToken(self.url)})
+                p = self.session.post(self.url, files=payload, allow_redirects=True)
                 if p.status_code != 200:
                     print(f"{self.red}[!] File upload failed!{self.white}")
                     utils.log(

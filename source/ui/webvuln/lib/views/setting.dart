@@ -1,12 +1,9 @@
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:webvuln/items/gradient_button.dart';
-import 'package:webvuln/variable.dart';
+import 'package:ini/ini.dart';
+import 'package:webvuln/items/input.dart';
+import 'package:file_picker/file_picker.dart';
 
 
 class SettingScreen extends StatefulWidget {
@@ -17,42 +14,52 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
+  late Config config;
   final TextEditingController _databaseController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _fuff_location_Controller =
-      TextEditingController();
+  late String state;
+  List<DropdownMenuItem<String>> dropdownValue = [
+    const DropdownMenuItem(key: Key('PDF'), value: 'PDF', child: Text('PDF')),
+    const DropdownMenuItem(key: Key('XML'), value: 'XML', child: Text('XML')),
+    const DropdownMenuItem(
+        key: Key('JSON'), value: 'JSON', child: Text('JSON')),
+  ];
 
-  Future<String> _read() async {
-    String text = '';
-    try {
-      final Directory directory = await getApplicationDocumentsDirectory();
-      final File file = File('F:/webvuln/.env');
-      text = await file.readAsString();
-      print(directory);
-    } catch (e) {
-      print("Couldn't read file");
-    }
-    return text;
+  @override
+  void initState() {
+    super.initState();
+    config = Config.fromStrings(File("config.ini").readAsLinesSync());
+    _databaseController.text =
+        config.get('database', 'uri').toString().replaceAll('\'', '');
+    _locationController.text = config
+        .get('export', 'default_location')
+        .toString()
+        .replaceAll('\'', '');
+    state =
+        config.get('export', 'default_type').toString().replaceAll('\'', '');
   }
 
-  Future<void> _pickFolder({required TextEditingController controller}) async {
-    String? directory = (await FilePicker.platform.getDirectoryPath());
-    if (directory != null) {
-      setState(() {
-        controller.text = directory;
-      });
+  @override
+  void dispose() {
+    _databaseController.dispose();
+    _locationController.dispose();
+    super.dispose();
+  }
+
+  void saveConfig(
+      TextEditingController controller, String section, String configKey) {
+    if (controller.text != '') {
+      config.set(section, configKey, '\'${controller.text}\'');
+      File('config.ini').writeAsStringSync(config.toString());
+      setState(() {});
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    
-    String state = 'PDF';
-    List<DropdownMenuItem<String>> dropdownValue = [
-      const DropdownMenuItem(value: 'PDF', child: Text('PDF')),
-      const DropdownMenuItem(value: 'XML', child: Text('XML')),
-      const DropdownMenuItem(value: 'JSON', child: Text('JSON')),
-    ];
+    double width = MediaQuery.of(context).size.width * 0.87;
+    double height = MediaQuery.of(context).size.height - 50;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF0F0F0),
       appBar: AppBar(
@@ -64,242 +71,303 @@ class _SettingScreenState extends State<SettingScreen> {
               GoogleFonts.montserrat(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       )),
-      body: SingleChildScrollView(
+      body: Container(
+        width: width,
+        height: height,
+        margin: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 2,
+                offset: const Offset(0, 2), // changes position of shadow
+              )
+            ]),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            container(context,
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height - 100,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children:[
-                      Container(
-                        width: double.infinity,
-                        height: 80,
-                        margin: const EdgeInsets.all(10),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF4B55B6),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 1,
-                              offset: const Offset(
-                                  0, 1), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                        child: ListTile(
-                          leading: const Icon(
-                            Icons.file_copy_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          title: Text(
-                            "File format export:",
-                            style: GoogleFonts.montserrat(
-                                fontSize: 20, color: Colors.white),
-                          ),
-                          subtitle: Text(
-                            "Default file format to export",
-                            style: GoogleFonts.montserrat(
-                                fontSize: 16, color: Colors.white),
-                          ),
-                          trailing: dropdownButton(state, dropdownValue),
-                        ),
-                      ),
-                      listtile(context,
-                          title: 'Database IP:             ',
-                          trailing: IconButton(
-                              onPressed: () {
-                                print(_databaseController.text);
-                              },
-                              icon: const Icon(
-                                Icons.save_as_outlined,
-                                color: Colors.white,
-                              )),
-                          controller: _databaseController),
-                      listtile(context,
-                          title: 'Change export location:',
-                          trailing: IconButton(
-                              onPressed: () {
-                                _pickFolder(controller: _locationController);
-                              },
-                              icon: const Icon(
-                                Icons.folder,
-                                color: Colors.white,
-                              )),
-                          controller: _locationController),
-                      listtile(context,
-                          title: 'Fuff location:            ',
-                          trailing: IconButton(
-                              onPressed: () {
-                                _pickFolder(
-                                    controller: _fuff_location_Controller);
-                              },
-                              icon: const Icon(
-                                Icons.folder,
-                                color: Colors.white,
-                              )),
-                          controller: _fuff_location_Controller),
-                      SizedBox(
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height / 5,
-                      ),
-                      GradientButton(
-                          onPressed: () {
-                            _read();
-                            setState(() {
-                              _databaseController.text =
-                                  DotEnv().env['DATABASE_URI'].toString();
-                            });
-                            Constants(
-                                directtoryDownload: _locationController.text,
-                                fuffLocation: _fuff_location_Controller.text,
-                                databaseIp: _databaseController.text);
-                          },
-                          child: Text(
-                            'Save',
-                            style: GoogleFonts.montserrat(
-                                fontSize: 20, color: Colors.white),
-                          ))
-                    ],
+            Container(
+              width: width,
+              height: 50,
+              margin: const EdgeInsetsDirectional.symmetric(
+                  horizontal: 40, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ListTile(
+                      leading: const Icon(Icons.dns),
+                      title: Text("Database URI",
+                          style: GoogleFonts.montserrat(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                    ),
                   ),
-                ))
+                  SizedBox(
+                    width: width - 800,
+                    height: 40,
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        fillColor: Colors.white,
+                        filled: true,
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 20.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 1.0),
+                        ),
+                        suffixIcon: Icon(Icons.text_fields),
+                      ),
+                      controller: _databaseController,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  IconButton(
+                      onPressed: () {
+                        saveConfig(_databaseController, 'database', 'uri');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.greenAccent,
+                            content: Text('Save config success', style: GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.normal,color:Colors.black)),
+                            action: SnackBarAction(
+                              label: 'OK',
+                              textColor: Colors.black,
+                              onPressed: () {
+                                // Code to be executed when the user clicks on the action
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.save,
+                        color: Colors.black,
+                      )),
+                ],
+              ),
+            ),
+            Container(
+              width: width,
+              height: 50,
+              margin: const EdgeInsetsDirectional.symmetric(
+                  horizontal: 40, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ListTile(
+                      leading: const Icon(Icons.folder),
+                      title: Text("Default export location",
+                          style: GoogleFonts.montserrat(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  SizedBox(
+                    width: width - 850,
+                    height: 40,
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        fillColor: Colors.white,
+                        filled: true,
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 20.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 1.0),
+                        ),
+                        suffixIcon: Icon(Icons.text_fields),
+                      ),
+                      controller: _locationController,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  IconButton(
+                      onPressed: () {
+                        FilePicker.platform.getDirectoryPath().then((value) {
+                          setState(() {
+                            _locationController.text =
+                                value!.replaceAll('\\', '\\\\');
+                          });
+                        });
+                      },
+                      icon: const Icon(Icons.folder_open)),
+                  const SizedBox(width: 10),
+                  IconButton(
+                      onPressed: () {
+                        saveConfig(
+                            _locationController, 'export', 'default_location');
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  title: const Row(
+                                    children: [
+                                      Icon(Icons.check_circle),
+                                      SizedBox(width: 10),
+                                      Text('Success')
+                                    ],
+                                  ),
+                                  content:
+                                      const Text('Save config successfully!'),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('OK'))
+                                  ],
+                                ));
+                      },
+                      icon: const Icon(
+                        Icons.save,
+                        color: Colors.black,
+                      )),
+                ],
+              ),
+            ),
+            Container(
+              width: width,
+              height: 50,
+              margin: const EdgeInsetsDirectional.symmetric(
+                  horizontal: 40, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ListTile(
+                      leading: const Icon(Icons.file_open),
+                      title: Text("Default export type",
+                          style: GoogleFonts.montserrat(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  SizedBox(
+                    width: width - 800,
+                    height: 40,
+                    child: DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                            fillColor: Colors.white,
+                            filled: true,
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 20.0),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                              borderSide:
+                                  BorderSide(color: Colors.black, width: 1.0),
+                            )),
+                        focusColor: const Color(0xFFF0F0F0),
+                        style: GoogleFonts.montserrat(
+                            fontSize: 20, color: Colors.black),
+                        icon: const Icon(Icons.arrow_drop_down,
+                            color: Colors.black),
+                        dropdownColor: Colors.white,
+                        value: state,
+                        items: dropdownValue,
+                        onSaved: (v) {
+                          setState(() {
+                            state = v!;
+                          });
+                        },
+                        onChanged: (v) {
+                          setState(() {
+                            state = v!;
+                          });
+                        }),
+                  ),
+                  const SizedBox(width: 10),
+                  IconButton(
+                      onPressed: () {
+                        config.set('export', 'default_type', '\'$state\'');
+                        File('config.ini').writeAsStringSync(config.toString());
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  title: const Row(
+                                    children: [
+                                      Icon(Icons.check_circle),
+                                      SizedBox(width: 10),
+                                      Text('Success')
+                                    ],
+                                  ),
+                                  content:
+                                      const Text('Save config successfully!'),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('OK'))
+                                  ],
+                                ));
+                      },
+                      icon: const Icon(
+                        Icons.save,
+                        color: Colors.black,
+                      )),
+                ],
+              ),
+            ),
+            SizedBox(height: height - 300),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 40),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'About',
+                    style: GoogleFonts.montserrat(
+                        fontSize: 20, fontWeight: FontWeight.normal),
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        showAboutDialog(
+                            context: context,
+                            applicationIcon: Image.asset(
+                              'lib/assets/logo.png',
+                              width: 75,
+                              height: 75,
+                            ),
+                            applicationName: 'WebVuln',
+                            applicationVersion: '1.0.0',
+                            children: [
+                              const Text(
+                                'WebVuln is a web vulnerability scanner that helps you to scan vulnerabilities in your web application.',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              const Text('This project is developed by:',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              const Text(
+                                  'Kieu Huy Hai,\nVu Duc Hieu,\nBui Cong Hoang,\nDoan Tri Tien,\nLe Trong Tan')
+                            ]);
+                      },
+                      icon: const Icon(Icons.help_outline)),
+                ],
+              ),
+            )
           ],
         ),
       ),
     );
   }
 
-  Container dropdownButton(
-      String state, List<DropdownMenuItem<String>> dropdownValue) {
+  Container boxInput(
+      {required TextEditingController controller, required String content}) {
     return Container(
-      margin: const EdgeInsetsDirectional.only(end: 40),
-      width: 150,
-      height: 40,
-      child: DropdownButtonFormField<String>(
-          decoration: const InputDecoration(
-            icon: Icon(
-              Icons.filter_alt_outlined,
-              size: 30,
-              color: Colors.white,
-            ),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
-                borderSide: BorderSide(color: Colors.white)),
-            contentPadding: EdgeInsetsDirectional.only(start: 15),
-          ),
-          focusColor: const Color(0xFFF0F0F0),
-          iconEnabledColor: Colors.white,
-          style: GoogleFonts.montserrat(fontSize: 20, color: Colors.black),
-          iconDisabledColor: Colors.white,
-          icon: const Icon(Icons.arrow_drop_down),
-          dropdownColor: Colors.white,
-          value: state,
-          items: dropdownValue,
-          onSaved: (v) {
-            setState(() {
-              state = v!;
-            });
-          },
-          onChanged: (v) {
-            setState(() {
-              state = v!;
-            });
-          }),
-    );
-  }
-
-  ListTile listtile(BuildContext context,
-      {required String title,
-      required Widget trailing,
-      required TextEditingController controller}) {
-    return ListTile(
-        title: Text(
-          title,
-          style: GoogleFonts.montserrat(
-              fontSize: 20, fontWeight: FontWeight.normal),
-        ),
-        subtitle: Container(
-            width: MediaQuery.of(context).size.width / 3,
-            height: 80,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFF4B55B6),
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 1,
-                  offset: const Offset(0, 1), // changes position of shadow
-                ),
-              ],
-            ),
-            child: ListTile(
-              leading: Text(title,
-                  style: GoogleFonts.montserrat(
-                      fontSize: 20,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.white)),
-              title: Theme(
-                data:
-                    Theme.of(context).copyWith(splashColor: Colors.transparent),
-                child: TextField(
-                  controller: controller,
-                  autofocus: false,
-                  style: const TextStyle(fontSize: 22.0, color: Colors.black),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: 'Type here...',
-                    hintStyle: GoogleFonts.montserrat(
-                        fontSize: 20,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.black),
-                    contentPadding: const EdgeInsets.only(
-                        left: 14.0, bottom: 8.0, top: 8.0),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.white),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onSubmitted: (value) {
-                    setState(() {
-                      _locationController.text = value;
-                    });
-                  },
-                ),
-              ),
-              trailing: trailing,
-            )));
-  }
-
-  Container container(BuildContext context,
-      {required double width, required double height, required Widget child}) {
-    return Container(
-      width: width,
-      height: height,
-      margin: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 2,
-              offset: const Offset(0, 2), // changes position of shadow
-            )
-          ]),
-      child: child,
+      width: 950,
+      height: 50,
+      margin:
+          const EdgeInsetsDirectional.symmetric(horizontal: 40, vertical: 10),
+      child: inputUser(
+        controller: controller,
+        hintName: content,
+        underIcon: const Icon(Icons.text_fields),
+      ),
     );
   }
 }

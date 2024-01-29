@@ -28,8 +28,6 @@ class _ResultScreenState extends State<ResultScreen> {
   // String exportState = dotenv.env['DEFAULT_EXPORT_TYPE']!;
   String exportState = 'pdf';
   List<HistoryTableData> jsonDecoded = [];
-  double dialogWidth = MediaQuery.of(Get.context!).size.width / 1.5;
-  double dialogHeight = MediaQuery.of(Get.context!).size.height / 2;
 
   @override
   void initState() {
@@ -58,7 +56,8 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   // function to parse data to table based on the selected module
-  List<DataRow> updateTable(String vulnType, List<Vulnerability> data) {
+  List<DataRow> updateTable(String vulnType, List<Vulnerability> data,
+      double dialogWidth, double dialogHeight) {
     List<Vulnerability> newData = [];
     if (vulnType != 'All') {
       for (var obj in data) {
@@ -179,6 +178,8 @@ class _ResultScreenState extends State<ResultScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    double dialogWidth = MediaQuery.of(context).size.width / 2;
+    double dialogHeight = MediaQuery.of(context).size.height / 2;
     Get.testMode = true;
     List<DropdownMenuItem<String>> dropdownValue = [
       const DropdownMenuItem(value: 'All', child: Text('All'))
@@ -315,33 +316,36 @@ class _ResultScreenState extends State<ResultScreen> {
                           )
                         ],
                       ),
-                      child: DataTable2(columns: [
-                        DataColumn2(
-                          label: Text(
-                            'Severity',
-                            style: GoogleFonts.montserrat(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          tooltip: 'Blue - Low, Yellow - Medium, Red - High',
-                        ),
-                        DataColumn2(
-                          label: Text(
-                            'Type',
-                            style: GoogleFonts.montserrat(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          tooltip: 'Type of vulnerability',
-                        ),
-                        DataColumn2(
-                          label: Text(
-                            'Payloads used',
-                            style: GoogleFonts.montserrat(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          tooltip: 'Payloads used to get the result',
-                        ),
-                      ], rows: updateTable(state, listVuln)),
-                      // TODO: make row clickable to show more info
+                      child: DataTable2(
+                          columns: [
+                            DataColumn2(
+                              label: Text(
+                                'Severity',
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              tooltip:
+                                  'Blue - Low, Yellow - Medium, Red - High',
+                            ),
+                            DataColumn2(
+                              label: Text(
+                                'Type',
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              tooltip: 'Type of vulnerability',
+                            ),
+                            DataColumn2(
+                              label: Text(
+                                'Payloads used',
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              tooltip: 'Payloads used to get the result',
+                            ),
+                          ],
+                          rows: updateTable(
+                              state, listVuln, dialogWidth, dialogHeight)),
                     ),
                   ],
                 ),
@@ -435,39 +439,43 @@ class _ResultScreenState extends State<ResultScreen> {
                           }),
                     ),
                     Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: GradientButton(
-                          horizontalMargin: 40,
-                          verticalMargin: 10,
-                          borderRadius: const BorderRadius.all(Radius.circular(20)),
-                          onPressed: () async {
-                            // TODO: implement export function
-                            String result = await createReport(
-                                result: jsonDecoded, type: exportState);
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                backgroundColor: result == 'Success' ? Colors.green : Colors.yellow,
-                                content: Row(
-                                  children: [
-                                    Icon(result == 'Success' ? Icons.done:Icons.warning),
-                                    Text('$result',style:GoogleFonts.montserrat(fontSize:20,color:Colors.black,fontWeight:FontWeight.bold))
-                                  ],
-                                ),
-                                duration: const Duration(seconds: 1), // Adjust the duration as needed
+                      padding: const EdgeInsets.only(top: 15),
+                      child: GradientButton(
+                        horizontalMargin: 40,
+                        verticalMargin: 10,
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        onPressed: () async {
+                          // TODO: implement export function
+                          String result = await createReport(
+                            result: jsonDecoded,
+                            type: exportState,
+                          );
+                          // Replaced showDialog with ScaffoldMessenger to show Snackbar
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.green,
+                              content: Text(result, style: GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.normal,color:Colors.black)),
+                              action: SnackBarAction(
+                                label: 'OK',
+                                textColor: Colors.black,
+                                onPressed: () {
+                                  // Code to be executed when the user clicks on the action
+                                },
                               ),
-                            );
-                          },
-                          child: const Text(
-                            'Export',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
                             ),
+                          );
+                        },
+                        child: const Text(
+                          'Export',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
+                    ),
+
                   ],
                 ),
               ),

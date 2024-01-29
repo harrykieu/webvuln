@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:process_run/process_run.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:webvuln/views/history.dart';
 import 'package:webvuln/views/resources.dart';
 import 'package:webvuln/views/scan.dart';
 import 'package:webvuln/views/setting.dart';
 
-void main() {
-  execute();
-  runApp(const MyApp());
-}
 
-void execute(){
-  try {
-    var shell = Shell();
-    shell.run('cd ../../../ & python webvuln.py');
-    print('\n [Logs Backend]:\n${shell.toString()}');
-  } catch (e) {
-    print(e);
-  }
+
+Future main() async {
+  //execute();
+  runApp(
+    const MyApp()
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -28,19 +21,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const MainScreen(),
+      home: mainScreen(),
     );
   }
 }
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
-
+class mainScreen extends StatefulWidget {
+  const mainScreen({super.key});
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<mainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<mainScreen> {
   int _selectedIndex = 0;
 
   final List<String> _listButton = ['Scan', 'History', 'Resources', 'Settings'];
@@ -54,33 +46,41 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    Get.testMode = true;
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: const Color(0xFF03112e),
         body: Row(
           children: [
-            // Drawer Bar
-            Container(
-              width: screenWidth * 0.16,
-              height: double.infinity,
-              child: ListView(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Image.asset('lib/assets/logo.png',
-                        fit: BoxFit.scaleDown),
-                  ),
-                  for (int i = 0; i < _listButton.length; i++)
-                    _buildButton(i, screenWidth),
-                ],
-              ),
-            ),
+            //Drawer Bar
+            SizedBox(
+                width: screenWidth * 0.13,
+                height: double.infinity,
+                child: ListView(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Image.asset('lib/assets/logo.png',
+                          fit: BoxFit.scaleDown),
+                    ),
+                    for (int i = 0; i < _listButton.length; i++)
+                    Column(
+                      children: [
+                        _buildButton(
+                          onPressed: () {
+                            setState(() => _selectedIndex = i);
+                          },
+                          icon: 'lib/assets/${_listButton[i].toLowerCase()}.png',
+                          name: _listButton[i],
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ],
+                )),
             // Gradient background
             Container(
-              width: screenWidth - (screenWidth * 0.16),
+              width: screenWidth - (screenWidth * 0.13),
               height: double.infinity,
               decoration: const BoxDecoration(
                 image: DecorationImage(
@@ -96,39 +96,31 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  ElevatedButton _buildButton(int index, double screenWidth) {
-    double paddingSize = MediaQuery.of(context).size.width * 0.005;
+  ElevatedButton _buildButton({required Function() onPressed,required String icon,required String name}) {
 
     return ElevatedButton(
-      onPressed: () {
-        setState(() => _selectedIndex = index);
-      },
-      style: ElevatedButton.styleFrom(
-        minimumSize: Size(screenWidth * 0.1, 80),
-        backgroundColor: Colors.transparent,
-        foregroundColor: Theme.of(context).colorScheme.secondary,
-      ),
-      child: Row(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(paddingSize),
-            child: Image.asset(
-                'lib/assets/${_listButton[index].toLowerCase()}.png',
-                height: 28),
-          ),
-          SizedBox(
-            width: 8,
-          ),
-          Text(
-            _listButton[index],
-            overflow: TextOverflow.fade,
-            maxLines: 1,
-            softWrap: false,
-            style: const TextStyle(
-                fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
-          ),
-        ],
-      ),
-    );
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+            minimumSize: const Size(200, 80),
+            backgroundColor: Colors.transparent,
+            foregroundColor: Theme.of(context).colorScheme.secondary),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Image.asset(icon),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                name,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                softWrap: false,
+                style: GoogleFonts.montserrat(fontSize:16,fontWeight:FontWeight.w600,color:Colors.white),
+              ),
+            )
+          ],
+        ));
   }
 }
