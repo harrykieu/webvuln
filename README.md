@@ -16,7 +16,7 @@ A website vulnerability scanner for coders without any knowledge of web security
 - Add self-written modules
 - Export a report in PDF/XML/JSON format
 ## System Architecture
-![Architecture](./assets/architecture.png)
+![Architecture](./assets/arch.png)
 ## Database Schema
 ![Database Schema](./assets/db.png)
 ## Data Sequence Diagram
