@@ -159,7 +159,7 @@ class WebVuln:
             )
             return "Failed"
         for url in urls:
-            filename = f"scanresult_url{urls.index(url)}.json"
+            filename = f"{ROOTPATH}/logs/scanresult_url{urls.index(url)}.json"
             jsonFiles.append(filename)
             # For using ffuf or dirsearch (if needed)
             if "ffuf" in modules:

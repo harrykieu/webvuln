@@ -27,12 +27,13 @@ A website vulnerability scanner for coders without any knowledge of web security
 [Here](https://docs.google.com/document/d/1q2712vtjwxAC53eEqRq5TR32uh3Rn8zE73PcZUIBzOs/edit?usp=sharing)
 ## Figma
 [Here](https://www.figma.com/file/GaYOiOhGOmMFxXdlmdPTDr/Project-Scanner-website?type=design&node-id=0-1&mode=design)
-## Install for pdfkit-generate report as PDF
+## Install pdfkit to generate report as PDF
 https://github.com/JazzCore/python-pdfkit/wiki/Installing-wkhtmltopdf                                      
-- Guide: https://www.youtube.com/watch?v=XX9nhxVF8Z4
+Guide: https://www.youtube.com/watch?v=XX9nhxVF8Z4
 ## How to run
 - Install Docker
 - Run `docker-compose up` at the `source\\core\\database` directory
 - Add mongoURI to the `.env_example` file at the root directory and rename it to `.env`
 - Run `setup.py` file to add all resources to the database
 - Run `webvuln.py` file to start the API server and backend
+- Change directory to `source\\ui\\webvuln` and run `flutter run -d windows` to start the GUI.
